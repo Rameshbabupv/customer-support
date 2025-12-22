@@ -31,9 +31,11 @@ Lowercase, hyphenated. Living docs have no date; versioned docs use `-yyyy-mmm-d
 
 ## Project Docs
 
-- `docs/architecture.md` - Stack, folder structure, data models
+- `docs/product.md` - User personas, user stories, MVP scope
+- `docs/architecture.md` - Stack, flow, roles, SLA, data models
 - `docs/api.md` - API endpoints reference
 - `AGENTS.md` - Beads workflow, session completion protocol
+- `beads` - Epics/features/tasks with acceptance criteria (`bd show <id>`)
 
 ## STAGE Protocol
 
