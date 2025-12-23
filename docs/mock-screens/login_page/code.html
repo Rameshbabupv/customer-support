@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Support Desk</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3c83f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            boxShadow: {
+                'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d131c] dark:text-white antialiased min-h-screen flex flex-col">
+<!-- Main Layout Container -->
+<div class="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+<!-- Logo Header (Above Card) -->
+<div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center mb-8">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center size-10 rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined text-2xl">support_agent</span>
+</div>
+<h2 class="text-2xl font-bold leading-tight tracking-tight text-[#0d131c] dark:text-white">Support Desk</h2>
+</div>
+</div>
+<!-- Card Container -->
+<div class="bg-white dark:bg-[#1e293b] py-10 px-6 shadow-card rounded-xl w-full sm:max-w-[480px] sm:px-10 border border-[#e7ecf4] dark:border-gray-700">
+<!-- Headline Section -->
+<div class="mb-8 text-center">
+<h1 class="text-[#0d131c] dark:text-white tracking-tight text-[28px] font-bold leading-tight pb-2">Welcome back</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Enter your credentials to access the portal.</p>
+</div>
+<!-- Form Section -->
+<form action="#" class="space-y-6" method="POST">
+<!-- Email Field -->
+<div>
+<label class="block text-sm font-medium leading-6 text-[#0d131c] dark:text-slate-200 mb-2" for="email">Work Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<input autocomplete="email" class="form-input block w-full rounded-lg border-0 py-3 pl-10 text-[#0d131c] dark:text-white ring-1 ring-inset ring-[#ced8e8] dark:ring-gray-600 placeholder:text-[#49699c] dark:placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-primary bg-[#f8f9fc] dark:bg-[#0f172a] sm:text-sm sm:leading-6" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="block text-sm font-medium leading-6 text-[#0d131c] dark:text-slate-200" for="password">Password</label>
+<div class="text-sm">
+<a class="font-semibold text-primary hover:text-blue-500" href="#">Forgot password?</a>
+</div>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<input autocomplete="current-password" class="form-input block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-[#0d131c] dark:text-white ring-1 ring-inset ring-[#ced8e8] dark:ring-gray-600 placeholder:text-[#49699c] dark:placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-primary bg-[#f8f9fc] dark:bg-[#0f172a] sm:text-sm sm:leading-6" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</div>
+</div>
+</div>
+<!-- Submit Button -->
+<div>
+<button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3 text-sm font-bold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors" type="submit">
+                        Sign In
+                    </button>
+</div>
+</form>
+<!-- Divider -->
+<div class="relative mt-8">
+<div aria-hidden="true" class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+</div>
+<div class="relative flex justify-center text-sm font-medium leading-6">
+<span class="bg-white dark:bg-[#1e293b] px-4 text-slate-500 dark:text-slate-400">Or continue with</span>
+</div>
+</div>
+<!-- SSO Button -->
+<div class="mt-6">
+<button class="flex w-full items-center justify-center gap-3 rounded-lg bg-white dark:bg-[#2d3748] px-3 py-3 text-sm font-semibold text-[#0d131c] dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-[#374151] transition-colors" type="button">
+<svg aria-hidden="true" class="h-5 w-5" viewbox="0 0 24 24">
+<path d="M12.0003 20.45C16.667 20.45 20.5836 17.2917 20.5836 12.75C20.5836 12.2417 20.5336 11.75 20.4503 11.275H12.0003V14.4083H16.9086C16.7086 15.5417 15.4836 17.2917 12.0003 17.2917C9.28362 17.2917 7.02529 15.4583 6.20029 12.9917C5.98362 12.35 5.86696 11.675 5.86696 10.975C5.86696 10.275 5.98362 9.6 6.20029 8.95834C7.02529 6.49168 9.28362 4.65834 12.0003 4.65834C13.8336 4.65834 15.1503 5.45001 15.8503 6.12501L18.1503 3.82501C16.592 2.37501 14.4753 1.40834 12.0003 1.40834C7.30029 1.40834 3.25029 4.09168 1.30029 7.97501C0.475293 9.61668 0.000292969 11.4583 0.000292969 13.4C0.000292969 15.3417 0.475293 17.1833 1.30029 18.825C3.25029 22.7083 7.30029 25.3917 12.0003 25.3917C16.667 25.3917 20.5836 22.2333 20.5836 17.6917H12.0003V20.45Z" fill="currentColor"></path>
+</svg>
+<span class="text-sm font-semibold leading-6">Google Workspace</span>
+</button>
+</div>
+<p class="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                Don't have an account? 
+                <a class="font-semibold text-primary hover:text-blue-500" href="#">Contact Admin</a>
+</p>
+</div>
+<!-- Footer -->
+<div class="mt-8">
+<p class="text-center text-xs text-slate-400 dark:text-slate-600">
+                © 2024 Support Desk Inc. All rights reserved.
+            </p>
+</div>
+</div>
+</body></html>

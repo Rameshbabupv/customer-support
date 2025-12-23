@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>New Ticket Form</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "primary-dark": "#2563eb",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                        "text-main": "#0f172a",
+                        "text-muted": "#64748b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "md": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display antialiased transition-colors duration-200">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full border-b border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md">
+<div class="px-4 md:px-8 max-w-7xl mx-auto h-16 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-3xl">confirmation_number</span>
+</div>
+<h2 class="text-text-main dark:text-white text-lg font-bold tracking-tight">Support Desk</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-primary font-medium text-sm" href="#">Tickets</a>
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium" href="#">Knowledge Base</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm text-text-main dark:text-white placeholder-text-muted focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Search tickets..." type="text"/>
+</div>
+<button class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-primary transition-all">
+<div class="bg-cover bg-center w-full h-full" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAvqkR9I2eOFXk2S4bggwpSAz_ppo_9RFw3Epl4J1FYeO__CWVd-wn_JQ0a4ITAfhalxmZYScKHNBVhrN2q6BHUE1j2nHG0JzQ_fWnOgpvfwZE0UEhRfjPcCoWLMdKozRsU0gtf39PtXiajqx7iVCJBlrT9lK56I6dmFHJJ8gM3ZL2WbPso4GsUvf5zIVbghW_3Qy8bDjxKIRnsXoD-geht97bberlpGR6rUtO9BIkD2gv4nLnNITzKJT2Vv-_GZzOmpo5HFo7oBJI");'></div>
+</button>
+</div>
+</div>
+</header>
+<main class="min-h-[calc(100vh-64px)] p-4 md:py-8 md:px-8">
+<div class="max-w-4xl mx-auto flex flex-col gap-6">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl md:text-4xl font-black tracking-tight text-text-main dark:text-white mb-2">New Support Ticket</h1>
+<p class="text-text-muted text-base">Submit a new issue to our engineering team.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg text-text-muted hover:text-text-main dark:hover:text-white font-medium text-sm transition-colors">Cancel</button>
+<!-- Small mobile save button visible only on small screens if needed, otherwise hidden -->
+</div>
+</div>
+<!-- Main Form Card -->
+<form class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-soft border border-border-light dark:border-border-dark p-6 md:p-8 flex flex-col gap-8">
+<!-- Section: Ticket Basics -->
+<div class="grid gap-6">
+<!-- Subject Field -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200" for="subject">Subject</label>
+<input class="w-full h-12 px-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-border-light dark:border-border-dark text-text-main dark:text-white placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="subject" placeholder="Briefly summarize the issue (e.g. Login page timeout)" type="text"/>
+</div>
+<!-- Product Select -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200" for="product">Affected Product</label>
+<div class="relative">
+<select class="w-full h-12 px-4 appearance-none rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-border-light dark:border-border-dark text-text-main dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all pr-10" id="product">
+<option disabled="" selected="" value="">Select a product...</option>
+<option value="analytics">Analytics Dashboard</option>
+<option value="crm">CRM Integration</option>
+<option value="mobile">Mobile App (iOS)</option>
+<option value="api">Public API</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Section: Description (Rich Text) -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200">Description</label>
+<div class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-slate-50 dark:bg-slate-800/50 overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+<!-- Toolbar -->
+<div class="flex items-center gap-1 p-2 border-b border-border-light dark:border-border-dark bg-slate-100 dark:bg-slate-800">
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Bold" type="button">
+<span class="material-symbols-outlined text-[20px]">format_bold</span>
+</button>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Italic" type="button">
+<span class="material-symbols-outlined text-[20px]">format_italic</span>
+</button>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Underline" type="button">
+<span class="material-symbols-outlined text-[20px]">format_underlined</span>
+</button>
+<div class="w-px h-5 bg-border-light dark:bg-border-dark mx-1"></div>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Bullet List" type="button">
+<span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+</button>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Numbered List" type="button">
+<span class="material-symbols-outlined text-[20px]">format_list_numbered</span>
+</button>
+<div class="w-px h-5 bg-border-light dark:bg-border-dark mx-1"></div>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Link" type="button">
+<span class="material-symbols-outlined text-[20px]">link</span>
+</button>
+<button class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-text-muted transition-colors" title="Image" type="button">
+<span class="material-symbols-outlined text-[20px]">image</span>
+</button>
+</div>
+<!-- Text Area -->
+<textarea class="w-full h-40 p-4 bg-transparent border-none resize-y focus:ring-0 text-text-main dark:text-white placeholder-text-muted" placeholder="Please provide detailed steps to reproduce the issue..."></textarea>
+</div>
+</div>
+<!-- Section: Attributes Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Priority -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200" for="priority">Priority</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">signal_cellular_alt</span>
+<select class="w-full h-12 pl-10 pr-10 appearance-none rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-border-light dark:border-border-dark text-text-main dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="priority">
+<option value="low">Low - General Question</option>
+<option selected="" value="medium">Medium - Functional Issue</option>
+<option value="high">High - Feature Unavailable</option>
+<option value="urgent">Urgent - System Outage</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Severity -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200" for="severity">Severity</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">warning</span>
+<select class="w-full h-12 pl-10 pr-10 appearance-none rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-border-light dark:border-border-dark text-text-main dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="severity">
+<option value="cosmetic">Cosmetic - Visual Glitch</option>
+<option value="minor">Minor - Workaround Available</option>
+<option value="major">Major - Business Logic Broken</option>
+<option value="critical">Critical - Data Loss / Security</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Section: Attachments -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-text-main dark:text-gray-200">Attachments</label>
+<div class="border-2 border-dashed border-border-light dark:border-border-dark rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-primary/50 transition-all group">
+<div class="size-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-2xl">cloud_upload</span>
+</div>
+<p class="text-sm font-medium text-text-main dark:text-white">Click to upload or drag and drop</p>
+<p class="text-xs text-text-muted mt-1">SVG, PNG, JPG or GIF (max. 5 files)</p>
+</div>
+<!-- File Previews -->
+<div class="mt-2 flex flex-wrap gap-3">
+<!-- Preview Item 1 -->
+<div class="flex items-center gap-3 p-2 pr-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-border-light dark:border-border-dark">
+<div class="size-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-text-muted">image</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-medium text-text-main dark:text-white truncate max-w-[120px]">screenshot_error.png</span>
+<span class="text-[10px] text-text-muted">1.2 MB</span>
+</div>
+<button class="ml-2 text-text-muted hover:text-red-500 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Preview Item 2 -->
+<div class="flex items-center gap-3 p-2 pr-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-border-light dark:border-border-dark">
+<div class="size-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-text-muted">description</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-medium text-text-main dark:text-white truncate max-w-[120px]">system_logs.txt</span>
+<span class="text-[10px] text-text-muted">45 KB</span>
+</div>
+<button class="ml-2 text-text-muted hover:text-red-500 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+</div>
+<div class="h-px bg-border-light dark:bg-border-dark w-full my-2"></div>
+<!-- Form Actions -->
+<div class="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-3">
+<button class="px-6 py-3 rounded-lg text-text-muted hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300 font-medium transition-colors" type="button">
+                        Save as Draft
+                    </button>
+<button class="px-8 py-3 rounded-lg bg-primary hover:bg-primary-dark text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]">send</span>
+                        Submit Ticket
+                    </button>
+</div>
+</form>
+<div class="text-center pb-8">
+<p class="text-xs text-text-muted">Need immediate help? Check our <a class="text-primary hover:underline" href="#">Knowledge Base</a> or <a class="text-primary hover:underline" href="#">Chat with us</a>.</p>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Support Queue Kanban</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "primary-dark": "#2563eb",
+                        "background-light": "#f8f9fc",
+                        "background-dark": "#101722",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                        "column-light": "#f1f5f9",
+                        "column-dark": "#1a2230",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for better aesthetic in columns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.3);
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(156, 163, 175, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display h-screen overflow-hidden flex">
+<!-- Sidebar -->
+<aside class="w-64 bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 transition-colors duration-300">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div>
+<h1 class="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">SupportDesk</h1>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">v2.4.0</span>
+</div>
+</div>
+<nav class="flex-1 px-4 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-blue-400 font-semibold" href="#">
+<span class="material-symbols-outlined text-[22px] fill-1">confirmation_number</span>
+<span class="text-sm">Tickets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">group</span>
+<span class="text-sm font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">bar_chart</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<div class="my-2 border-t border-slate-100 dark:border-slate-800"></div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="User avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUTY4T6NCkpnXmzJ6oO4uyRpHfdJE0oGvnAYE942VJ3QaYvtlDDx-BEZ0oqXJPXrp2J-BxulRPI-KO6S7PTyo7-BdLX9Xw2UM3-xy6BadCbhteDeCJchcy5O6_lo_HsuD8DVYFwZzrhyCFyWEwjtbxTTCVHYIFkcYBpSZDBwPP6bKeLRgJ2rIQgMBFQWsXbLvt-BiQMD7RttVHeX6NM6VHLyBl765bqeNRaQJ11lu9vU_Kr6EZ5qA5EDcYaXKlPA8lUXDVl-8jHAU')"></div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-sm font-semibold truncate text-slate-900 dark:text-white">Alex Morgan</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 truncate">Support Lead</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<!-- Header -->
+<header class="h-16 px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] flex items-center justify-between shrink-0 z-20">
+<div class="flex items-center gap-4">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Support Board</h2>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 w-64 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-900 transition-all" placeholder="Search tickets..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="size-10 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-[#111827]"></span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Create Ticket
+                </button>
+</div>
+</header>
+<!-- Filters Toolbar -->
+<div class="px-6 py-4 flex flex-wrap items-center gap-3 border-b border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-[#111827]/50 backdrop-blur-sm shrink-0 z-10">
+<div class="flex items-center gap-2 mr-4 text-sm font-medium text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+                Filters:
+            </div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm">
+<span>Assignee</span>
+<span class="material-symbols-outlined text-[18px] text-slate-400">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm">
+<span>Priority</span>
+<span class="material-symbols-outlined text-[18px] text-slate-400">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm">
+<span>Tags</span>
+<span class="material-symbols-outlined text-[18px] text-slate-400">keyboard_arrow_down</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-[18px]">sort</span>
+                Sort by: Date Created
+            </button>
+</div>
+<!-- Kanban Board Area -->
+<div class="flex-1 overflow-x-auto p-6">
+<div class="flex h-full min-w-[1000px] gap-6">
+<!-- Column 1: Open -->
+<div class="flex flex-col flex-1 w-full max-w-[400px] bg-column-light dark:bg-column-dark rounded-xl border border-slate-200/60 dark:border-slate-800">
+<div class="p-4 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-slate-700 dark:text-slate-200">Open</h3>
+<span class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full text-xs font-bold">3</span>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-3 custom-scrollbar">
+<!-- Card 1 (High Priority) -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500 rounded-l-lg"></div>
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">#SUP-102</span>
+<div class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-red-100 dark:border-red-800/50">P1 - High</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug">Login issue for Enterprise Account</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">User reporting persistent 503 errors when accessing the dashboard via SSO.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-800" data-alt="Assignee Avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMuDkSro0WuaRncJp94jg2j6bMZ0iERMAdQndGIiXCQu7gyEgBPijmduWjmGMwyt7UQm7MUOchwN_fT-lNbiWvEguirPJJbaa9Dd5vIsy3Po1B1RFOLta7pRKgyAdnMNwOKDE96gk08g-l8Mi9htBR3_NbX9OhPwactTw0PrDOoB7wLzHXFRf1ck_KQ0uSL1hIPu7KrJoIfNt8DMSVer4_ULy2LGriVnRv-8QzXNcuFEDTDcm5UNqD9rBmLZVfpcfydlI4qpLvoz8')"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">Unassigned</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    2h
+                                </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">#SUP-105</span>
+<div class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-emerald-100 dark:border-emerald-800/50">P4 - Low</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug">Feature request: Dark mode</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">Customer wants native dark mode support for the mobile app view.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-800" data-alt="Assignee Avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDlMNxOxpc5sJ3SGG8nL_5Ow65D7znTReZ4ptY0OCeKqjf1LdV-yp9JQqj5yamYhd6-UiJXZLSbccUqQJsfd7GhpMJLMFhHrwk5WjKGP4CH6hn_7ihMHlHaRhHAGai4s2cxiwhznFGJcBKimrCwLE6iDMLEkSsQVZcnfupCkff0-cjqSIjH_0eAFpU5hI66-06px-3DLPaEH0jqRRFkfYAv9Vz3RozNKoYWoaw4tKkh-XMyRTt-dUxGfejrbhtDbNwdLncav30yeeY')"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">Design Team</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    1d
+                                </div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">#SUP-109</span>
+<div class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-blue-100 dark:border-blue-800/50">P3 - Normal</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug">Export CSV Failing</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">The export button does nothing when clicked on the analytics page.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold ring-2 ring-white dark:ring-slate-800">JD</div>
+<span class="text-xs text-slate-600 dark:text-slate-400">John Doe</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    4h
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 2: In Progress -->
+<div class="flex flex-col flex-1 w-full max-w-[400px] bg-column-light dark:bg-column-dark rounded-xl border border-slate-200/60 dark:border-slate-800">
+<div class="p-4 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-slate-700 dark:text-slate-200">In Progress</h3>
+<span class="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full text-xs font-bold">2</span>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-3 custom-scrollbar">
+<!-- Card 4 -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-lg"></div>
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">#SUP-104</span>
+<div class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-amber-100 dark:border-amber-800/50">P2 - Medium</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug">API Rate limiting errors</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">Clients receiving 429 errors despite being under the limit. Needs investigation.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-800" data-alt="Assignee Avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBawqE5gV6CY9kHrO41HavBFAxxGm45P7AMLtDJV7kmJtyGk2fgavttMJ2fnedr1jxfNjyhNOGzocomjCuNOSDyptmQhUeMDhD1iXfxt6SCYINCuBcmUrM4khkGaj7v8lvbWNlN7u3dTv1jYMsz5rynLUOgYBVGAT7X2oGatBUuILZ0O9ssmQmbVWmhKCMa8pDbO09n-llrHqV-tLSRB0J2c9P__QxWJTql6OdTNWFH8UtxyBilXtsNW_fA4LS_CYjvjuLzgDnQVIM')"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">Sarah Jenkins</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    3d
+                                </div>
+</div>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] rounded border border-slate-200 dark:border-slate-700">backend</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] rounded border border-slate-200 dark:border-slate-700">urgent</span>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">#SUP-108</span>
+<div class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-blue-100 dark:border-blue-800/50">P3 - Normal</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug">Update billing details UI</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">The text on the billing page is misaligned on Safari.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-800" data-alt="Assignee Avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCfJEs3cZWZ6Y7CjVSwfhBWZ4g0Kky--hYfoAmcblcmoWlc8xwnnq3-IQv8eVyhmqs-_wR8fiQgPrevywf3Sz8JedbUMQj6YzG2ryGrllVibll8op6teOP7x6xBttxAnwmYT9Wmrm5YzWzsmVpN288qdXSlFDwwUdSNllHFYYQQUaMaWTYluAFYODw-JHH4uhkBPnBb7_Ni715IrqyIomaIJ1tDNUnwgMxEGTCFfA6EgtODULQ8tc-2N_hRUIJsuPV0scXLX1Y9nzM')"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">Frontend Team</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    5d
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 3: Resolved -->
+<div class="flex flex-col flex-1 w-full max-w-[400px] bg-column-light dark:bg-column-dark rounded-xl border border-slate-200/60 dark:border-slate-800">
+<div class="p-4 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-slate-700 dark:text-slate-200">Resolved</h3>
+<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full text-xs font-bold">1</span>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-3 custom-scrollbar">
+<!-- Card 6 -->
+<div class="group bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer opacity-75 hover:opacity-100">
+<div class="flex justify-between items-start mb-2">
+<span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400 line-through">#SUP-098</span>
+<div class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-slate-200 dark:border-slate-700">Resolved</div>
+</div>
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-1 leading-snug line-through decoration-slate-400">Password reset link broken</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">Fixed by updating the SendGrid template logic.</p>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-3">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-800" data-alt="Assignee Avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuClAtbC7ZmEEdeW8E2SByZc69kQOaB4GEycArqzfdtVkaU_lu6bsG_uMdZjYDz-g15xYUnuAJJ3WcmDSWZY09f-uu278UCpqXqlzYGBZyr5B7aLCoOaWGGEFmGBuqxqM5anlmAOiuc-00BnuOSQMOG3uT_4p-JQK56JzmLWkdV9PR1IeE5_OoKJSaAJ9IlHdqkTOgJ9lE4AaBH6iZQ6fFGPs5GdjW43yBVbsNn1q7CEeRuUJ482uHi6cwkVVDsHql1XXUilsyZI5wQ')"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">Mike Ross</span>
+</div>
+<div class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                    Today
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

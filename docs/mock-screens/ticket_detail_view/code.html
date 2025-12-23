@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ticket Detail View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-[#111418]">
+<!-- Top Navbar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a202c] px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0d131c] dark:text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Support Desk</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64 hidden md:flex">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+<div class="text-[#49699c] flex items-center justify-center pl-4 bg-transparent">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="flex w-full min-w-0 flex-1 resize-none bg-transparent border-none text-sm text-[#0d131c] dark:text-white placeholder:text-[#49699c] px-3 focus:ring-0 focus:outline-none h-full" placeholder="Search tickets..."/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-[#0d131c] dark:text-gray-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-medium leading-normal" href="#">Tickets</a>
+<a class="text-[#0d131c] dark:text-gray-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Customers</a>
+<a class="text-[#0d131c] dark:text-gray-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Reports</a>
+</nav>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-gray-800 shadow-sm cursor-pointer" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAHTENcte-M9lQRfvz-FRGwJcplr7ZLT158uCEebjSWHdNGk4BeKljVJVWcBvLIdZFC1sDLPwQEdwN86nfDvCnRY9qQN8oCGH1I9Bi_ZUDnHh4saErk_AiFnFYlzZnIcfwPjhAp0xa6MA2rcRotgyq37ke5ZLjqb19QgHBKrcQo-iXC0P7Z6qIZ0OvALSiAptmCD1etAbod_kIg1iN2eMSH6_IPdyGiW8cH2330Sj4ddHmxOgmwOBRGMvNuhioLyM-MEYovVKJREnM");'></div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 pb-20">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 py-4 items-center mb-2">
+<a class="text-[#49699c] hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Home</a>
+<span class="text-[#9ca3af] text-sm font-medium leading-normal">/</span>
+<a class="text-[#49699c] hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Tickets</a>
+<span class="text-[#9ca3af] text-sm font-medium leading-normal">/</span>
+<span class="text-[#0d131c] dark:text-white text-sm font-medium leading-normal">Ticket #2948</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Main Content Column -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Ticket Header Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
+<div class="flex flex-col md:flex-row justify-between gap-4 md:items-start mb-6">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 flex-wrap">
+<h1 class="text-[#0d131c] dark:text-white text-2xl md:text-3xl font-bold leading-tight tracking-tight">Cannot access API endpoints</h1>
+<span class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-md">#2948</span>
+</div>
+<p class="text-[#49699c] text-sm">Created on Oct 24, 2023 at 10:42 AM via Email</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-transparent rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                                Share
+                            </button>
+<button class="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-medium shadow-sm shadow-blue-200 dark:shadow-none transition-colors">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                Resolve
+                            </button>
+</div>
+</div>
+<!-- Tags/Chips -->
+<div class="flex gap-2 flex-wrap border-t border-gray-100 dark:border-gray-800 pt-4">
+<div class="flex h-7 items-center justify-center gap-x-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 pl-3 pr-3 border border-blue-100 dark:border-blue-800">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+<p class="text-blue-700 dark:text-blue-300 text-xs font-semibold">In Progress</p>
+</div>
+<div class="flex h-7 items-center justify-center gap-x-1.5 rounded-full bg-red-50 dark:bg-red-900/30 pl-3 pr-3 border border-red-100 dark:border-red-800">
+<span class="material-symbols-outlined text-[14px] text-red-600 dark:text-red-400">priority_high</span>
+<p class="text-red-700 dark:text-red-300 text-xs font-semibold">P2 - High</p>
+</div>
+<div class="flex h-7 items-center justify-center gap-x-1.5 rounded-full bg-gray-100 dark:bg-gray-800 pl-3 pr-3 text-gray-600 dark:text-gray-300 text-xs font-medium">
+                            API
+                        </div>
+<div class="flex h-7 items-center justify-center gap-x-1.5 rounded-full bg-gray-100 dark:bg-gray-800 pl-3 pr-3 text-gray-600 dark:text-gray-300 text-xs font-medium">
+                            Bug
+                        </div>
+</div>
+</div>
+<!-- Conversation Timeline -->
+<div class="flex flex-col gap-6 relative">
+<!-- Vertical Line -->
+<div class="absolute left-[28px] top-6 bottom-6 w-0.5 bg-gray-200 dark:bg-gray-800 -z-10"></div>
+<!-- Date Divider -->
+<div class="flex justify-center my-2">
+<span class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs font-medium px-3 py-1 rounded-full">Today, Oct 24</span>
+</div>
+<!-- Customer Message -->
+<div class="flex gap-4 group">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14 ring-4 ring-white dark:ring-[#101722] shadow-sm shrink-0 mt-1" data-alt="Customer avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDO0ck-kNjKZ36yzcA2HGgR9wMuHkTZEGJAMO6WwJrSfPwMNDWF2-VCJ5dR1AzsNhFlYTFX4o1aaLshB-9bCD7q3Cy9cECrZU56564dFL_bGKsIrdBiM69oJttxi4U4XU9fAPZgbhqNnK5KWdU98YBQdHPEMvnrFqZXz5sn-zB91e8mn0a7h9bRDARKKM-NyIBVrwoU5rIvQKVI2Z5WwOtyoOoNpKBGCSO-iXaXqdmuN5AV0vMKnzoarM-R7ulSOd6nda8hVWTDPss");'></div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[#0d131c] dark:text-white text-sm font-bold">John Doe</span>
+<span class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">Customer</span>
+<span class="text-xs text-[#49699c] ml-auto">10:42 AM</span>
+</div>
+<div class="bg-white dark:bg-[#1a202c] border border-gray-100 dark:border-gray-800 p-5 rounded-xl rounded-tl-none shadow-sm text-[#0d131c] dark:text-gray-200 text-sm leading-relaxed">
+<p>Hello support,</p>
+<p class="mt-2">I'm getting a 403 error when trying to GET /v1/users. I've checked my API key and it seems valid. Can you please check if my IP is whitelisted? I've attached a screenshot of the error below.</p>
+<!-- Attachment within message -->
+<div class="mt-4 flex gap-3">
+<div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 max-w-[240px] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<div class="size-10 rounded bg-red-100 flex items-center justify-center text-red-500 shrink-0">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-sm font-medium truncate text-gray-900 dark:text-white">error_screenshot.png</span>
+<span class="text-xs text-gray-500">245 KB</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Agent Message -->
+<div class="flex gap-4 group flex-row-reverse">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14 ring-4 ring-white dark:ring-[#101722] shadow-sm shrink-0 mt-1" data-alt="Support agent avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDY_aIZnwAokBq7X89b7C63RSjkzgeekhHAQIGVyAJygFe5BWm3Lg2ydPAuD8vnC3-MH3qI8R9FKXAOQMkzBoii-EsMQ0BWQAm-MHRJqPkO2gSC8r-DecSvG-9DL3ZNMZHA2vUCM7Xmdu_jV9qyECDuNjvqxZ_u2Z7doSVu3enXWFjlgcB76DFsL5lv6LQ67umMMf4x2FdBVqY2HLCzT_pDb_fbxaybDCHsAKVlUENSzSqecECTjyHlW6cK3TTHyz_THceK7R1NSkc");'></div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1 flex-row-reverse">
+<span class="text-[#0d131c] dark:text-white text-sm font-bold">Sarah Jenkins</span>
+<span class="text-xs text-primary bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-1.5 py-0.5 rounded">Support Agent</span>
+<span class="text-xs text-[#49699c] ml-auto">11:15 AM</span>
+</div>
+<div class="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 p-5 rounded-xl rounded-tr-none shadow-sm text-[#0d131c] dark:text-gray-200 text-sm leading-relaxed">
+<p>Hi John,</p>
+<p class="mt-2">Thanks for reaching out. I'm looking into your account configuration right now. It does look like there might be an IP restriction policy applied to your API key.</p>
+<p class="mt-2">Could you please confirm the IP address you are making the request from?</p>
+</div>
+</div>
+</div>
+<!-- Internal Note Example -->
+<div class="flex gap-4 group flex-row-reverse">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-14 ring-4 ring-white dark:ring-[#101722] shadow-sm shrink-0 mt-1 opacity-70" data-alt="Support agent avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBdl4333Mb4Bt6uNXM29UAU6rQ4zAExezcJvmuvdV1KVrOuA5AZLmidjd4-tlEawsdne7BjcKGo0f2-GLjs1qXE2zRKQtrzaQJp9ifA5exVwML2Nofzv-_l18p4paU5vj3gBdcBcMBdFANpiRjU6GkVYYRvJo5KQ4VUOlYRd_M4IrguaNuhNVbVBQurn0tqIVjZjJbiXYfGK4ajmASWTmPkoH8jcyNXRhAhSzBmRqAkDO4G1CtAHH1w1mhL9nFNrwiUreXW6CFofrI");'></div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1 flex-row-reverse">
+<span class="text-gray-600 dark:text-gray-400 text-sm font-bold">Sarah Jenkins</span>
+<span class="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px]">lock</span> Internal Note
+                                </span>
+<span class="text-xs text-[#49699c] ml-auto">11:16 AM</span>
+</div>
+<div class="bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-5 rounded-xl rounded-tr-none shadow-sm text-gray-700 dark:text-gray-300 text-sm leading-relaxed italic">
+<p>Note to self: Checked the backend logs, seeing 403s coming from IP 203.0.113.45. Need to verify if this matches their registered range.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Reply Area -->
+<div class="mt-4 bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+<!-- Tabs -->
+<div class="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-primary text-primary bg-white dark:bg-[#1a202c]">Public Reply</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Internal Note</button>
+</div>
+<!-- Editor Toolbar (simplified) -->
+<div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex gap-2">
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">format_bold</span></button>
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">format_italic</span></button>
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">link</span></button>
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">format_list_bulleted</span></button>
+<div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1 self-center"></div>
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">attach_file</span></button>
+<button class="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">sentiment_satisfied</span></button>
+</div>
+<div class="p-4">
+<textarea class="w-full min-h-[120px] resize-y border-none focus:ring-0 bg-transparent text-sm text-[#0d131c] dark:text-white placeholder:text-gray-400" placeholder="Type your reply here..."></textarea>
+</div>
+<div class="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center border-t border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-500">Press <kbd class="font-sans px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs">Cmd</kbd> + <kbd class="font-sans px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs">Enter</kbd> to send</span>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Save Draft</button>
+<button class="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-lg shadow-sm transition-colors">Send Reply</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar Column -->
+<div class="lg:col-span-4 flex flex-col gap-6 sticky top-24">
+<!-- Ticket Properties Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-0 overflow-hidden">
+<div class="px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 flex justify-between items-center">
+<h3 class="text-sm font-semibold text-[#0d131c] dark:text-white">Ticket Properties</h3>
+<button class="text-primary text-xs font-medium hover:underline">Edit</button>
+</div>
+<div class="p-5 flex flex-col gap-5">
+<!-- Assignee -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-[#49699c]">Assignee</label>
+<div class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors -mx-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" data-alt="Assignee avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDdYglwQ-gofZ0H0bGkmhNNjLvo7a7KYUAgkDF9tnt2M-c1hNus0DLx0EMDC7JFmLDkT8Pmdcn7ffncWEXCrrxhiLMCVqVWzW7Qw0Rj5HBA9QmvGh_LxGP3lCYZjt3AdHoGu4GiXhv_9xEUlGc-GjFVLcb70fYYEAXAY6TPIXDXy1b-N_bXd3stkXM1-i9avTfML8B2Ec9Dx-Pkih4Tbd3t31QoBM0hAD9GAnVW-yAIn3X0iF_IxJ096N5MrNAqC3Hzy1Dhcvz8IvM");'></div>
+<span class="text-sm font-medium text-[#0d131c] dark:text-white">Sarah Jenkins</span>
+<span class="material-symbols-outlined text-gray-400 text-[18px] ml-auto">expand_more</span>
+</div>
+</div>
+<!-- Status & Priority Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-[#49699c]">Status</label>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="text-sm font-medium text-[#0d131c] dark:text-white">In Progress</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-[#49699c]">Priority</label>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-red-500">priority_high</span>
+<span class="text-sm font-medium text-[#0d131c] dark:text-white">High</span>
+</div>
+</div>
+</div>
+<!-- Due Date -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-[#49699c]">Due Date</label>
+<div class="flex items-center gap-2 text-[#0d131c] dark:text-white">
+<span class="material-symbols-outlined text-[18px] text-gray-400">calendar_today</span>
+<span class="text-sm">Oct 26, 2023 (2 days left)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Requester Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-0 overflow-hidden">
+<div class="px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 flex justify-between items-center">
+<h3 class="text-sm font-semibold text-[#0d131c] dark:text-white">Requester</h3>
+<button class="text-gray-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">open_in_new</span></button>
+</div>
+<div class="p-5">
+<div class="flex items-center gap-3 mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Requester avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCQ1JlS_0c0LoierXWuZA5sDWDjKVSxkk-iYJPlDMJDs1_N986l8mDsUOIAm21LbJwsh-zJDqekRLDEY275oF0mnwOWU0Xlg73Z7CJMP7EWLZ7ceF0b1-q5vpENlZ6w_vOB_0kNNXlqdzs7mqnxL68wiTJMgAtL-yBj_KDBfFaVgd2vbvoK_Hw5J79J8R128IWLNd6QDCPlXrDn1--RyYrEdwaih7zSvWi0ujdQ0iVhx0rNzxE59GYvOl44dxskfSOXrD7aJ1yhpbU");'></div>
+<div>
+<h4 class="text-sm font-bold text-[#0d131c] dark:text-white">John Doe</h4>
+<p class="text-xs text-[#49699c]">john.doe@company.com</p>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between text-sm">
+<span class="text-gray-500">Organization</span>
+<span class="font-medium text-[#0d131c] dark:text-white">Acme Corp</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-500">Total Tickets</span>
+<span class="font-medium text-[#0d131c] dark:text-white">12</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-500">Last Seen</span>
+<span class="font-medium text-[#0d131c] dark:text-white">10 mins ago</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Attachments Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-0 overflow-hidden">
+<div class="px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 flex justify-between items-center">
+<h3 class="text-sm font-semibold text-[#0d131c] dark:text-white">Attachments (3)</h3>
+<button class="text-primary text-xs font-medium hover:underline">View All</button>
+</div>
+<div class="p-5 grid grid-cols-2 gap-3">
+<!-- Image Attachment -->
+<div class="group relative aspect-square rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-110" data-alt="Screenshot of error" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCq6MyXXYp7RwpzTPoor9fwOlsWW6XxIsONyaOcF4pV4MHMpuideyFa6aIvPdsp99dUrRqTGbZo-q_Nu1TpEgqHeqwvg7LAaKmt555wOe21b2WK7mXVjOZ-V3EmfLIXuQF8na-HqaXVCKIexRnsONZnVWjONEIL0vBS8vp1lHtldqZ4zpp4EDvdWcSHaqgpHkIBHEiSdrCacCclwKxaoXRZFxUBImiWF2F_32eThGDnj6kxgOX1w1u_JoddNyef4MV7bo_2D-KEMpQ");'></div>
+<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+</div>
+<div class="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-black/80 backdrop-blur-sm p-1.5">
+<p class="text-[10px] font-medium truncate text-center text-gray-900 dark:text-white">error.png</p>
+</div>
+</div>
+<!-- File Attachment -->
+<div class="group relative aspect-square rounded-lg bg-gray-50 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400 text-3xl">description</span>
+<p class="text-[10px] font-medium text-gray-600 dark:text-gray-300 px-2 text-center break-all">logs.txt</p>
+</div>
+<!-- Image Attachment -->
+<div class="group relative aspect-square rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-110" data-alt="Configuration settings screenshot" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAYzh1Wneq6rRY30qvmlMRsNOdyYEtoTTOU04GSCi1ELix-9G8uKjHDpTSDlkkS0F1JUwW6mtGSjEnnTBFK7ArU3-SU7tSM1TybUSNZM0ZDuI6Yz25fT0HV4Q9TCjP8bWHvqaBboNEQIOQ0cbzalAIom6y0h0it7UgC1YWpxWkNA7DlpervwP5fs3_H4vsTpOfZVFi3jAsAWmAEzHSFb9-L8ozrQfd-0nBBVzodeUo9vbuVYt53F94G5xTzjPUGLAfpDNKxeg2aYOM");'></div>
+<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+</div>
+<div class="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-black/80 backdrop-blur-sm p-1.5">
+<p class="text-[10px] font-medium truncate text-center text-gray-900 dark:text-white">config.jpg</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

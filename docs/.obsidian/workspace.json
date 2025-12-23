@@ -185,9 +185,29 @@
   },
   "active": "dff5489d5d2da741",
   "lastOpenFiles": [
-    "product.md.tmp.34472.1766442886675",
-    "product.md",
+    "design-prompt.md",
     "architecture.md",
-    "api.md"
+    "product.md",
+    "api.md",
+    "mock-screens/user_dashboard/screen.png",
+    "mock-screens/ticket_detail_view/screen.png",
+    "mock-screens/support_queue_kanban/screen.png",
+    "mock-screens/new_ticket_form/screen.png",
+    "mock-screens/login_page/screen.png",
+    "mock-screens/admin_users_table_2/screen.png",
+    "mock-screens/admin_users_table_1/screen.png",
+    "mock-screens/user_registration_page/screen.png",
+    "mock-screens/user_registration_page/code.html",
+    "mock-screens/user_dashboard/code.html",
+    "mock-screens/ticket_detail_view/code.html",
+    "mock-screens/support_queue_kanban/code.html",
+    "mock-screens/new_ticket_form/code.html",
+    "mock-screens/login_page/code.html",
+    "mock-screens/admin_users_table_2/code.html",
+    "mock-screens/admin_users_table_1/code.html",
+    "mock-screens/admin_tenant_management/screen.png",
+    "mock-screens/admin_tenant_management/code.html",
+    "mock-screens/user_registration_page",
+    "mock_screens/user_registration_page/screen.png"
   ]
 }
