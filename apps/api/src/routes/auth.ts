@@ -87,7 +87,7 @@ authRoutes.post('/signin', async (req, res) => {
     })
 
     res.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, isOwner: tenant?.isOwner ?? false },
       token,
     })
   } catch (error) {
