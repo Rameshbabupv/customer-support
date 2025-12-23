@@ -105,22 +105,150 @@ Approver reviews
 
 **SLA clock starts:** When integrator triages (not submission).
 
-## Folder Structure
+## App Architecture
+
 ```
-/src
-  /api          # Express routes
-  /models       # Sequelize/Prisma models
-  /middleware   # Auth, tenant resolution
-  /services     # Business logic
-  /utils        # Helpers
-/client         # React app
-/migrations     # DB migrations
+┌──────────────────┐      ┌──────────────────┐
+│   CLIENT PORTAL  │      │  INTERNAL PORTAL │
+│   (Tenants)      │      │  (Our Team)      │
+│   :3000          │      │  :3001           │
+└────────┬─────────┘      └────────┬─────────┘
+         │                         │
+         └────────────┬────────────┘
+                      │
+               ┌──────▼──────┐
+               │   REST API   │
+               │   :4000      │
+               └──────┬──────┘
+                      │
+               ┌──────▼──────┐
+               │  PostgreSQL  │
+               │   :5432      │
+               └─────────────┘
+```
+
+**Why Two Portals:**
+- Independent deployments
+- Different release cycles
+- Clean security boundary
+- Different UX needs (power users vs simple UI)
+
+## Monorepo Structure (npm workspaces)
+
+```
+customer-support/
+├── apps/
+│   ├── client-portal/        # Tenant-facing React app
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── vite.config.ts
+│   ├── internal-portal/      # Our team React app
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── vite.config.ts
+│   └── api/                  # Express REST API
+│       ├── src/
+│       │   ├── routes/
+│       │   ├── models/
+│       │   ├── middleware/
+│       │   └── services/
+│       └── package.json
+│
+├── packages/
+│   ├── ui/                   # Shared React components
+│   │   ├── src/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── TicketCard.tsx
+│   │   │   ├── StatusBadge.tsx
+│   │   │   ├── PriorityPill.tsx
+│   │   │   └── index.ts
+│   │   └── package.json      # name: "@repo/ui"
+│   │
+│   ├── types/                # Shared TypeScript types
+│   │   ├── src/
+│   │   │   ├── ticket.ts
+│   │   │   ├── user.ts
+│   │   │   ├── tenant.ts
+│   │   │   └── index.ts
+│   │   └── package.json      # name: "@repo/types"
+│   │
+│   └── utils/                # Shared utilities
+│       ├── src/
+│       │   ├── formatDate.ts
+│       │   ├── validators.ts
+│       │   └── index.ts
+│       └── package.json      # name: "@repo/utils"
+│
+├── package.json              # Workspaces config
+└── .beads/                   # Issue tracking
+```
+
+## Shared Packages
+
+| Package | Purpose | Example |
+|---------|---------|---------|
+| `@repo/ui` | React components | `import { Button, TicketCard } from '@repo/ui'` |
+| `@repo/types` | TypeScript interfaces | `import { Ticket, User } from '@repo/types'` |
+| `@repo/utils` | Helper functions | `import { formatDate } from '@repo/utils'` |
+
+## npm Workspaces Config
+
+**Root `package.json`:**
+```json
+{
+  "name": "customer-support",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:client": "npm run dev -w apps/client-portal",
+    "dev:internal": "npm run dev -w apps/internal-portal",
+    "dev:api": "npm run dev -w apps/api",
+    "build": "npm run build --workspaces --if-present"
+  }
+}
+```
+
+## Owner vs Tenant (JWT-based)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Tenant Table                                               │
+├─────────────────────────────────────────────────────────────┤
+│  id    name           is_owner   tier                       │
+│  1     "SysTech"      true       -          ← US (owner)    │
+│  2     "Acme Corp"    false      enterprise ← Client        │
+│  3     "StartupXYZ"   false      starter    ← Client        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**JWT Payload:**
+```json
+{
+  "user_id": "123",
+  "tenant_id": "2",
+  "is_owner": false,
+  "role": "user"
+}
+```
+
+**API Middleware Logic:**
+```
+if (jwt.is_owner) {
+  // Can query ALL tenants
+  // Access internal-portal features
+} else {
+  // Scoped to own tenant_id only
+  // Access client-portal features
+}
 ```
 
 ## Data Models
 
 ### Tenant
-`id, name, subdomain, tier (enterprise|business|starter), gatekeeper_enabled, created_at`
+`id, name, subdomain, is_owner, tier (enterprise|business|starter), gatekeeper_enabled, created_at`
+- `is_owner: boolean` - TRUE for us (owner), FALSE for clients
 
 ### User
 `id, email, password_hash, role, tenant_id, created_at`
