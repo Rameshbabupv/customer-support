@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "work/01-epics/z-archived/customer-support-mvp.md",
+                "file": "product.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "customer-support-mvp"
+              "title": "product"
             }
           }
         ]
@@ -164,6 +164,16 @@
               "icon": "lucide-list",
               "title": "Outline of 01-bootstrap"
             }
+          },
+          {
+            "id": "3e997c566ad8017f",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Calendar"
+            }
           }
         ]
       }
@@ -183,17 +193,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "dff5489d5d2da741",
+  "active": "7f50b3f79349f7ce",
   "lastOpenFiles": [
-    "product.md",
-    "work/02-features/z-archived/multi-tenant-setup.md",
-    "work/02-features/z-archived/admin-dashboard.md",
-    "work/02-features/z-archived/ticket-management.md",
-    "work/02-features/z-archived/authentication-system.md",
-    "work/01-epics/z-archived/customer-support-mvp.md",
+    "quick-start.md",
     "design-prompt.md",
     "architecture.md",
     "api.md",
+    "product.md",
+    "work/02-features/z-archived/ticket-management.md",
+    "work/02-features/z-archived/authentication-system.md",
+    "work/02-features/z-archived/admin-dashboard.md",
+    "work/01-epics/z-archived/customer-support-mvp.md",
+    "work/02-features/z-archived/multi-tenant-setup.md",
     "misc/01-bootstrap.md",
     "work/guide.md",
     "work/templates/customer-issue-template.md",

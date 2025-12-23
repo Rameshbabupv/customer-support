@@ -2,10 +2,16 @@ import { db } from './index.js'
 import { tenants, users } from './schema.js'
 import bcrypt from 'bcryptjs'
 
+const PASSWORD = 'systech@123'
+
 async function seed() {
   console.log('Seeding database...')
 
-  // Create owner tenant (us)
+  const passwordHash = await bcrypt.hash(PASSWORD, 10)
+
+  // === TENANTS ===
+
+  // Owner tenant (SysTech - us)
   const [ownerTenant] = await db.insert(tenants).values({
     name: 'SysTech',
     subdomain: 'systech',
@@ -14,7 +20,7 @@ async function seed() {
   }).returning()
   console.log('Created owner tenant:', ownerTenant.name)
 
-  // Create client tenant
+  // Client tenant (Acme Corp)
   const [clientTenant] = await db.insert(tenants).values({
     name: 'Acme Corp',
     subdomain: 'acme',
@@ -23,56 +29,74 @@ async function seed() {
   }).returning()
   console.log('Created client tenant:', clientTenant.name)
 
-  // Create owner admin user
-  const adminHash = await bcrypt.hash('admin123', 10)
-  const [adminUser] = await db.insert(users).values({
-    email: 'admin@systech.com',
-    passwordHash: adminHash,
-    name: 'Admin User',
+  // === INTERNAL USERS (Owner Side) ===
+
+  await db.insert(users).values({
+    email: 'ramesh@systech.com',
+    passwordHash,
+    name: 'Ramesh',
     role: 'admin',
     tenantId: ownerTenant.id,
-  }).returning()
-  console.log('Created admin user:', adminUser.email)
+  })
+  console.log('Created internal user: ramesh@systech.com (admin)')
 
-  // Create support user
-  const supportHash = await bcrypt.hash('support123', 10)
-  const [supportUser] = await db.insert(users).values({
-    email: 'support@systech.com',
-    passwordHash: supportHash,
-    name: 'Support Agent',
+  await db.insert(users).values({
+    email: 'mohan@systech.com',
+    passwordHash,
+    name: 'Mohan',
     role: 'support',
     tenantId: ownerTenant.id,
-  }).returning()
-  console.log('Created support user:', supportUser.email)
+  })
+  console.log('Created internal user: mohan@systech.com (support)')
 
-  // Create client user
-  const userHash = await bcrypt.hash('user123', 10)
-  const [clientUser] = await db.insert(users).values({
+  await db.insert(users).values({
+    email: 'sakthi@systech.com',
+    passwordHash,
+    name: 'Sakthi',
+    role: 'integrator',
+    tenantId: ownerTenant.id,
+  })
+  console.log('Created internal user: sakthi@systech.com (integrator)')
+
+  // === CLIENT USERS (Acme Corp) ===
+
+  await db.insert(users).values({
     email: 'john@acme.com',
-    passwordHash: userHash,
+    passwordHash,
     name: 'John Doe',
     role: 'user',
     tenantId: clientTenant.id,
-  }).returning()
-  console.log('Created client user:', clientUser.email)
+  })
+  console.log('Created client user: john@acme.com (user)')
 
-  // Create client admin
-  const clientAdminHash = await bcrypt.hash('admin123', 10)
-  const [clientAdmin] = await db.insert(users).values({
-    email: 'admin@acme.com',
-    passwordHash: clientAdminHash,
-    name: 'Acme Admin',
+  await db.insert(users).values({
+    email: 'jane@acme.com',
+    passwordHash,
+    name: 'Jane Smith',
+    role: 'user',
+    tenantId: clientTenant.id,
+  })
+  console.log('Created client user: jane@acme.com (user)')
+
+  await db.insert(users).values({
+    email: 'latha@acme.com',
+    passwordHash,
+    name: 'Latha',
     role: 'company_admin',
     tenantId: clientTenant.id,
-  }).returning()
-  console.log('Created client admin:', clientAdmin.email)
+  })
+  console.log('Created client user: latha@acme.com (company_admin)')
 
   console.log('\n✅ Seed complete!')
-  console.log('\nTest credentials:')
-  console.log('  Owner Admin: admin@systech.com / admin123')
-  console.log('  Support: support@systech.com / support123')
-  console.log('  Client User: john@acme.com / user123')
-  console.log('  Client Admin: admin@acme.com / admin123')
+  console.log('\n📋 All users password: systech@123')
+  console.log('\nInternal Portal (http://localhost:3001):')
+  console.log('  ramesh@systech.com  (admin)')
+  console.log('  mohan@systech.com   (support)')
+  console.log('  sakthi@systech.com  (integrator)')
+  console.log('\nClient Portal (http://localhost:3000):')
+  console.log('  john@acme.com       (user)')
+  console.log('  jane@acme.com       (user)')
+  console.log('  latha@acme.com      (company_admin)')
 }
 
 seed().catch(console.error)
