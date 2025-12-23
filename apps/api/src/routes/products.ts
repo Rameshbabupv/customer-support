@@ -44,6 +44,31 @@ productRoutes.post('/', requireOwner, async (req, res) => {
   }
 })
 
+// Update product (owner only)
+productRoutes.patch('/:id', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { name, description } = req.body
+
+    const [product] = await db.update(products)
+      .set({ name, description })
+      .where(eq(products.id, parseInt(id)))
+      .returning()
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' })
+    }
+
+    res.json(product)
+  } catch (error: any) {
+    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return res.status(400).json({ error: 'Product name already exists' })
+    }
+    console.error('Update product error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Assign products to tenant (owner only)
 productRoutes.post('/assign', requireOwner, async (req, res) => {
   try {
@@ -84,6 +109,37 @@ productRoutes.get('/tenant/:tenantId', async (req, res) => {
     res.json(productList)
   } catch (error) {
     console.error('Get tenant products error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Update products for a tenant (replace all assignments)
+productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
+  try {
+    const { tenantId } = req.params
+    const { productIds } = req.body
+
+    if (!productIds || !Array.isArray(productIds)) {
+      return res.status(400).json({ error: 'productIds array required' })
+    }
+
+    const tid = parseInt(tenantId)
+
+    // Delete existing assignments
+    await db.delete(tenantProducts).where(eq(tenantProducts.tenantId, tid))
+
+    // Insert new assignments
+    if (productIds.length > 0) {
+      const assignments = productIds.map((productId: number) => ({
+        tenantId: tid,
+        productId,
+      }))
+      await db.insert(tenantProducts).values(assignments)
+    }
+
+    res.json({ message: 'Products updated', count: productIds.length })
+  } catch (error) {
+    console.error('Update tenant products error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })

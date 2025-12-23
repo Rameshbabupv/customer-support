@@ -44,6 +44,15 @@ async function seed() {
     { name: 'Leave Management', description: 'Leave Request & Approval System' },
     { name: 'Recruitment', description: 'Applicant Tracking & Hiring' },
     { name: 'Performance', description: 'Performance Review & Appraisal' },
+    { name: 'Employee Self Service', description: 'Employee Portal for HR Services' },
+    { name: 'Training & LMS', description: 'Learning Management System' },
+    { name: 'Asset Management', description: 'IT & Office Asset Tracking' },
+    { name: 'Expense Management', description: 'Employee Expense Claims & Reimbursement' },
+    { name: 'Project Management', description: 'Project Planning & Task Tracking' },
+    { name: 'Timesheet', description: 'Project-based Time Tracking' },
+    { name: 'Document Management', description: 'HR Document Storage & Workflow' },
+    { name: 'Onboarding', description: 'New Employee Onboarding Automation' },
+    { name: 'Exit Management', description: 'Offboarding & Exit Interview System' },
   ]
 
   const createdProducts: number[] = []
@@ -51,7 +60,7 @@ async function seed() {
     const [prod] = await db.insert(products).values(p).returning()
     createdProducts.push(prod.id)
   }
-  console.log('Created 6 products: HRM, Payroll, Attendance, Leave, Recruitment, Performance')
+  console.log(`Created ${productList.length} products`)
 
   // Assign products to tenants
   // Acme Corp: HRM, Payroll, Attendance

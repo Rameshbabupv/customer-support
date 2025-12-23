@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/auth'
 const navItems = [
   { path: '/', icon: 'confirmation_number', label: 'Tickets', active: true },
   { path: '/tenants', icon: 'group', label: 'Tenants' },
+  { path: '/products', icon: 'inventory_2', label: 'Products' },
 ]
 
 export default function Sidebar() {

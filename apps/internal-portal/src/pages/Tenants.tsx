@@ -29,6 +29,7 @@ export default function Tenants() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [editingTenant, setEditingTenant] = useState<Tenant | null>(null)
   const { token } = useAuthStore()
 
   // Form state
@@ -70,6 +71,18 @@ export default function Tenants() {
     }
   }
 
+  const fetchTenantProducts = async (tenantId: number) => {
+    try {
+      const res = await fetch(`/api/products/tenant/${tenantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      setSelectedProducts(data.map((p: Product) => p.id))
+    } catch (err) {
+      console.error('Failed to fetch tenant products', err)
+    }
+  }
+
   const toggleProduct = (productId: number) => {
     setSelectedProducts(prev =>
       prev.includes(productId)
@@ -85,6 +98,20 @@ export default function Tenants() {
     setAdminEmail('')
     setAdminName('')
     setError('')
+    setEditingTenant(null)
+  }
+
+  const openAddModal = () => {
+    resetForm()
+    setShowModal(true)
+  }
+
+  const openEditModal = async (tenant: Tenant) => {
+    setEditingTenant(tenant)
+    setCompanyName(tenant.name)
+    setTier(tenant.tier)
+    await fetchTenantProducts(tenant.id)
+    setShowModal(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,59 +120,83 @@ export default function Tenants() {
     setSaving(true)
 
     try {
-      // 1. Create tenant
-      const tenantRes = await fetch('/api/tenants', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: companyName,
-          tier,
-        }),
-      })
+      if (editingTenant) {
+        // Update existing tenant
+        const tenantRes = await fetch(`/api/tenants/${editingTenant.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: companyName, tier }),
+        })
 
-      if (!tenantRes.ok) {
-        const data = await tenantRes.json()
-        throw new Error(data.error || 'Failed to create tenant')
-      }
+        if (!tenantRes.ok) {
+          const data = await tenantRes.json()
+          throw new Error(data.error || 'Failed to update tenant')
+        }
 
-      const { tenant } = await tenantRes.json()
+        // Update product assignments
+        await fetch(`/api/products/tenant/${editingTenant.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productIds: selectedProducts }),
+        })
+      } else {
+        // Create new tenant
+        const tenantRes = await fetch('/api/tenants', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: companyName, tier }),
+        })
 
-      // 2. Assign products
-      if (selectedProducts.length > 0) {
-        await fetch('/api/products/assign', {
+        if (!tenantRes.ok) {
+          const data = await tenantRes.json()
+          throw new Error(data.error || 'Failed to create tenant')
+        }
+
+        const { tenant } = await tenantRes.json()
+
+        // Assign products
+        if (selectedProducts.length > 0) {
+          await fetch('/api/products/assign', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              tenantId: tenant.id,
+              productIds: selectedProducts,
+            }),
+          })
+        }
+
+        // Create admin user
+        const userRes = await fetch('/api/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
+            email: adminEmail,
+            name: adminName,
+            role: 'company_admin',
             tenantId: tenant.id,
-            productIds: selectedProducts,
           }),
         })
-      }
 
-      // 3. Create admin user
-      const userRes = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          email: adminEmail,
-          name: adminName,
-          role: 'company_admin',
-          tenantId: tenant.id,
-        }),
-      })
-
-      if (!userRes.ok) {
-        const data = await userRes.json()
-        throw new Error(data.error || 'Failed to create admin user')
+        if (!userRes.ok) {
+          const data = await userRes.json()
+          throw new Error(data.error || 'Failed to create admin user')
+        }
       }
 
       // Success
@@ -168,7 +219,7 @@ export default function Tenants() {
         <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
           <h2 className="text-lg font-bold text-slate-900">Tenants</h2>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={openAddModal}
             className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
@@ -201,7 +252,12 @@ export default function Tenants() {
                           <div className="size-9 rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm">
                             {tenant.name.charAt(0)}
                           </div>
-                          <span className="font-medium text-slate-900">{tenant.name}</span>
+                          <button
+                            onClick={() => openEditModal(tenant)}
+                            className="font-medium text-primary hover:text-blue-700 hover:underline"
+                          >
+                            {tenant.name}
+                          </button>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -223,8 +279,11 @@ export default function Tenants() {
                         {new Date(tenant.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className="text-slate-400 hover:text-slate-600">
-                          <span className="material-symbols-outlined">more_vert</span>
+                        <button
+                          onClick={() => openEditModal(tenant)}
+                          className="text-slate-400 hover:text-primary"
+                        >
+                          <span className="material-symbols-outlined">edit</span>
                         </button>
                       </td>
                     </tr>
@@ -245,8 +304,14 @@ export default function Tenants() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-200">
-              <h3 className="text-lg font-bold text-slate-900">Add New Tenant</h3>
-              <p className="text-sm text-slate-500 mt-1">Onboard a new client company</p>
+              <h3 className="text-lg font-bold text-slate-900">
+                {editingTenant ? 'Edit Tenant' : 'Add New Tenant'}
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                {editingTenant
+                  ? `Tenant Code: ${editingTenant.subdomain}`
+                  : 'Onboard a new client company'}
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -288,7 +353,9 @@ export default function Tenants() {
                       <option value="business">Business</option>
                       <option value="enterprise">Enterprise</option>
                     </select>
-                    <p className="text-xs text-slate-400 mt-1">Tenant ID will be auto-generated</p>
+                    {!editingTenant && (
+                      <p className="text-xs text-slate-400 mt-1">Tenant ID will be auto-generated</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -315,50 +382,55 @@ export default function Tenants() {
                     </button>
                   ))}
                 </div>
+                {products.length === 0 && (
+                  <p className="text-xs text-slate-400">No products available</p>
+                )}
               </div>
 
-              {/* Admin User */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">person</span>
-                  Admin User
-                </h4>
+              {/* Admin User - only for new tenants */}
+              {!editingTenant && (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">person</span>
+                    Admin User
+                  </h4>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={`block text-sm font-medium mb-1 ${adminName ? 'text-green-600' : 'text-red-500'}`}>
-                      Admin Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={adminName}
-                      onChange={(e) => setAdminName(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
-                      required
-                    />
-                    <p className="text-xs text-slate-400 mt-1">Company admin name</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${adminName ? 'text-green-600' : 'text-red-500'}`}>
+                        Admin Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={adminName}
+                        onChange={(e) => setAdminName(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                        required
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Company admin name</p>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${adminEmail ? 'text-green-600' : 'text-red-500'}`}>
+                        Admin Email *
+                      </label>
+                      <input
+                        type="email"
+                        value={adminEmail}
+                        onChange={(e) => setAdminEmail(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                        required
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Your company email ID</p>
+                    </div>
                   </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-1 ${adminEmail ? 'text-green-600' : 'text-red-500'}`}>
-                      Admin Email *
-                    </label>
-                    <input
-                      type="email"
-                      value={adminEmail}
-                      onChange={(e) => setAdminEmail(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
-                      required
-                    />
-                    <p className="text-xs text-slate-400 mt-1">Your company email ID</p>
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                    <p className="text-xs text-blue-700">
+                      <span className="font-medium">Note:</span> An email will be sent to verify this email address.
+                      Default password: <span className="font-mono font-medium">systech@123</span>
+                    </p>
                   </div>
                 </div>
-                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                  <p className="text-xs text-blue-700">
-                    <span className="font-medium">Note:</span> An email will be sent to verify this email address.
-                    Default password: <span className="font-mono font-medium">systech@123</span>
-                  </p>
-                </div>
-              </div>
+              )}
 
               {/* Actions */}
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
@@ -374,7 +446,7 @@ export default function Tenants() {
                   disabled={saving}
                   className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
                 >
-                  {saving ? 'Creating...' : 'Create Tenant'}
+                  {saving ? 'Saving...' : (editingTenant ? 'Save Changes' : 'Create Tenant')}
                 </button>
               </div>
             </form>
