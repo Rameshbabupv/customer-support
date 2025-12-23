@@ -1,20 +1,58 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 
+interface Product {
+  id: number
+  name: string
+  description: string | null
+}
+
 export default function NewTicket() {
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
   const [form, setForm] = useState({
     title: '',
     description: '',
+    productId: 0,
     clientPriority: 3,
     clientSeverity: 3,
   })
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!user?.tenantId || !token) return
+
+      try {
+        const res = await fetch(`/api/products/tenant/${user.tenantId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (!res.ok) throw new Error('Failed to fetch products')
+
+        const data = await res.json()
+        setProducts(data)
+      } catch (err) {
+        console.error('Failed to fetch products:', err)
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+
+    fetchProducts()
+  }, [user?.tenantId, token])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.productId || form.productId === 0) {
+      alert('Please select a product')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -92,6 +130,30 @@ export default function NewTicket() {
               rows={6}
               className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
             />
+          </div>
+
+          {/* Product */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Product</label>
+            {loadingProducts ? (
+              <div className="block w-full rounded-lg border-0 py-3 px-4 text-slate-400 ring-1 ring-inset ring-slate-300 bg-slate-50 text-sm">
+                Loading products...
+              </div>
+            ) : (
+              <select
+                value={form.productId}
+                onChange={(e) => setForm({ ...form, productId: parseInt(e.target.value) })}
+                required
+                className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
+              >
+                <option value={0}>Select a product...</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name} - {product.description}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Priority & Severity */}
