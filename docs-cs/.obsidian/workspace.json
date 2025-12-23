@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "quick-start.md",
+                "file": "testing-guide.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "quick-start"
+              "title": "testing-guide"
             }
           }
         ]
@@ -195,8 +195,9 @@
   },
   "active": "dff5489d5d2da741",
   "lastOpenFiles": [
-    "product.md",
     "quick-start.md",
+    "testing-guide.md",
+    "product.md",
     "design-prompt.md",
     "architecture.md",
     "api.md",
