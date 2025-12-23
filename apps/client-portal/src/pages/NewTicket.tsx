@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 
@@ -11,9 +11,11 @@ interface Product {
 export default function NewTicket() {
   const { token, user } = useAuthStore()
   const navigate = useNavigate()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -45,6 +47,46 @@ export default function NewTicket() {
     fetchProducts()
   }, [user?.tenantId, token])
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const validFiles = files.filter((file) => {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name}: Invalid file type. Only JPG, PNG, GIF, and SVG are allowed.`)
+        return false
+      }
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name}: File too large. Maximum size is 5MB.`)
+        return false
+      }
+      return true
+    })
+
+    // Check total count
+    if (selectedFiles.length + validFiles.length > 5) {
+      alert('Maximum 5 files allowed')
+      return
+    }
+
+    setSelectedFiles([...selectedFiles, ...validFiles])
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index))
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -56,6 +98,7 @@ export default function NewTicket() {
     setLoading(true)
 
     try {
+      // Step 1: Create ticket
       const res = await fetch('/api/tickets', {
         method: 'POST',
         headers: {
@@ -68,9 +111,33 @@ export default function NewTicket() {
       if (!res.ok) throw new Error('Failed to create ticket')
 
       const data = await res.json()
-      navigate(`/tickets/${data.ticket.id}`)
+      const ticketId = data.ticket.id
+
+      // Step 2: Upload files if any
+      if (selectedFiles.length > 0) {
+        const formData = new FormData()
+        selectedFiles.forEach((file) => {
+          formData.append('files', file)
+        })
+
+        const uploadRes = await fetch(`/api/tickets/${ticketId}/attachments`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        })
+
+        if (!uploadRes.ok) {
+          console.error('Failed to upload attachments')
+          // Continue anyway - ticket was created
+        }
+      }
+
+      navigate(`/tickets/${ticketId}`)
     } catch (err) {
       console.error('Failed to create ticket:', err)
+      alert('Failed to create ticket. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -186,14 +253,52 @@ export default function NewTicket() {
             </div>
           </div>
 
-          {/* File Upload Placeholder */}
+          {/* File Upload */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-slate-700 mb-2">Attachments</label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/svg+xml"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-slate-400 transition-colors"
+            >
               <span className="material-symbols-outlined text-4xl text-slate-400 mb-2">cloud_upload</span>
-              <p className="text-sm text-slate-500">Click to upload or drag and drop</p>
-              <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5 files)</p>
+              <p className="text-sm text-slate-500">Click to upload</p>
+              <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5 files, 5MB each)</p>
             </div>
+
+            {/* Selected Files */}
+            {selectedFiles.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {selectedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-slate-50 rounded-lg p-3 border border-slate-200"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className="material-symbols-outlined text-slate-400">attach_file</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
+                        <p className="text-xs text-slate-500">{formatFileSize(file.size)}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(index)}
+                      className="text-slate-400 hover:text-red-600 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Actions */}

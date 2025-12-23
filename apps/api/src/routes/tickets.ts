@@ -3,6 +3,7 @@ import { db } from '../db/index.js'
 import { tickets, attachments, ticketComments } from '../db/schema.js'
 import { eq, and, desc } from 'drizzle-orm'
 import { authenticate, requireOwner } from '../middleware/auth.js'
+import { upload } from '../middleware/upload.js'
 
 export const ticketRoutes = Router()
 
@@ -187,6 +188,60 @@ ticketRoutes.post('/:id/comments', async (req, res) => {
     res.status(201).json({ comment })
   } catch (error) {
     console.error('Add comment error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Upload attachments
+ticketRoutes.post('/:id/attachments', upload.array('files', 5), async (req, res) => {
+  try {
+    const { id } = req.params
+    const { userId, tenantId, isOwner } = req.user!
+    const files = req.files as Express.Multer.File[]
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' })
+    }
+
+    // Check ticket exists and user has access
+    const [ticket] = await db.select().from(tickets)
+      .where(eq(tickets.id, parseInt(id)))
+      .limit(1)
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' })
+    }
+
+    // Check access: ticket creator or owner
+    if (!isOwner && ticket.userId !== userId && ticket.tenantId !== tenantId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+
+    // Save attachment metadata to database
+    const uploadedAttachments = []
+    for (const file of files) {
+      const [attachment] = await db.insert(attachments).values({
+        ticketId: parseInt(id),
+        fileUrl: `/uploads/${file.filename}`,
+        fileName: file.originalname,
+        fileSize: file.size,
+      }).returning()
+
+      uploadedAttachments.push(attachment)
+    }
+
+    res.status(201).json({ attachments: uploadedAttachments })
+  } catch (error: any) {
+    console.error('Upload attachments error:', error)
+
+    // Handle multer errors
+    if (error.message?.includes('File too large')) {
+      return res.status(400).json({ error: 'File size exceeds 5MB limit' })
+    }
+    if (error.message?.includes('Invalid file type')) {
+      return res.status(400).json({ error: 'Invalid file type. Only JPG, PNG, GIF, and SVG are allowed.' })
+    }
+
     res.status(500).json({ error: 'Internal server error' })
   }
 })
