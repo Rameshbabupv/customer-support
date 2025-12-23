@@ -40,21 +40,35 @@ npm run dev:internal
 
 **Password for all users:** `systech@123`
 
-### Internal Portal (Owner Side)
+### Internal Portal (http://localhost:3001)
 
-| Email | Role | Access |
-|-------|------|--------|
-| ramesh@systech.com | admin | Full access, tenant management |
-| mohan@systech.com | support | Ticket triage, internal priority |
-| sakthi@systech.com | integrator | Cross-tenant visibility |
+| Email | Role |
+|-------|------|
+| ramesh@systech.com | admin |
+| mohan@systech.com | support |
+| sakthi@systech.com | integrator |
+| jai@systech.com | support (dev) |
+| priya@systech.com | support (dev) |
 
-### Client Portal (Acme Corp)
+### Client Portal (http://localhost:3000)
 
-| Email | Role | Access |
-|-------|------|--------|
-| john@acme.com | user | Create/view own tickets |
-| jane@acme.com | user | Create/view own tickets |
-| latha@acme.com | company_admin | View all tenant tickets |
+**Acme Corp** (enterprise tier)
+
+| Email | Role |
+|-------|------|
+| john@acme.com | user |
+| jane@acme.com | user |
+| kumar@acme.com | user |
+| latha@acme.com | company_admin |
+| deepa@acme.com | company_admin |
+
+**TechCorp** (business tier)
+
+| Email | Role |
+|-------|------|
+| alex@techcorp.com | user |
+| sara@techcorp.com | user |
+| mike@techcorp.com | company_admin |
 
 ## Database
 

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "product.md",
+                "file": "quick-start.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "product"
+              "title": "quick-start"
             }
           }
         ]
@@ -193,13 +193,13 @@
       "bases:Create new base": false
     }
   },
-  "active": "7f50b3f79349f7ce",
+  "active": "dff5489d5d2da741",
   "lastOpenFiles": [
+    "product.md",
     "quick-start.md",
     "design-prompt.md",
     "architecture.md",
     "api.md",
-    "product.md",
     "work/02-features/z-archived/ticket-management.md",
     "work/02-features/z-archived/authentication-system.md",
     "work/02-features/z-archived/admin-dashboard.md",

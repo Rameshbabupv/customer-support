@@ -11,92 +11,116 @@ async function seed() {
 
   // === TENANTS ===
 
-  // Owner tenant (SysTech - us)
   const [ownerTenant] = await db.insert(tenants).values({
     name: 'SysTech',
     subdomain: 'systech',
     isOwner: true,
     tier: 'enterprise',
   }).returning()
-  console.log('Created owner tenant:', ownerTenant.name)
 
-  // Client tenant (Acme Corp)
-  const [clientTenant] = await db.insert(tenants).values({
+  const [acmeTenant] = await db.insert(tenants).values({
     name: 'Acme Corp',
     subdomain: 'acme',
     isOwner: false,
     tier: 'enterprise',
   }).returning()
-  console.log('Created client tenant:', clientTenant.name)
 
-  // === INTERNAL USERS (Owner Side) ===
+  const [techcorpTenant] = await db.insert(tenants).values({
+    name: 'TechCorp',
+    subdomain: 'techcorp',
+    isOwner: false,
+    tier: 'business',
+  }).returning()
 
-  await db.insert(users).values({
-    email: 'ramesh@systech.com',
-    passwordHash,
-    name: 'Ramesh',
-    role: 'admin',
-    tenantId: ownerTenant.id,
-  })
-  console.log('Created internal user: ramesh@systech.com (admin)')
+  console.log('Created tenants: SysTech, Acme Corp, TechCorp')
 
-  await db.insert(users).values({
-    email: 'mohan@systech.com',
-    passwordHash,
-    name: 'Mohan',
-    role: 'support',
-    tenantId: ownerTenant.id,
-  })
-  console.log('Created internal user: mohan@systech.com (support)')
+  // === INTERNAL USERS (SysTech - Owner) ===
 
-  await db.insert(users).values({
-    email: 'sakthi@systech.com',
-    passwordHash,
-    name: 'Sakthi',
-    role: 'integrator',
-    tenantId: ownerTenant.id,
-  })
-  console.log('Created internal user: sakthi@systech.com (integrator)')
+  const internalUsers = [
+    { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin' },
+    { email: 'mohan@systech.com', name: 'Mohan', role: 'support' },
+    { email: 'sakthi@systech.com', name: 'Sakthi', role: 'integrator' },
+    { email: 'jai@systech.com', name: 'Jai', role: 'support' },
+    { email: 'priya@systech.com', name: 'Priya', role: 'support' },
+  ]
+
+  for (const u of internalUsers) {
+    await db.insert(users).values({
+      email: u.email,
+      passwordHash,
+      name: u.name,
+      role: u.role as any,
+      tenantId: ownerTenant.id,
+    })
+  }
+  console.log('Created 5 internal users')
 
   // === CLIENT USERS (Acme Corp) ===
 
-  await db.insert(users).values({
-    email: 'john@acme.com',
-    passwordHash,
-    name: 'John Doe',
-    role: 'user',
-    tenantId: clientTenant.id,
-  })
-  console.log('Created client user: john@acme.com (user)')
+  const acmeUsers = [
+    { email: 'john@acme.com', name: 'John Doe', role: 'user' },
+    { email: 'jane@acme.com', name: 'Jane Smith', role: 'user' },
+    { email: 'kumar@acme.com', name: 'Kumar', role: 'user' },
+    { email: 'latha@acme.com', name: 'Latha', role: 'company_admin' },
+    { email: 'deepa@acme.com', name: 'Deepa', role: 'company_admin' },
+  ]
 
-  await db.insert(users).values({
-    email: 'jane@acme.com',
-    passwordHash,
-    name: 'Jane Smith',
-    role: 'user',
-    tenantId: clientTenant.id,
-  })
-  console.log('Created client user: jane@acme.com (user)')
+  for (const u of acmeUsers) {
+    await db.insert(users).values({
+      email: u.email,
+      passwordHash,
+      name: u.name,
+      role: u.role as any,
+      tenantId: acmeTenant.id,
+    })
+  }
+  console.log('Created 5 Acme Corp users')
 
-  await db.insert(users).values({
-    email: 'latha@acme.com',
-    passwordHash,
-    name: 'Latha',
-    role: 'company_admin',
-    tenantId: clientTenant.id,
-  })
-  console.log('Created client user: latha@acme.com (company_admin)')
+  // === CLIENT USERS (TechCorp) ===
+
+  const techcorpUsers = [
+    { email: 'alex@techcorp.com', name: 'Alex', role: 'user' },
+    { email: 'sara@techcorp.com', name: 'Sara', role: 'user' },
+    { email: 'mike@techcorp.com', name: 'Mike', role: 'company_admin' },
+  ]
+
+  for (const u of techcorpUsers) {
+    await db.insert(users).values({
+      email: u.email,
+      passwordHash,
+      name: u.name,
+      role: u.role as any,
+      tenantId: techcorpTenant.id,
+    })
+  }
+  console.log('Created 3 TechCorp users')
+
+  // === SUMMARY ===
 
   console.log('\n✅ Seed complete!')
   console.log('\n📋 All users password: systech@123')
-  console.log('\nInternal Portal (http://localhost:3001):')
-  console.log('  ramesh@systech.com  (admin)')
-  console.log('  mohan@systech.com   (support)')
-  console.log('  sakthi@systech.com  (integrator)')
-  console.log('\nClient Portal (http://localhost:3000):')
-  console.log('  john@acme.com       (user)')
-  console.log('  jane@acme.com       (user)')
-  console.log('  latha@acme.com      (company_admin)')
+  console.log('\n┌─────────────────────────────────────────────────────────┐')
+  console.log('│ INTERNAL PORTAL (http://localhost:3001)                 │')
+  console.log('├─────────────────────────────────────────────────────────┤')
+  console.log('│ ramesh@systech.com    admin                             │')
+  console.log('│ mohan@systech.com     support                           │')
+  console.log('│ sakthi@systech.com    integrator                        │')
+  console.log('│ jai@systech.com       support (dev)                     │')
+  console.log('│ priya@systech.com     support (dev)                     │')
+  console.log('├─────────────────────────────────────────────────────────┤')
+  console.log('│ CLIENT PORTAL (http://localhost:3000)                   │')
+  console.log('├─────────────────────────────────────────────────────────┤')
+  console.log('│ Acme Corp:                                              │')
+  console.log('│   john@acme.com       user                              │')
+  console.log('│   jane@acme.com       user                              │')
+  console.log('│   kumar@acme.com      user                              │')
+  console.log('│   latha@acme.com      company_admin                     │')
+  console.log('│   deepa@acme.com      company_admin                     │')
+  console.log('│ TechCorp:                                               │')
+  console.log('│   alex@techcorp.com   user                              │')
+  console.log('│   sara@techcorp.com   user                              │')
+  console.log('│   mike@techcorp.com   company_admin                     │')
+  console.log('└─────────────────────────────────────────────────────────┘')
 }
 
 seed().catch(console.error)
