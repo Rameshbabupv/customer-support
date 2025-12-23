@@ -51,7 +51,7 @@ export default function Tenants() {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
-      setTenants(data)
+      setTenants(data.tenants || [])
     } catch (err) {
       console.error('Failed to fetch tenants', err)
     } finally {
