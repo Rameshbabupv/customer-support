@@ -38,21 +38,25 @@ async function seed() {
   // === PRODUCTS (Our Offerings) ===
 
   const productList = [
-    { name: 'HRM', description: 'Human Resource Management System' },
-    { name: 'Payroll', description: 'Payroll & Compensation Management' },
-    { name: 'Attendance', description: 'Time & Attendance Tracking' },
-    { name: 'Leave Management', description: 'Leave Request & Approval System' },
-    { name: 'Recruitment', description: 'Applicant Tracking & Hiring' },
-    { name: 'Performance', description: 'Performance Review & Appraisal' },
-    { name: 'Employee Self Service', description: 'Employee Portal for HR Services' },
-    { name: 'Training & LMS', description: 'Learning Management System' },
-    { name: 'Asset Management', description: 'IT & Office Asset Tracking' },
-    { name: 'Expense Management', description: 'Employee Expense Claims & Reimbursement' },
-    { name: 'Project Management', description: 'Project Planning & Task Tracking' },
-    { name: 'Timesheet', description: 'Project-based Time Tracking' },
-    { name: 'Document Management', description: 'HR Document Storage & Workflow' },
-    { name: 'Onboarding', description: 'New Employee Onboarding Automation' },
-    { name: 'Exit Management', description: 'Offboarding & Exit Interview System' },
+    // Legacy Products
+    { name: 'CRM (legacy)', description: 'Customer Relationship Management - Marketing, lead generation, deal conversion' },
+    { name: 'SDMS (legacy)', description: 'Supply & Distribution Management - Multi-location distributors (automobile, industrial, FMCG, food)' },
+    { name: 'MMS (legacy)', description: 'Manufacturing Management System - Discrete manufacturing (machinery, fabrication, foundry, dies & moulds)' },
+    { name: 'HTMS (legacy)', description: 'Home Textile Management System - Made-ups and home textile manufacturing' },
+    { name: 'SMS (legacy)', description: 'Spinning Management System - Cotton to yarn conversion (first stage of textile supply chain)' },
+    { name: 'HRM (legacy)', description: 'Human Resource Management - Recruitment to retirement, payroll, attendance, leave management' },
+    { name: 'Finance (legacy)', description: 'Financial Management - Standalone and integrated finance module for all business metrics' },
+    { name: 'Custom', description: 'Custom-made legacy applications for exclusive businesses and customers' },
+
+    // New/v2 Products
+    { name: 'CRM Sales', description: 'Customer Relationship Management v2 - Pre-sale customer engagement' },
+    { name: 'CRM Service', description: 'Customer Relationship Management v2 - Post-sale customer support and service' },
+    { name: 'SDMS v2', description: 'Supply & Distribution Management System - New version with enhanced features' },
+    { name: 'MMS v2', description: 'Manufacturing Management System - New version with enhanced features' },
+    { name: 'TMS', description: 'Textile Management System - Comprehensive solution for spinning, processing, weaving, knitting, apparel' },
+    { name: 'HRM v2', description: 'Human Resource Management - New version with enhanced features' },
+    { name: 'Finance v2', description: 'Financial Management - New version with enhanced features' },
+    { name: 'EXIM', description: 'Export & Import Management - For businesses involved in international trade' },
   ]
 
   const createdProducts: number[] = []
