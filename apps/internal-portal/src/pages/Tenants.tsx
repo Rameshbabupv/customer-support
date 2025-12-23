@@ -33,7 +33,6 @@ export default function Tenants() {
 
   // Form state
   const [companyName, setCompanyName] = useState('')
-  const [subdomain, setSubdomain] = useState('')
   const [tier, setTier] = useState<'enterprise' | 'business' | 'starter'>('starter')
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
   const [adminEmail, setAdminEmail] = useState('')
@@ -71,15 +70,6 @@ export default function Tenants() {
     }
   }
 
-  const generateSubdomain = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 20)
-  }
-
-  const handleCompanyNameChange = (value: string) => {
-    setCompanyName(value)
-    setSubdomain(generateSubdomain(value))
-  }
-
   const toggleProduct = (productId: number) => {
     setSelectedProducts(prev =>
       prev.includes(productId)
@@ -90,7 +80,6 @@ export default function Tenants() {
 
   const resetForm = () => {
     setCompanyName('')
-    setSubdomain('')
     setTier('starter')
     setSelectedProducts([])
     setAdminEmail('')
@@ -113,7 +102,6 @@ export default function Tenants() {
         },
         body: JSON.stringify({
           name: companyName,
-          subdomain,
           tier,
         }),
       })
@@ -123,7 +111,7 @@ export default function Tenants() {
         throw new Error(data.error || 'Failed to create tenant')
       }
 
-      const tenant = await tenantRes.json()
+      const { tenant } = await tenantRes.json()
 
       // 2. Assign products
       if (selectedProducts.length > 0) {
@@ -198,7 +186,7 @@ export default function Tenants() {
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Subdomain</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tenant Code</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tier</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Created</th>
@@ -275,25 +263,15 @@ export default function Tenants() {
                   Company Information
                 </h4>
 
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">Company Name *</label>
-                  <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => handleCompanyNameChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
-                    required
-                  />
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Subdomain</label>
+                    <label className="block text-sm text-slate-600 mb-1">Company Name *</label>
                     <input
                       type="text"
-                      value={subdomain}
-                      onChange={(e) => setSubdomain(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 font-mono"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                      required
                     />
                   </div>
                   <div>
@@ -309,6 +287,7 @@ export default function Tenants() {
                     </select>
                   </div>
                 </div>
+                <p className="text-xs text-slate-400">Tenant ID will be auto-generated</p>
               </div>
 
               {/* Products */}

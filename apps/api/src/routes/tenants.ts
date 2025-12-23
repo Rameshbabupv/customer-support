@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { nanoid } from 'nanoid'
 import { db } from '../db/index.js'
 import { tenants, users } from '../db/schema.js'
 import { eq, count } from 'drizzle-orm'
@@ -55,11 +56,12 @@ tenantRoutes.get('/:id', async (req, res) => {
 // Create tenant (owner only)
 tenantRoutes.post('/', requireOwner, async (req, res) => {
   try {
-    const { name, subdomain, tier } = req.body
+    const { name, tier } = req.body
+    const tenantCode = nanoid(10).toUpperCase() // e.g., "XK9Q2MZLP1"
 
     const [tenant] = await db.insert(tenants).values({
       name,
-      subdomain,
+      subdomain: tenantCode,
       tier,
       isOwner: false,
     }).returning()

@@ -195,8 +195,9 @@
   },
   "active": "dff5489d5d2da741",
   "lastOpenFiles": [
-    "quick-start.md",
+    "mock-screens/login_page/screen.png",
     "testing-guide.md",
+    "quick-start.md",
     "product.md",
     "design-prompt.md",
     "architecture.md",
@@ -218,7 +219,6 @@
     "mock-screens/ticket_detail_view/screen.png",
     "mock-screens/support_queue_kanban/screen.png",
     "mock-screens/new_ticket_form/screen.png",
-    "mock-screens/login_page/screen.png",
     "mock-screens/admin_users_table_2/screen.png",
     "mock-screens/admin_users_table_1/screen.png",
     "mock-screens/user_registration_page/screen.png",
