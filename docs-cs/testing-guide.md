@@ -107,8 +107,19 @@ Client-side admin. Can view all tickets within their tenant/company.
 
 ## URLs
 
-| App | URL |
-|-----|-----|
-| Client Portal | http://localhost:3000 |
-| Internal Portal | http://localhost:3001 |
-| API | http://localhost:4000 |
+| App | Local | Network |
+|-----|-------|---------|
+| Client Portal | http://localhost:3000 | http://10.0.0.9:3000 |
+| Internal Portal | http://localhost:3001 | http://10.0.0.9:3001 |
+| API | http://localhost:4000 | (proxied via portals) |
+
+**To start in network mode:**
+```bash
+# Kill existing
+lsof -ti:4000,3000,3001 | xargs kill -9
+
+# Start all apps
+npm run dev:api &
+cd apps/client-portal && npx vite --host --port 3000 &
+cd apps/internal-portal && npx vite --host --port 3001 &
+```
