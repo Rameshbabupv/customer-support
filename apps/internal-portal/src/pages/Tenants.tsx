@@ -265,7 +265,9 @@ export default function Tenants() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Company Name *</label>
+                    <label className={`block text-sm font-medium mb-1 ${companyName ? 'text-green-600' : 'text-red-500'}`}>
+                      Company Name *
+                    </label>
                     <input
                       type="text"
                       value={companyName}
@@ -273,6 +275,7 @@ export default function Tenants() {
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                       required
                     />
+                    <p className="text-xs text-slate-400 mt-1">Enter your company name</p>
                   </div>
                   <div>
                     <label className="block text-sm text-slate-600 mb-1">Tier</label>
@@ -285,9 +288,9 @@ export default function Tenants() {
                       <option value="business">Business</option>
                       <option value="enterprise">Enterprise</option>
                     </select>
+                    <p className="text-xs text-slate-400 mt-1">Tenant ID will be auto-generated</p>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400">Tenant ID will be auto-generated</p>
               </div>
 
               {/* Products */}
@@ -323,7 +326,9 @@ export default function Tenants() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Admin Name *</label>
+                    <label className={`block text-sm font-medium mb-1 ${adminName ? 'text-green-600' : 'text-red-500'}`}>
+                      Admin Name *
+                    </label>
                     <input
                       type="text"
                       value={adminName}
@@ -331,9 +336,12 @@ export default function Tenants() {
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                       required
                     />
+                    <p className="text-xs text-slate-400 mt-1">Company admin name</p>
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Admin Email *</label>
+                    <label className={`block text-sm font-medium mb-1 ${adminEmail ? 'text-green-600' : 'text-red-500'}`}>
+                      Admin Email *
+                    </label>
                     <input
                       type="email"
                       value={adminEmail}
@@ -341,9 +349,15 @@ export default function Tenants() {
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                       required
                     />
+                    <p className="text-xs text-slate-400 mt-1">Your company email ID</p>
                   </div>
                 </div>
-                <p className="text-xs text-slate-500">Password will be: systech@123</p>
+                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    <span className="font-medium">Note:</span> An email will be sent to verify this email address.
+                    Default password: <span className="font-mono font-medium">systech@123</span>
+                  </p>
+                </div>
               </div>
 
               {/* Actions */}
