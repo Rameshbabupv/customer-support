@@ -59,25 +59,35 @@ async function seed() {
     { name: 'EXIM', description: 'Export & Import Management - For businesses involved in international trade' },
   ]
 
-  const createdProducts: number[] = []
+  const createdProducts: { id: number; name: string }[] = []
   for (const p of productList) {
     const [prod] = await db.insert(products).values(p).returning()
-    createdProducts.push(prod.id)
+    createdProducts.push({ id: prod.id, name: prod.name })
   }
   console.log(`Created ${productList.length} products`)
 
+  // Helper function to find product by name
+  const findProduct = (name: string) => {
+    const product = createdProducts.find(p => p.name === name)
+    if (!product) throw new Error(`Product not found: ${name}`)
+    return product.id
+  }
+
   // Assign products to tenants
-  // Acme Corp: HRM, Payroll, Attendance
+  // Acme Corp (Enterprise): CRM Sales, CRM Service, HRM v2, Finance v2, EXIM
   await db.insert(tenantProducts).values([
-    { tenantId: acmeTenant.id, productId: createdProducts[0] },
-    { tenantId: acmeTenant.id, productId: createdProducts[1] },
-    { tenantId: acmeTenant.id, productId: createdProducts[2] },
+    { tenantId: acmeTenant.id, productId: findProduct('CRM Sales') },
+    { tenantId: acmeTenant.id, productId: findProduct('CRM Service') },
+    { tenantId: acmeTenant.id, productId: findProduct('HRM v2') },
+    { tenantId: acmeTenant.id, productId: findProduct('Finance v2') },
+    { tenantId: acmeTenant.id, productId: findProduct('EXIM') },
   ])
 
-  // TechCorp: HRM, Leave Management
+  // TechCorp (Business): MMS v2, TMS, HRM v2
   await db.insert(tenantProducts).values([
-    { tenantId: techcorpTenant.id, productId: createdProducts[0] },
-    { tenantId: techcorpTenant.id, productId: createdProducts[3] },
+    { tenantId: techcorpTenant.id, productId: findProduct('MMS v2') },
+    { tenantId: techcorpTenant.id, productId: findProduct('TMS') },
+    { tenantId: techcorpTenant.id, productId: findProduct('HRM v2') },
   ])
   console.log('Assigned products to tenants')
 
