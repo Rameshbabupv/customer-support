@@ -30,21 +30,21 @@ npm run db:seed
 
 ## Run Applications
 
+**Start all servers (from root):**
 ```bash
-# Terminal 1: API (port 4000)
-cd apps/api && npm run dev
-
-# Terminal 2: Client Portal (port 3000)
-cd apps/client-portal && npm run dev
-
-# Terminal 3: Internal Portal (port 3003)
-cd apps/internal-portal && npm run dev
+npm run dev
 ```
 
-**Network access (for team testing):**
+This starts all three servers in one terminal with color-coded output:
+- 🔵 **API** (blue) → http://localhost:4000
+- 🟢 **CLIENT** (green) → http://localhost:3000
+- 🟣 **INTERNAL** (magenta) → http://localhost:3003
+
+**Or run individually:**
 ```bash
-# Add --host flag to expose on network
-npm run dev -- --host
+npm run dev:api       # API only (port 4000)
+npm run dev:client    # Client Portal only (port 3000)
+npm run dev:internal  # Internal Portal only (port 3003)
 ```
 
 ## URLs

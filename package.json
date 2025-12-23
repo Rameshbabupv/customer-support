@@ -6,15 +6,17 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:api": "cd apps/api && npx tsx src/index.ts",
-    "dev:client": "cd apps/client-portal && npx vite --port 3000",
-    "dev:internal": "cd apps/internal-portal && npx vite --port 3001",
+    "dev": "concurrently -n API,CLIENT,INTERNAL -c blue,green,magenta \"npm run dev:api\" \"npm run dev:client\" \"npm run dev:internal\"",
+    "dev:api": "cd apps/api && npx tsx watch src/index.ts",
+    "dev:client": "cd apps/client-portal && npx vite",
+    "dev:internal": "cd apps/internal-portal && npx vite",
     "build": "npm run build --workspaces --if-present",
     "db:push": "cd apps/api && npx drizzle-kit push:sqlite",
     "db:seed": "npx tsx apps/api/src/db/seed.ts",
     "db:studio": "cd apps/api && npx drizzle-kit studio"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "typescript": "^5.3.3"
   }
 }
