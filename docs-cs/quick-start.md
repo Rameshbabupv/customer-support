@@ -19,13 +19,13 @@ npm run db:seed
 ## Run Applications
 
 ```bash
-# Terminal 1: API (port 3000)
+# Terminal 1: API (port 4000)
 cd apps/api && npm run dev
 
-# Terminal 2: Client Portal (port 5173)
+# Terminal 2: Client Portal (port 3000)
 cd apps/client-portal && npm run dev
 
-# Terminal 3: Internal Portal (port 3001)
+# Terminal 3: Internal Portal (port 3003)
 cd apps/internal-portal && npm run dev
 ```
 
@@ -38,15 +38,15 @@ npm run dev -- --host
 
 | App | Local | Network |
 |-----|-------|---------|
-| API | http://localhost:3000 | http://YOUR_IP:3000 |
-| Client Portal | http://localhost:5173 | http://YOUR_IP:5173 |
-| Internal Portal | http://localhost:3001 | http://YOUR_IP:3001 |
+| API | http://localhost:4000 | http://YOUR_IP:4000 |
+| Client Portal | http://localhost:3000 | http://YOUR_IP:3000 |
+| Internal Portal | http://localhost:3003 | http://YOUR_IP:3003 |
 
 ## Test Users
 
 **Password for all users:** `systech@123`
 
-### Internal Portal (http://localhost:3001)
+### Internal Portal (http://localhost:3003)
 
 | Email | Role | Access |
 |-------|------|--------|
@@ -58,7 +58,7 @@ npm run dev -- --host
 
 **Features:** Tickets (Kanban), Tenants (CRUD + products), Products (CRUD)
 
-### Client Portal (http://localhost:5173)
+### Client Portal (http://localhost:3000)
 
 Login requires: Email + Password + **Tenant Code**
 
