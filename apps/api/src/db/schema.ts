@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { relations } from 'drizzle-orm'
 
 // Tenant (Company)
 export const tenants = sqliteTable('tenants', {
@@ -72,3 +73,20 @@ export const ticketComments = sqliteTable('ticket_comments', {
   isInternal: integer('is_internal', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
+
+// Relations
+export const ticketsRelations = relations(tickets, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [tickets.tenantId],
+    references: [tenants.id],
+  }),
+  user: one(users, {
+    fields: [tickets.userId],
+    references: [users.id],
+  }),
+}))
+
+export const tenantsRelations = relations(tenants, ({ many }) => ({
+  tickets: many(tickets),
+  users: many(users),
+}))

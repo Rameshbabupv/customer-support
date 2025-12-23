@@ -9,6 +9,38 @@ export const ticketRoutes = Router()
 // All ticket routes require authentication
 ticketRoutes.use(authenticate)
 
+// Get all tickets (owner only) - for internal portal kanban
+ticketRoutes.get('/all', requireOwner, async (req, res) => {
+  try {
+    const results = await db.query.tickets.findMany({
+      orderBy: (tickets, { desc }) => [desc(tickets.createdAt)],
+      with: {
+        tenant: true,
+      },
+    })
+
+    // Flatten response for easier frontend use
+    const formatted = results.map((t: any) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      status: t.status,
+      clientPriority: t.clientPriority,
+      clientSeverity: t.clientSeverity,
+      internalPriority: t.internalPriority,
+      internalSeverity: t.internalSeverity,
+      tenantId: t.tenantId,
+      tenantName: t.tenant?.name || 'Unknown',
+      createdAt: t.createdAt,
+    }))
+
+    res.json(formatted)
+  } catch (error) {
+    console.error('Get all tickets error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Create ticket
 ticketRoutes.post('/', async (req, res) => {
   try {
