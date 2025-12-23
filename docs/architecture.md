@@ -244,6 +244,53 @@ if (jwt.is_owner) {
 }
 ```
 
+## Security (Defense in Depth)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  LAYER 1: Obscurity                                         │
+│  └── Clients don't know internal portal URL exists          │
+├─────────────────────────────────────────────────────────────┤
+│  LAYER 2: Domain Separation                                 │
+│  └── portal.app.com (client) vs admin.app.com (internal)    │
+├─────────────────────────────────────────────────────────────┤
+│  LAYER 3: Auth + Redirect                                   │
+│  └── If is_owner=false hits internal → redirect to client   │
+├─────────────────────────────────────────────────────────────┤
+│  LAYER 4: API Enforcement                                   │
+│  └── Even if UI bypassed, API rejects non-owner requests    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Internal Portal Guard:**
+```ts
+// internal-portal/middleware/ownerGuard.ts
+export function ownerGuard(jwt: JWTPayload) {
+  if (!jwt.is_owner) {
+    redirect('https://portal.app.com')  // send to client portal
+  }
+}
+```
+
+**API Route Protection:**
+```ts
+// api/middleware/requireOwner.ts
+export function requireOwner(req, res, next) {
+  if (!req.jwt.is_owner) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+  next()
+}
+
+// Usage
+router.get('/admin/all-tenants', requireOwner, getAllTenants)
+```
+
+**Additional Hardening (Optional):**
+- Internal portal behind VPN or IP whitelist
+- Rate limiting on login attempts
+- Audit logging for all internal portal access
+
 ## Data Models
 
 ### Tenant
