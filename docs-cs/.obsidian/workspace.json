@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "testing-guide.md",
+                "file": "work/02-features/z-archived/admin-dashboard.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "testing-guide"
+              "title": "admin-dashboard"
             }
           }
         ]
@@ -193,20 +193,21 @@
       "bases:Create new base": false
     }
   },
-  "active": "dff5489d5d2da741",
+  "active": "7f50b3f79349f7ce",
   "lastOpenFiles": [
-    "mock-screens/login_page/screen.png",
+    "work/02-features/tenant-onboarding.md",
+    "work/02-features/z-archived/authentication-system.md",
+    "work/02-features/z-archived/multi-tenant-setup.md",
+    "work/02-features/z-archived/ticket-management.md",
     "testing-guide.md",
+    "mock-screens/login_page/screen.png",
     "quick-start.md",
     "product.md",
     "design-prompt.md",
     "architecture.md",
     "api.md",
-    "work/02-features/z-archived/ticket-management.md",
-    "work/02-features/z-archived/authentication-system.md",
     "work/02-features/z-archived/admin-dashboard.md",
     "work/01-epics/z-archived/customer-support-mvp.md",
-    "work/02-features/z-archived/multi-tenant-setup.md",
     "misc/01-bootstrap.md",
     "work/guide.md",
     "work/templates/customer-issue-template.md",
