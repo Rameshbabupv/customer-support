@@ -130,6 +130,81 @@ Run from `apps/api`:
 | `npm run db:push` | Push schema to SQLite |
 | `npm run db:seed` | Seed sample data |
 
+## AWS Deployment (EC2)
+
+### 1. Launch EC2 Instance
+- Ubuntu 22.04 LTS
+- Instance type: t2.micro (free tier) or t2.small
+- Security Group: Allow inbound on ports 22, 3000, 3003, 4000
+
+### 2. SSH into Instance
+```bash
+ssh -i your-key.pem ubuntu@<EC2_PUBLIC_IP>
+```
+
+### 3. Install Node.js
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v  # Verify: v20.x
+```
+
+### 4. Clone & Setup
+```bash
+git clone https://github.com/Rameshbabupv/customer-support.git
+cd customer-support
+npm install
+cd apps/api
+npm run db:push
+npm run db:seed
+cd ../..
+```
+
+### 5. Run with Host Binding
+```bash
+# Option A: Run all servers (use screen/tmux to keep running)
+npm run dev
+
+# Option B: Run with --host for network access
+cd apps/api && npm run dev &
+cd apps/client-portal && npm run dev -- --host &
+cd apps/internal-portal && npm run dev -- --host &
+```
+
+### 6. Access URLs
+| App | URL |
+|-----|-----|
+| API | http://<EC2_PUBLIC_IP>:4000 |
+| Client Portal | http://<EC2_PUBLIC_IP>:3000 |
+| Internal Portal | http://<EC2_PUBLIC_IP>:3003 |
+
+### 7. Run in Background (using PM2)
+```bash
+# Install PM2
+sudo npm install -g pm2
+
+# Start API
+cd apps/api && pm2 start "npm run dev" --name api
+
+# Start portals (with host binding)
+cd ../client-portal && pm2 start "npm run dev -- --host" --name client
+cd ../internal-portal && pm2 start "npm run dev -- --host" --name internal
+
+# Save & auto-start on reboot
+pm2 save
+pm2 startup
+```
+
+### Security Group Rules (AWS Console)
+| Type | Port | Source |
+|------|------|--------|
+| SSH | 22 | Your IP |
+| Custom TCP | 3000 | 0.0.0.0/0 |
+| Custom TCP | 3003 | 0.0.0.0/0 |
+| Custom TCP | 4000 | 0.0.0.0/0 |
+
+---
+
 ## API Endpoints (http://localhost:4000)
 
 ### Auth
