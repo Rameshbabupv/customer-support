@@ -1,6 +1,7 @@
 import { db } from './index.js'
 import { tenants, users, products, tenantProducts } from './schema.js'
 import bcrypt from 'bcryptjs'
+import { nanoid } from 'nanoid'
 
 const PASSWORD = 'systech@123'
 
@@ -13,21 +14,21 @@ async function seed() {
 
   const [ownerTenant] = await db.insert(tenants).values({
     name: 'SysTech',
-    subdomain: 'systech',
+    subdomain: 'SYSTECH',  // Owner keeps fixed code
     isOwner: true,
     tier: 'enterprise',
   }).returning()
 
   const [acmeTenant] = await db.insert(tenants).values({
     name: 'Acme Corp',
-    subdomain: 'acme',
+    subdomain: nanoid(10).toUpperCase(),
     isOwner: false,
     tier: 'enterprise',
   }).returning()
 
   const [techcorpTenant] = await db.insert(tenants).values({
     name: 'TechCorp',
-    subdomain: 'techcorp',
+    subdomain: nanoid(10).toUpperCase(),
     isOwner: false,
     tier: 'business',
   }).returning()
