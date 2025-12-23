@@ -3,6 +3,8 @@ import cors from 'cors'
 import { authRoutes } from './routes/auth.js'
 import { ticketRoutes } from './routes/tickets.js'
 import { tenantRoutes } from './routes/tenants.js'
+import { productRoutes } from './routes/products.js'
+import { userRoutes } from './routes/users.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -15,6 +17,8 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/tickets', ticketRoutes)
 app.use('/api/tenants', tenantRoutes)
+app.use('/api/products', productRoutes)
+app.use('/api/users', userRoutes)
 
 // Health check
 app.get('/health', (_, res) => res.json({ status: 'ok' }))

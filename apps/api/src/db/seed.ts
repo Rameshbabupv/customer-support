@@ -1,5 +1,5 @@
 import { db } from './index.js'
-import { tenants, users } from './schema.js'
+import { tenants, users, products, tenantProducts } from './schema.js'
 import bcrypt from 'bcryptjs'
 
 const PASSWORD = 'systech@123'
@@ -33,6 +33,39 @@ async function seed() {
   }).returning()
 
   console.log('Created tenants: SysTech, Acme Corp, TechCorp')
+
+  // === PRODUCTS (Our Offerings) ===
+
+  const productList = [
+    { name: 'HRM', description: 'Human Resource Management System' },
+    { name: 'Payroll', description: 'Payroll & Compensation Management' },
+    { name: 'Attendance', description: 'Time & Attendance Tracking' },
+    { name: 'Leave Management', description: 'Leave Request & Approval System' },
+    { name: 'Recruitment', description: 'Applicant Tracking & Hiring' },
+    { name: 'Performance', description: 'Performance Review & Appraisal' },
+  ]
+
+  const createdProducts: number[] = []
+  for (const p of productList) {
+    const [prod] = await db.insert(products).values(p).returning()
+    createdProducts.push(prod.id)
+  }
+  console.log('Created 6 products: HRM, Payroll, Attendance, Leave, Recruitment, Performance')
+
+  // Assign products to tenants
+  // Acme Corp: HRM, Payroll, Attendance
+  await db.insert(tenantProducts).values([
+    { tenantId: acmeTenant.id, productId: createdProducts[0] },
+    { tenantId: acmeTenant.id, productId: createdProducts[1] },
+    { tenantId: acmeTenant.id, productId: createdProducts[2] },
+  ])
+
+  // TechCorp: HRM, Leave Management
+  await db.insert(tenantProducts).values([
+    { tenantId: techcorpTenant.id, productId: createdProducts[0] },
+    { tenantId: techcorpTenant.id, productId: createdProducts[3] },
+  ])
+  console.log('Assigned products to tenants')
 
   // === INTERNAL USERS (SysTech - Owner) ===
 
