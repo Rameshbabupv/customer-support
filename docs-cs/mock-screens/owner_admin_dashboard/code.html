@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Support User Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "background-light": "#f8f9fc", 
+                        "background-dark": "#101722",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "text-main": "#0d131c",
+                        "text-secondary": "#49699c",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-display transition-colors duration-200 overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Side Navigation -->
+<aside class="w-64 flex-shrink-0 flex flex-col justify-between border-r border-[#e7ecf4] dark:border-gray-800 bg-background-light dark:bg-surface-dark overflow-y-auto hidden lg:flex">
+<div class="flex flex-col gap-4 p-4">
+<div class="flex gap-3 items-center mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-sm" data-alt="Abstract blue logo shape" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDI72-gKppdVW5otPUpJVwKVZPRTP9kxkDuUG67ZSJX_hCiP8IFA6QD051aoH2eQN8wkBXvyveAwKpyKfuV1sPoFzO9yVqGkCE5q0XvQGdUPIHA98ggBiLwFYFP_h6kOtgg8nLmO0b6wTcNsK85uXCpCZ-jBmv9TVwAH5VKE-6pVZszMmkkddrONlXdIvCl_ZPWNFwagTLrSdaSSS9XbGtZyh9Nqw_xw-D5nBhMRFO7yls9miyubLpI4r8zuk15PSJuFBd-qrDnkV8");'></div>
+<div class="flex flex-col">
+<h1 class="text-text-main dark:text-white text-base font-bold leading-normal">SupportHub</h1>
+<p class="text-text-secondary dark:text-gray-400 text-sm font-normal leading-normal">Internal Tool</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#e7ecf4] dark:bg-primary/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-text-main dark:text-white" style="font-size: 24px;">dashboard</span>
+<p class="text-text-main dark:text-white text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-main dark:text-gray-300 group-hover:text-primary transition-colors" style="font-size: 24px;">confirmation_number</span>
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Tickets</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-main dark:text-gray-300 group-hover:text-primary transition-colors" style="font-size: 24px;">group</span>
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Customers</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-main dark:text-gray-300 group-hover:text-primary transition-colors" style="font-size: 24px;">bar_chart</span>
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Analytics</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-main dark:text-gray-300 group-hover:text-primary transition-colors" style="font-size: 24px;">settings</span>
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="p-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-blue-600 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em] shadow-md shadow-blue-500/20">
+<span class="truncate">Create Ticket</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full relative overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Top Header -->
+<header class="flex-shrink-0 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7ecf4] dark:border-gray-800 bg-surface-light dark:bg-surface-dark px-6 py-3 z-10">
+<div class="flex items-center gap-8 w-1/2">
+<div class="flex items-center gap-4 text-text-main dark:text-white lg:hidden">
+<button class="p-1"><span class="material-symbols-outlined">menu</span></button>
+</div>
+<div class="hidden md:flex items-center gap-4 text-text-main dark:text-white">
+<!-- Logo Icon SVG -->
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined" style="font-size: 28px;">dashboard</span>
+</div>
+<h2 class="text-text-main dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Dashboard</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-[#e7ecf4] dark:bg-gray-800 group focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+<div class="text-text-secondary dark:text-gray-400 flex border-none items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined" style="font-size: 20px;">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-main dark:text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-secondary px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search tickets..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="flex gap-2">
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg size-10 bg-[#e7ecf4] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-text-main dark:text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg size-10 bg-[#e7ecf4] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-text-main dark:text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">account_circle</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-gray-700" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDvjWD5djaU2GQ9CHS-czU6cjkCLvZVn0rH_8hjnlODJ30Y4EI02GTS6Mrj1yfT2GJp1zfXLY3MxMTu1PmeoSBOuZPLnJkPlJqxnKin-pF3-UX35FKBNbxMOg7LI2SU9O5fuDV0PxkZ5bSTRLiB8vTIagLn4kud1imPr6nwCsj37wl7OQS3Po-Oh03B9yXPgoHN7pvrRZ4Ux8AYEIURD7AzWlGsKZd1zKuEcs-wYp7e2tC6TZlMiJLiiQjAT9vZ3qI9xbB37kjK1Ys");'></div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-8">
+<!-- KPI Stats Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Open Tickets</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-1 rounded-md" style="font-size: 20px;">folder_open</span>
+</div>
+<div class="flex items-end gap-2 mt-2">
+<p class="text-text-main dark:text-white tracking-light text-3xl font-bold leading-tight">24</p>
+<p class="text-[#07883b] text-sm font-medium leading-normal mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-0.5">trending_up</span>+12%</p>
+</div>
+<p class="text-text-secondary text-xs">vs. last week</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Avg Response Time</p>
+<span class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-1 rounded-md" style="font-size: 20px;">timer</span>
+</div>
+<div class="flex items-end gap-2 mt-2">
+<p class="text-text-main dark:text-white tracking-light text-3xl font-bold leading-tight">1h 45m</p>
+<p class="text-[#e73908] text-sm font-medium leading-normal mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-0.5">trending_down</span>-5%</p>
+</div>
+<p class="text-text-secondary text-xs">vs. last week</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<p class="text-text-main dark:text-gray-300 text-sm font-medium leading-normal">Resolution Rate</p>
+<span class="material-symbols-outlined text-green-600 bg-green-600/10 p-1 rounded-md" style="font-size: 20px;">check_circle</span>
+</div>
+<div class="flex items-end gap-2 mt-2">
+<p class="text-text-main dark:text-white tracking-light text-3xl font-bold leading-tight">94%</p>
+<p class="text-[#07883b] text-sm font-medium leading-normal mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-0.5">trending_up</span>+2%</p>
+</div>
+<p class="text-text-secondary text-xs">vs. last week</p>
+</div>
+</section>
+<!-- Chart and Sprint Overview Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Chart Section -->
+<div class="lg:col-span-2 rounded-xl border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark p-6 shadow-sm">
+<div class="flex flex-col gap-2 mb-6">
+<div class="flex justify-between items-center">
+<h3 class="text-text-main dark:text-white text-lg font-bold leading-tight">Ticket Volume</h3>
+<div class="flex gap-2">
+<button class="text-xs font-medium px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-text-secondary hover:text-primary">Daily</button>
+<button class="text-xs font-medium px-2 py-1 bg-primary/10 rounded text-primary">Weekly</button>
+</div>
+</div>
+<div class="flex gap-2 items-baseline">
+<p class="text-text-main dark:text-white text-2xl font-bold leading-tight">Total: 145</p>
+<p class="text-[#07883b] text-sm font-medium leading-normal">+8% from last week</p>
+</div>
+</div>
+<!-- Chart SVG -->
+<div class="w-full h-[220px] relative">
+<!-- Grid lines background imitation -->
+<div class="absolute inset-0 flex flex-col justify-between text-text-secondary opacity-30 pointer-events-none">
+<div class="border-b border-dashed border-gray-300 w-full h-0"></div>
+<div class="border-b border-dashed border-gray-300 w-full h-0"></div>
+<div class="border-b border-dashed border-gray-300 w-full h-0"></div>
+<div class="border-b border-dashed border-gray-300 w-full h-0"></div>
+<div class="border-b border-dashed border-gray-300 w-full h-0"></div>
+</div>
+<svg class="absolute inset-0 w-full h-full z-10" fill="none" preserveaspectratio="none" viewbox="0 0 478 150" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#3c83f6" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#3c83f6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V150H0V109Z" fill="url(#chartGradient)"></path>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#3c83f6" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+</div>
+<div class="flex justify-between mt-4 px-2">
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Mon</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Tue</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Wed</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Thu</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Fri</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Sat</p>
+<p class="text-text-secondary text-xs font-bold uppercase tracking-wider">Sun</p>
+</div>
+</div>
+<!-- Sprint Overview Card -->
+<div class="lg:col-span-1 rounded-xl overflow-hidden shadow-sm relative group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Abstract dark blue technological patterns representing sprint workflow" style='background-image: linear-gradient(0deg, rgba(16, 23, 34, 0.9) 0%, rgba(60, 131, 246, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBrP0mbzFP8iJ-hC1APTrJDZfmZTlQnQrvN17CoqzGrlFzCFMPlLqsUSOW051vV3mVbE4tef0TpVP6FKJzEH718fyWAWMTK-Q_ko_SYi_u6IG9oHuGwGDJLABS61x-CaKRH_7HdrpgmngMpqCxz6X7reDirF0tcBqfn6HBB9nEN_WpXdnG50U70yIjtwoP5feyG2jqLdqcQIM33m8h5JrFQqQ6RH-JWaRM4y_n6mBP4ju4d8PBVxm9HwF7vo-gnnH6VFLN88CRNFS4");'></div>
+<div class="relative z-10 h-full flex flex-col justify-end p-6 pt-32">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider">Active</span>
+<span class="text-white/80 text-xs font-medium">Ends in 2 days</span>
+</div>
+<p class="text-white tracking-tight text-2xl font-bold leading-tight mb-1">Sprint 34 Overview</p>
+<p class="text-white/80 text-sm font-medium leading-normal mb-6">Focus: Core Infrastructure &amp; Bug Fixes</p>
+<div class="w-full bg-white/20 rounded-full h-2 mb-2">
+<div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between text-xs text-white/70 mb-6">
+<span>12/16 Tasks Done</span>
+<span>75%</span>
+</div>
+<button class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-white text-primary hover:bg-gray-50 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">View Sprint Board</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Table and Backlog Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+<!-- Assigned Tickets Table -->
+<div class="lg:col-span-2 rounded-xl border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark overflow-hidden shadow-sm flex flex-col">
+<div class="p-6 border-b border-[#ced8e8] dark:border-gray-700 flex justify-between items-center">
+<h3 class="text-text-main dark:text-white text-lg font-bold">My Assigned Tickets</h3>
+<button class="text-primary text-sm font-bold hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 dark:bg-gray-800/50">
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider">ID</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider">Subject</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider">Status</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider">Priority</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider text-right">Last Updated</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e7ecf4] dark:divide-gray-700">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer">
+<td class="p-4 text-sm font-medium text-text-main dark:text-white">#TR-8832</td>
+<td class="p-4 text-sm text-text-main dark:text-gray-300 font-medium">Login failure on dashboard</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                                Open
+                                            </span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-red-500 text-sm">priority_high</span>
+<span class="text-sm text-text-main dark:text-gray-300">High</span>
+</div>
+</td>
+<td class="p-4 text-sm text-text-secondary text-right">2 hrs ago</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer">
+<td class="p-4 text-sm font-medium text-text-main dark:text-white">#TR-8829</td>
+<td class="p-4 text-sm text-text-main dark:text-gray-300 font-medium">API Timeout errors</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                                                In Progress
+                                            </span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-orange-500 text-sm">remove</span>
+<span class="text-sm text-text-main dark:text-gray-300">Medium</span>
+</div>
+</td>
+<td class="p-4 text-sm text-text-secondary text-right">5 hrs ago</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer">
+<td class="p-4 text-sm font-medium text-text-main dark:text-white">#TR-8815</td>
+<td class="p-4 text-sm text-text-main dark:text-gray-300 font-medium">Feature request: Dark mode</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                Pending
+                                            </span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-green-500 text-sm">arrow_downward</span>
+<span class="text-sm text-text-main dark:text-gray-300">Low</span>
+</div>
+</td>
+<td class="p-4 text-sm text-text-secondary text-right">1 day ago</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group cursor-pointer">
+<td class="p-4 text-sm font-medium text-text-main dark:text-white">#TR-8801</td>
+<td class="p-4 text-sm text-text-main dark:text-gray-300 font-medium">Billing cycle discrepancy</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                                Resolved
+                                            </span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-red-500 text-sm">priority_high</span>
+<span class="text-sm text-text-main dark:text-gray-300">High</span>
+</div>
+</td>
+<td class="p-4 text-sm text-text-secondary text-right">2 days ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Backlog Summary Card -->
+<div class="lg:col-span-1 rounded-xl border border-[#ced8e8] dark:border-gray-700 bg-surface-light dark:bg-surface-dark p-6 shadow-sm flex flex-col h-full">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-text-main dark:text-white text-lg font-bold">Backlog Summary</h3>
+<span class="bg-gray-100 dark:bg-gray-800 text-text-main dark:text-white text-xs font-bold px-2 py-1 rounded">45 Items</span>
+</div>
+<div class="flex-1 flex flex-col gap-4">
+<!-- Backlog Item 1 -->
+<div class="flex flex-col gap-2 p-3 rounded-lg border border-[#e7ecf4] dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">
+<div class="flex justify-between items-start">
+<span class="text-xs font-bold text-text-secondary">#BK-102</span>
+<span class="text-[10px] uppercase font-bold text-orange-600 bg-orange-100 dark:bg-orange-900/30 px-1.5 py-0.5 rounded">Critical</span>
+</div>
+<p class="text-sm font-medium text-text-main dark:text-white">Update security protocols for OAuth</p>
+</div>
+<!-- Backlog Item 2 -->
+<div class="flex flex-col gap-2 p-3 rounded-lg border border-[#e7ecf4] dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">
+<div class="flex justify-between items-start">
+<span class="text-xs font-bold text-text-secondary">#BK-145</span>
+<span class="text-[10px] uppercase font-bold text-blue-600 bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">Enhancement</span>
+</div>
+<p class="text-sm font-medium text-text-main dark:text-white">Refactor customer export module</p>
+</div>
+<!-- Backlog Item 3 -->
+<div class="flex flex-col gap-2 p-3 rounded-lg border border-[#e7ecf4] dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">
+<div class="flex justify-between items-start">
+<span class="text-xs font-bold text-text-secondary">#BK-150</span>
+<span class="text-[10px] uppercase font-bold text-gray-600 bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">Low</span>
+</div>
+<p class="text-sm font-medium text-text-main dark:text-white">Update footer copyright year</p>
+</div>
+</div>
+<button class="w-full mt-4 flex items-center justify-center gap-2 rounded-lg h-9 px-4 border border-[#ced8e8] dark:border-gray-600 text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium">
+<span>View Full Backlog</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
