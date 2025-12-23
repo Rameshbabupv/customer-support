@@ -2,7 +2,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 
 const navItems = [
-  { path: '/', icon: 'confirmation_number', label: 'Tickets', active: true },
+  { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { path: '/tickets', icon: 'confirmation_number', label: 'Tickets' },
   { path: '/tenants', icon: 'group', label: 'Tenants' },
   { path: '/products', icon: 'inventory_2', label: 'Products' },
 ]

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/auth'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 import SupportQueue from './pages/SupportQueue'
 import TicketDetail from './pages/TicketDetail'
 import Tenants from './pages/Tenants'
@@ -33,7 +34,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<PrivateRoute><SupportQueue /></PrivateRoute>} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/tickets" element={<PrivateRoute><SupportQueue /></PrivateRoute>} />
         <Route path="/tickets/:id" element={<PrivateRoute><TicketDetail /></PrivateRoute>} />
         <Route path="/tenants" element={<PrivateRoute><Tenants /></PrivateRoute>} />
         <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
