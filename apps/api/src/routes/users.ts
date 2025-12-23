@@ -22,6 +22,7 @@ userRoutes.get('/tenant/:tenantId', requireOwner, async (req, res) => {
       email: users.email,
       name: users.name,
       role: users.role,
+      isActive: users.isActive,
       createdAt: users.createdAt,
     }).from(users)
       .where(eq(users.tenantId, parseInt(tenantId)))
@@ -70,6 +71,73 @@ userRoutes.post('/', requireOwner, async (req, res) => {
     })
   } catch (error) {
     console.error('Create user error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Update user (owner only)
+userRoutes.patch('/:id', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { name, role } = req.body
+
+    const updateData: { name?: string; role?: string } = {}
+    if (name) updateData.name = name
+    if (role) updateData.role = role
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'Nothing to update' })
+    }
+
+    const [user] = await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, parseInt(id)))
+      .returning()
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    })
+  } catch (error) {
+    console.error('Update user error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Toggle user active status (owner only)
+userRoutes.patch('/:id/toggle', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const uid = parseInt(id)
+
+    // Get current status
+    const [current] = await db.select().from(users).where(eq(users.id, uid)).limit(1)
+    if (!current) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const newStatus = !current.isActive
+
+    const [user] = await db.update(users)
+      .set({ isActive: newStatus })
+      .where(eq(users.id, uid))
+      .returning()
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isActive: user.isActive,
+    })
+  } catch (error) {
+    console.error('Toggle user error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })

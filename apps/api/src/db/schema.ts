@@ -9,6 +9,7 @@ export const tenants = sqliteTable('tenants', {
   isOwner: integer('is_owner', { mode: 'boolean' }).default(false),
   tier: text('tier', { enum: ['enterprise', 'business', 'starter'] }).default('starter'),
   gatekeeperEnabled: integer('gatekeeper_enabled', { mode: 'boolean' }).default(false),
+  isActive: integer('is_active', { mode: 'boolean' }).default(true),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 
@@ -22,6 +23,7 @@ export const users = sqliteTable('users', {
     enum: ['user', 'gatekeeper', 'company_admin', 'approver', 'integrator', 'support', 'ceo', 'admin']
   }).default('user'),
   tenantId: integer('tenant_id').references(() => tenants.id),
+  isActive: integer('is_active', { mode: 'boolean' }).default(true),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 

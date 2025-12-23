@@ -90,3 +90,30 @@ tenantRoutes.patch('/:id', requireOwner, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
+
+// Toggle tenant active status (owner only)
+tenantRoutes.patch('/:id/toggle', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const tid = parseInt(id)
+
+    // Get current status
+    const [current] = await db.select().from(tenants).where(eq(tenants.id, tid)).limit(1)
+    if (!current) {
+      return res.status(404).json({ error: 'Tenant not found' })
+    }
+
+    const newStatus = !current.isActive
+
+    // Update tenant only (preserve user states)
+    const [tenant] = await db.update(tenants)
+      .set({ isActive: newStatus })
+      .where(eq(tenants.id, tid))
+      .returning()
+
+    res.json({ tenant })
+  } catch (error) {
+    console.error('Toggle tenant error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})

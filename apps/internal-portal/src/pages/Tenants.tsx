@@ -8,6 +8,7 @@ interface Tenant {
   subdomain: string | null
   tier: 'enterprise' | 'business' | 'starter'
   isOwner: boolean
+  isActive: boolean
   createdAt: string
 }
 
@@ -15,6 +16,15 @@ interface Product {
   id: number
   name: string
   description: string | null
+}
+
+interface User {
+  id: number
+  email: string
+  name: string
+  role: string
+  isActive: boolean
+  createdAt?: string
 }
 
 const tierColors: Record<string, string> = {
@@ -30,6 +40,17 @@ export default function Tenants() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null)
+  const [showUserModal, setShowUserModal] = useState(false)
+  const [userModalTenant, setUserModalTenant] = useState<Tenant | null>(null)
+  const [tenantUsers, setTenantUsers] = useState<User[]>([])
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
+  const [userRole, setUserRole] = useState<'user' | 'company_admin'>('user')
+  const [savingUser, setSavingUser] = useState(false)
+  const [userError, setUserError] = useState('')
+  const [userSearchQuery, setUserSearchQuery] = useState('')
   const { token } = useAuthStore()
 
   // Form state
@@ -112,6 +133,130 @@ export default function Tenants() {
     setTier(tenant.tier)
     await fetchTenantProducts(tenant.id)
     setShowModal(true)
+  }
+
+  const fetchTenantUsers = async (tenantId: number) => {
+    setLoadingUsers(true)
+    try {
+      const res = await fetch(`/api/users/tenant/${tenantId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      setTenantUsers(data)
+    } catch (err) {
+      console.error('Failed to fetch users', err)
+    } finally {
+      setLoadingUsers(false)
+    }
+  }
+
+  const openUserModal = async (tenant: Tenant) => {
+    setUserModalTenant(tenant)
+    setEditingUser(null)
+    setUserName('')
+    setUserEmail('')
+    setUserRole('user')
+    setUserError('')
+    setUserSearchQuery('')
+    setShowUserModal(true)
+    await fetchTenantUsers(tenant.id)
+  }
+
+  const startEditUser = (user: User) => {
+    setEditingUser(user)
+    setUserName(user.name)
+    setUserEmail(user.email)
+    setUserRole(user.role as 'user' | 'company_admin')
+    setUserError('')
+  }
+
+  const cancelEditUser = () => {
+    setEditingUser(null)
+    setUserName('')
+    setUserEmail('')
+    setUserRole('user')
+    setUserError('')
+  }
+
+  const handleUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!userModalTenant) return
+    setUserError('')
+    setSavingUser(true)
+
+    try {
+      if (editingUser) {
+        // Update existing user
+        const res = await fetch(`/api/users/${editingUser.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: userName, role: userRole }),
+        })
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(data.error || 'Failed to update user')
+        }
+      } else {
+        // Create new user
+        const res = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: userName,
+            email: userEmail,
+            role: userRole,
+            tenantId: userModalTenant.id,
+          }),
+        })
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(data.error || 'Failed to create user')
+        }
+      }
+
+      // Refresh user list
+      await fetchTenantUsers(userModalTenant.id)
+      cancelEditUser()
+    } catch (err: any) {
+      setUserError(err.message)
+    } finally {
+      setSavingUser(false)
+    }
+  }
+
+  const toggleTenantActive = async (tenant: Tenant) => {
+    try {
+      const res = await fetch(`/api/tenants/${tenant.id}/toggle`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        fetchTenants()
+      }
+    } catch (err) {
+      console.error('Toggle tenant error:', err)
+    }
+  }
+
+  const toggleUserActive = async (user: User) => {
+    if (!userModalTenant) return
+    try {
+      const res = await fetch(`/api/users/${user.id}/toggle`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        fetchTenantUsers(userModalTenant.id)
+      }
+    } catch (err) {
+      console.error('Toggle user error:', err)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,12 +386,13 @@ export default function Tenants() {
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tier</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Created</th>
+                    <th className="text-center px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
                     <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {tenants.map((tenant) => (
-                    <tr key={tenant.id} className="hover:bg-slate-50">
+                    <tr key={tenant.id} className={`hover:bg-slate-50 ${!tenant.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="size-9 rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm">
@@ -278,13 +424,38 @@ export default function Tenants() {
                       <td className="px-6 py-4 text-sm text-slate-500">
                         {new Date(tenant.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-center">
                         <button
-                          onClick={() => openEditModal(tenant)}
-                          className="text-slate-400 hover:text-primary"
+                          onClick={() => toggleTenantActive(tenant)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            tenant.isActive ? 'bg-green-500' : 'bg-slate-300'
+                          }`}
+                          title={tenant.isActive ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
                         >
-                          <span className="material-symbols-outlined">edit</span>
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                              tenant.isActive ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openUserModal(tenant)}
+                            className="text-slate-400 hover:text-primary"
+                            title="Manage Users"
+                          >
+                            <span className="material-symbols-outlined">group</span>
+                          </button>
+                          <button
+                            onClick={() => openEditModal(tenant)}
+                            className="text-slate-400 hover:text-primary"
+                            title="Edit Tenant"
+                          >
+                            <span className="material-symbols-outlined">edit</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -450,6 +621,223 @@ export default function Tenants() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* User Management Modal */}
+      {showUserModal && userModalTenant && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Users - {userModalTenant.name}
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Tenant Code: <span className="font-mono">{userModalTenant.subdomain}</span>
+                </p>
+              </div>
+              <button
+                onClick={() => setShowUserModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {userError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {userError}
+                </div>
+              )}
+
+              {/* Add/Edit User Form */}
+              {userModalTenant.isActive ? (
+                <form onSubmit={handleUserSubmit} className="p-4 bg-slate-50 rounded-lg space-y-4">
+                  <h4 className="text-sm font-semibold text-slate-700">
+                    {editingUser ? 'Edit User' : 'Add New User'}
+                  </h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-1 ${userName ? 'text-green-600' : 'text-red-500'}`}>
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-1 ${userEmail || editingUser ? 'text-green-600' : 'text-red-500'}`}>
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100"
+                      required={!editingUser}
+                      disabled={!!editingUser}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-slate-600 mb-1">Role</label>
+                    <select
+                      value={userRole}
+                      onChange={(e) => setUserRole(e.target.value as any)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                    >
+                      <option value="user">User</option>
+                      <option value="company_admin">Company Admin</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={savingUser}
+                    className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                  >
+                    {savingUser ? 'Saving...' : (editingUser ? 'Update User' : 'Add User')}
+                  </button>
+                  {editingUser && (
+                    <button
+                      type="button"
+                      onClick={cancelEditUser}
+                      className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  {!editingUser && (
+                    <p className="text-xs text-slate-500">
+                      Default password: <span className="font-mono">systech@123</span>
+                    </p>
+                  )}
+                </div>
+              </form>
+              ) : (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-amber-700">
+                    <span className="material-symbols-outlined text-[20px]">info</span>
+                    <p className="text-sm font-medium">
+                      Tenant is inactive. Activate the tenant to manage users.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* User List */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-slate-700">
+                    Existing Users ({tenantUsers.filter(u =>
+                      u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                      u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                    ).length})
+                  </h4>
+                  {tenantUsers.length > 0 && (
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                        search
+                      </span>
+                      <input
+                        type="text"
+                        value={userSearchQuery}
+                        onChange={(e) => setUserSearchQuery(e.target.value)}
+                        placeholder="Search users..."
+                        className="pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      />
+                    </div>
+                  )}
+                </div>
+                {loadingUsers ? (
+                  <div className="text-center text-slate-400 py-6">Loading users...</div>
+                ) : tenantUsers.length === 0 ? (
+                  <div className="text-center text-slate-400 py-6">No users found</div>
+                ) : tenantUsers.filter(u =>
+                    u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                    u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                  ).length === 0 ? (
+                  <div className="text-center text-slate-400 py-6">
+                    No users match "{userSearchQuery}"
+                  </div>
+                ) : (
+                  <div className="border border-slate-200 rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Name</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Email</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Role</th>
+                          <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                          <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {tenantUsers
+                          .filter(u =>
+                            u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                            u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                          )
+                          .map((user) => (
+                          <tr key={user.id} className={`hover:bg-slate-50 ${!user.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900">{user.name}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                user.role === 'company_admin'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}>
+                                {user.role === 'company_admin' ? 'Admin' : 'User'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <button
+                                onClick={() => toggleUserActive(user)}
+                                disabled={!userModalTenant.isActive}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  user.isActive ? 'bg-green-500' : 'bg-slate-300'
+                                } ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                title={
+                                  !userModalTenant.isActive
+                                    ? 'Tenant is inactive - Cannot modify users'
+                                    : user.isActive
+                                    ? 'Active - Click to deactivate'
+                                    : 'Inactive - Click to activate'
+                                }
+                              >
+                                <span
+                                  className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform ${
+                                    user.isActive ? 'translate-x-5' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <button
+                                onClick={() => startEditUser(user)}
+                                disabled={!userModalTenant.isActive}
+                                className={`text-slate-400 hover:text-primary ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                title={!userModalTenant.isActive ? 'Tenant is inactive - Cannot edit users' : 'Edit user'}
+                              >
+                                <span className="material-symbols-outlined text-[18px]">edit</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
