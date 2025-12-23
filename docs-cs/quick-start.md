@@ -4,10 +4,22 @@
 - Node.js v18+
 - npm
 
+## Port Configuration
+
+| App | Port | Config File |
+|-----|------|-------------|
+| API | 4000 | `apps/api/src/index.ts` |
+| Client Portal | 3000 | `apps/client-portal/vite.config.ts` |
+| Internal Portal | 3003 | `apps/internal-portal/vite.config.ts` |
+
+**Proxy Configuration:**
+- Client Portal (3000) → proxies `/api` to API (4000)
+- Internal Portal (3003) → proxies `/api` to API (4000)
+
 ## Setup
 
 ```bash
-# Install dependencies
+# Install dependencies (from root)
 npm install
 
 # Initialize database and seed data
@@ -31,16 +43,25 @@ cd apps/internal-portal && npm run dev
 
 **Network access (for team testing):**
 ```bash
+# Add --host flag to expose on network
 npm run dev -- --host
 ```
 
 ## URLs
 
-| App | Local | Network |
-|-----|-------|---------|
-| API | http://localhost:4000 | http://YOUR_IP:4000 |
-| Client Portal | http://localhost:3000 | http://YOUR_IP:3000 |
-| Internal Portal | http://localhost:3003 | http://YOUR_IP:3003 |
+### Local Development
+| App | URL |
+|-----|-----|
+| API | http://localhost:4000 |
+| Client Portal | http://localhost:3000 |
+| Internal Portal | http://localhost:3003 |
+
+### Network Access (replace with your IP)
+| App | URL |
+|-----|-----|
+| API | http://10.0.0.X:4000 |
+| Client Portal | http://10.0.0.X:3000 |
+| Internal Portal | http://10.0.0.X:3003 |
 
 ## Test Users
 
@@ -62,7 +83,7 @@ npm run dev -- --host
 
 Login requires: Email + Password + **Tenant Code**
 
-**Acme Corp** (Tenant Code: auto-generated, check Internal Portal)
+**Acme Corp** (Tenant Code: check Internal Portal → Tenants)
 
 | Email | Role |
 |-------|------|
@@ -72,7 +93,7 @@ Login requires: Email + Password + **Tenant Code**
 | latha@acme.com | company_admin |
 | deepa@acme.com | company_admin |
 
-**TechCorp** (Tenant Code: auto-generated, check Internal Portal)
+**TechCorp** (Tenant Code: check Internal Portal → Tenants)
 
 | Email | Role |
 |-------|------|
@@ -81,7 +102,7 @@ Login requires: Email + Password + **Tenant Code**
 | mike@techcorp.com | company_admin |
 
 > **Note:** Tenant codes are auto-generated nanoid (e.g., `XK9Q2MZLP1`).
-> View them in Internal Portal → Tenants page.
+> View them in Internal Portal → Tenants page → Tenant Code column.
 
 ## Products (15 seeded)
 
@@ -99,15 +120,17 @@ npm run db:push
 npm run db:seed
 ```
 
-## npm Scripts (from apps/api)
+## npm Scripts
+
+Run from `apps/api`:
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start API server |
+| `npm run dev` | Start API server on port 4000 |
 | `npm run db:push` | Push schema to SQLite |
 | `npm run db:seed` | Seed sample data |
 
-## API Endpoints
+## API Endpoints (http://localhost:4000)
 
 ### Auth
 - `POST /api/auth/signin` - Login
