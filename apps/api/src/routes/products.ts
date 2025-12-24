@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { db } from '../db/index.js'
-import { products, tenantProducts } from '../db/schema.js'
+import { products, tenantProducts, epics, features, devTasks } from '../db/schema.js'
 import { eq } from 'drizzle-orm'
 import { authenticate, requireOwner } from '../middleware/auth.js'
 
@@ -140,6 +140,84 @@ productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
     res.json({ message: 'Products updated', count: productIds.length })
   } catch (error) {
     console.error('Update tenant products error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Get product dashboard metrics (owner only)
+productRoutes.get('/:id/dashboard', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const productId = parseInt(id)
+
+    // Get all epics for this product
+    const productEpics = await db.select().from(epics)
+      .where(eq(epics.productId, productId))
+
+    if (productEpics.length === 0) {
+      return res.json({
+        epics: [],
+        epicProgress: [],
+        taskStatusDistribution: { todo: 0, in_progress: 0, review: 0, done: 0 },
+        totalTasks: 0,
+      })
+    }
+
+    const epicIds = productEpics.map(e => e.id)
+
+    // Get all features for all epics
+    const allFeatures: any[] = []
+    for (const epicId of epicIds) {
+      const feat = await db.select().from(features)
+        .where(eq(features.epicId, epicId))
+      allFeatures.push(...feat)
+    }
+
+    const featureIds = allFeatures.map(f => f.id)
+
+    // Get all tasks for these features
+    const allTasks: any[] = []
+    for (const featureId of featureIds) {
+      const tasks = await db.select().from(devTasks)
+        .where(eq(devTasks.featureId, featureId))
+      allTasks.push(...tasks)
+    }
+
+    // Calculate epic progress
+    const epicProgress = productEpics.map(epic => {
+      const epicFeats = allFeatures.filter(f => f.epicId === epic.id)
+      const epicFeatIds = epicFeats.map(f => f.id)
+      const epicTasks = allTasks.filter(t => epicFeatIds.includes(t.featureId))
+      const completedTasks = epicTasks.filter(t => t.status === 'done').length
+      const totalTasks = epicTasks.length
+
+      return {
+        epicId: epic.id,
+        epicTitle: epic.title,
+        totalTasks,
+        completedTasks,
+        percentage: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      }
+    })
+
+    // Calculate task status distribution
+    const taskStatusDistribution = {
+      todo: allTasks.filter(t => t.status === 'todo').length,
+      in_progress: allTasks.filter(t => t.status === 'in_progress').length,
+      review: allTasks.filter(t => t.status === 'review').length,
+      done: allTasks.filter(t => t.status === 'done').length,
+    }
+
+    res.json({
+      epics: productEpics,
+      features: allFeatures,
+      tasks: allTasks,
+      epicProgress,
+      taskStatusDistribution,
+      totalTasks: allTasks.length,
+    })
+  } catch (error) {
+    console.error('Get product dashboard error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })

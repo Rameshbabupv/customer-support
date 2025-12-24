@@ -8,6 +8,9 @@ import { ticketRoutes } from './routes/tickets.js'
 import { tenantRoutes } from './routes/tenants.js'
 import { productRoutes } from './routes/products.js'
 import { userRoutes } from './routes/users.js'
+import { epicRoutes } from './routes/epics.js'
+import { featureRoutes } from './routes/features.js'
+import { taskRoutes } from './routes/tasks.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -28,6 +31,9 @@ app.use('/api/tickets', ticketRoutes)
 app.use('/api/tenants', tenantRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/epics', epicRoutes)
+app.use('/api/features', featureRoutes)
+app.use('/api/tasks', taskRoutes)
 
 // Health check
 app.get('/health', (_, res) => res.json({ status: 'ok' }))

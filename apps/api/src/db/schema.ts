@@ -20,7 +20,7 @@ export const users = sqliteTable('users', {
   passwordHash: text('password_hash').notNull(),
   name: text('name').notNull(),
   role: text('role', {
-    enum: ['user', 'gatekeeper', 'company_admin', 'approver', 'integrator', 'support', 'ceo', 'admin']
+    enum: ['user', 'gatekeeper', 'company_admin', 'approver', 'integrator', 'support', 'ceo', 'admin', 'developer']
   }).default('user'),
   tenantId: integer('tenant_id').references(() => tenants.id),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
@@ -81,6 +81,67 @@ export const ticketComments = sqliteTable('ticket_comments', {
   userId: integer('user_id').references(() => users.id),
   content: text('content').notNull(),
   isInternal: integer('is_internal', { mode: 'boolean' }).default(false),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Epic (Internal development planning)
+export const epics = sqliteTable('epics', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').references(() => products.id).notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status', {
+    enum: ['backlog', 'planned', 'in_progress', 'completed', 'cancelled']
+  }).default('backlog'),
+  priority: integer('priority').default(3),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Feature (Part of an Epic)
+export const features = sqliteTable('features', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  epicId: integer('epic_id').references(() => epics.id).notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status', {
+    enum: ['backlog', 'planned', 'in_progress', 'completed', 'cancelled']
+  }).default('backlog'),
+  priority: integer('priority').default(3),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Dev Task (Task or Bug within a Feature)
+export const devTasks = sqliteTable('dev_tasks', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  featureId: integer('feature_id').references(() => features.id).notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: text('type', {
+    enum: ['task', 'bug']
+  }).default('task'),
+  status: text('status', {
+    enum: ['todo', 'in_progress', 'review', 'done']
+  }).default('todo'),
+  priority: integer('priority').default(3),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Task Assignment (many-to-many: tasks ↔ developers)
+export const taskAssignments = sqliteTable('task_assignments', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  taskId: integer('task_id').references(() => devTasks.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Support Ticket to Dev Task link (many-to-many)
+export const supportTicketTasks = sqliteTable('support_ticket_tasks', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ticketId: integer('ticket_id').references(() => tickets.id).notNull(),
+  taskId: integer('task_id').references(() => devTasks.id).notNull(),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 

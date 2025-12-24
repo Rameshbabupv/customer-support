@@ -72,19 +72,25 @@ ticketRoutes.get('/', async (req, res) => {
     const { tenantId, isOwner, userId, role } = req.user!
     const { status, assignedTo } = req.query
 
-    let query = db.select().from(tickets)
+    let results
 
     // Scope by tenant unless owner
     if (!isOwner) {
-      query = query.where(eq(tickets.tenantId, tenantId))
-
       // Regular users only see their own tickets
       if (role === 'user') {
-        query = query.where(eq(tickets.userId, userId))
+        results = await db.select().from(tickets)
+          .where(and(eq(tickets.tenantId, tenantId), eq(tickets.userId, userId)))
+          .orderBy(desc(tickets.createdAt))
+      } else {
+        results = await db.select().from(tickets)
+          .where(eq(tickets.tenantId, tenantId))
+          .orderBy(desc(tickets.createdAt))
       }
+    } else {
+      results = await db.select().from(tickets)
+        .orderBy(desc(tickets.createdAt))
     }
 
-    const results = await query.orderBy(desc(tickets.createdAt))
     res.json({ tickets: results })
   } catch (error) {
     console.error('List tickets error:', error)

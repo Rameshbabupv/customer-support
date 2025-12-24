@@ -81,7 +81,7 @@ userRoutes.patch('/:id', requireOwner, async (req, res) => {
     const { id } = req.params
     const { name, role } = req.body
 
-    const updateData: { name?: string; role?: string } = {}
+    const updateData: any = {}
     if (name) updateData.name = name
     if (role) updateData.role = role
 
