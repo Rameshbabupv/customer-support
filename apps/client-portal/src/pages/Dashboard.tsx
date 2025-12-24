@@ -9,9 +9,12 @@ import { formatDate } from '@repo/utils'
 import StatCard from '../components/StatCard'
 import ModuleCard from '../components/ModuleCard'
 import NewTicketModal from '../components/NewTicketModal'
+import { useTheme } from '../hooks/useTheme'
+import ThemeToggle from '../components/ThemeToggle'
 
 export default function Dashboard() {
   const { user, token, logout } = useAuthStore()
+  const { theme } = useTheme()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [showNewTicketModal, setShowNewTicketModal] = useState(false)
@@ -20,6 +23,10 @@ export default function Dashboard() {
   useEffect(() => {
     fetchTickets()
   }, [])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   const fetchTickets = async () => {
     try {
@@ -48,13 +55,19 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-r from-white to-purple-50/30 border-b border-slate-200"
+        className="border-b"
+        style={{
+          background: theme === 'dark'
+            ? 'linear-gradient(to right, #1a1b24, #2d2e3a)'
+            : 'linear-gradient(to right, #ffffff, rgba(237, 233, 254, 0.3))',
+          borderColor: 'var(--border-primary)'
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -63,8 +76,17 @@ export default function Dashboard() {
                 <span className="material-symbols-outlined text-xl">support_agent</span>
               </div>
               <div>
-                <span className="font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Support Desk</span>
-                <p className="text-xs text-slate-500">{user?.tenant?.name || 'Client Portal'}</p>
+                <span
+                  className="font-bold bg-gradient-to-r bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage: theme === 'dark'
+                      ? 'linear-gradient(to right, #8b7eff, #9d6fd4)'
+                      : 'linear-gradient(to right, #667eea, #764ba2)'
+                  }}
+                >
+                  Support Desk
+                </span>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{user?.tenant?.name || 'Client Portal'}</p>
               </div>
             </div>
 
@@ -80,14 +102,19 @@ export default function Dashboard() {
               </motion.button>
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{user?.name}</p>
+                  <p className="text-xs capitalize" style={{ color: 'var(--text-secondary)' }}>{user?.role}</p>
                 </div>
+                <ThemeToggle />
                 <motion.button
                   onClick={handleLogout}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="text-slate-400 hover:text-primary transition-colors p-2 hover:bg-white rounded-lg"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{
+                    color: 'var(--text-tertiary)',
+                    background: 'var(--bg-elevated)'
+                  }}
                   aria-label="Logout"
                 >
                   <span className="material-symbols-outlined" aria-hidden="true">logout</span>
@@ -108,7 +135,16 @@ export default function Dashboard() {
         >
           <div className="flex items-center gap-3 mb-6">
             <span className="text-3xl" aria-hidden="true">📊</span>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Dashboard</h1>
+            <h1
+              className="text-3xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
+              style={{
+                backgroundImage: theme === 'dark'
+                  ? 'linear-gradient(to right, #8b7eff, #9d6fd4)'
+                  : 'linear-gradient(to right, #667eea, #764ba2)'
+              }}
+            >
+              Dashboard
+            </h1>
           </div>
         </motion.div>
 
@@ -119,7 +155,7 @@ export default function Dashboard() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Access</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div onClick={() => setShowNewTicketModal(true)} className="cursor-pointer">
               <ModuleCard
@@ -159,7 +195,7 @@ export default function Dashboard() {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Ticket Overview</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Ticket Overview</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <StatCard
               icon="confirmation_number"
@@ -197,12 +233,17 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow"
+          className="rounded-xl border transition-shadow"
+          style={{
+            background: 'var(--card-bg)',
+            borderColor: 'var(--card-border)',
+            boxShadow: 'var(--card-shadow)'
+          }}
         >
-          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-primary)' }}>
             <div className="flex items-center gap-2">
               <span className="text-xl" aria-hidden="true">📋</span>
-              <h2 className="font-bold text-slate-900">Recent Tickets</h2>
+              <h2 className="font-bold" style={{ color: 'var(--text-primary)' }}>Recent Tickets</h2>
             </div>
             <Link to="/tickets" className="text-sm text-primary hover:text-purple-600 flex items-center gap-1 font-semibold group">
               View all
@@ -213,13 +254,13 @@ export default function Dashboard() {
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center">
               <div className="inline-block size-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-slate-500">Loading tickets...</p>
+              <p style={{ color: 'var(--text-secondary)' }}>Loading tickets...</p>
             </div>
           ) : tickets.length === 0 ? (
             <div className="p-12 text-center">
               <div className="text-6xl mb-4">🎫</div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">No tickets yet</h3>
-              <p className="text-slate-500 mb-6">Get started by creating your first support ticket</p>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>No tickets yet</h3>
+              <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Get started by creating your first support ticket</p>
               <motion.button
                 onClick={() => setShowNewTicketModal(true)}
                 whileHover={{ scale: 1.05 }}
@@ -232,8 +273,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <table className="w-full">
-              <thead className="bg-slate-50">
-                <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <thead style={{ background: 'var(--bg-secondary)' }}>
+                <tr className="text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   <th className="px-6 py-4">ID</th>
                   <th className="px-6 py-4">Subject</th>
                   <th className="px-6 py-4">Status</th>
@@ -241,20 +282,32 @@ export default function Dashboard() {
                   <th className="px-6 py-4">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y" style={{ borderColor: 'var(--border-primary)' }}>
                 {tickets.slice(0, 5).map((ticket, index) => (
                   <motion.tr
                     key={ticket.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + index * 0.05 }}
-                    className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors"
+                    className="transition-colors"
+                    style={{
+                      background: 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = theme === 'dark'
+                        ? 'linear-gradient(to right, rgba(139, 126, 255, 0.1), rgba(157, 111, 212, 0.1))'
+                        : 'linear-gradient(to right, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent'
+                    }}
                   >
-                    <td className="px-6 py-4 text-sm font-semibold text-slate-500">#{ticket.id}</td>
+                    <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-tertiary)' }}>#{ticket.id}</td>
                     <td className="px-6 py-4">
                       <Link
                         to={`/tickets/${ticket.id}`}
-                        className="text-sm font-semibold text-slate-900 hover:text-primary transition-colors"
+                        className="text-sm font-semibold hover:text-primary transition-colors"
+                        style={{ color: 'var(--text-primary)' }}
                       >
                         {ticket.title}
                       </Link>
@@ -265,7 +318,7 @@ export default function Dashboard() {
                     <td className="px-6 py-4">
                       <PriorityPill priority={ticket.clientPriority} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                       {formatDate(ticket.createdAt)}
                     </td>
                   </motion.tr>
@@ -280,7 +333,7 @@ export default function Dashboard() {
       <NewTicketModal isOpen={showNewTicketModal} onClose={() => setShowNewTicketModal(false)} />
 
       {/* Toast Notifications */}
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" richColors theme={theme} />
     </div>
   )
 }
