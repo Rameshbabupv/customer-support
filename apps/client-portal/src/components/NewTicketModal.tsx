@@ -286,33 +286,43 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                     </div>
 
                     {/* Product */}
-                    {products.length !== 1 && (
-                      <div>
-                        <label htmlFor="product" className="block text-sm font-semibold text-slate-700 mb-2">
-                          Product *
-                        </label>
-                        {loadingProducts ? (
-                          <div className="block w-full rounded-lg border-0 py-3 px-4 text-slate-400 ring-1 ring-inset ring-slate-300 bg-slate-50 text-sm">
-                            Loading products...
-                          </div>
-                        ) : (
-                          <select
-                            id="product"
-                            value={form.productId}
-                            onChange={(e) => setForm({ ...form, productId: parseInt(e.target.value) })}
-                            required
-                            className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-primary bg-white text-sm"
-                          >
-                            <option value={0}>Select a product...</option>
-                            {products.map((product) => (
-                              <option key={product.id} value={product.id}>
-                                {product.name} - {product.description}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-                    )}
+                    <div>
+                      <label htmlFor="product" className="block text-sm font-semibold text-slate-700 mb-2">
+                        Product *
+                      </label>
+                      {loadingProducts ? (
+                        <div className="block w-full rounded-lg border-0 py-3 px-4 text-slate-400 ring-1 ring-inset ring-slate-300 bg-slate-50 text-sm">
+                          Loading products...
+                        </div>
+                      ) : products.length === 0 ? (
+                        <div className="block w-full rounded-lg border-0 py-3 px-4 text-red-600 ring-1 ring-inset ring-red-300 bg-red-50 text-sm">
+                          No products available. Please contact support.
+                        </div>
+                      ) : (
+                        <select
+                          id="product"
+                          value={form.productId}
+                          onChange={(e) => setForm({ ...form, productId: parseInt(e.target.value) })}
+                          required
+                          disabled={products.length === 1}
+                          className={`block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-primary text-sm ${
+                            products.length === 1 ? 'bg-slate-50 cursor-not-allowed' : 'bg-white'
+                          }`}
+                        >
+                          <option value={0}>Select a product...</option>
+                          {products.map((product) => (
+                            <option key={product.id} value={product.id}>
+                              {product.name} {product.description ? `- ${product.description}` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {products.length === 1 && (
+                        <p className="text-xs text-slate-500 mt-1">
+                          ℹ️ Auto-selected based on your account
+                        </p>
+                      )}
+                    </div>
 
                     {/* Priority & Severity */}
                     <div className="grid grid-cols-2 gap-4">
