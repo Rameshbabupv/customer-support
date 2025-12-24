@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { Toaster } from 'sonner'
 import { useAuthStore } from '../store/auth'
 import type { Ticket } from '@repo/types'
 import { StatusBadge, PriorityPill } from '@repo/ui'
 import { formatDate } from '@repo/utils'
 import StatCard from '../components/StatCard'
 import ModuleCard from '../components/ModuleCard'
+import NewTicketModal from '../components/NewTicketModal'
 
 export default function Dashboard() {
   const { user, token, logout } = useAuthStore()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
+  const [showNewTicketModal, setShowNewTicketModal] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -66,15 +69,15 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center gap-4">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  to="/tickets/new"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-all shadow-md hover:shadow-lg"
-                >
-                  <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span>
-                  New Ticket
-                </Link>
-              </motion.div>
+              <motion.button
+                onClick={() => setShowNewTicketModal(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-all shadow-md hover:shadow-lg"
+              >
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span>
+                New Ticket
+              </motion.button>
               <div className="flex items-center gap-3">
                 <div className="text-right">
                   <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
@@ -118,14 +121,16 @@ export default function Dashboard() {
         >
           <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ModuleCard
-              emoji="🎫"
-              title="Create Ticket"
-              description="Submit a new support request for our team to assist you"
-              to="/tickets/new"
-              badge="Start Here"
-              badgeColor="bg-gradient-to-r from-primary to-purple-600 text-white"
-            />
+            <div onClick={() => setShowNewTicketModal(true)} className="cursor-pointer">
+              <ModuleCard
+                emoji="🎫"
+                title="Create Ticket"
+                description="Submit a new support request for our team to assist you"
+                to="#"
+                badge="Start Here"
+                badgeColor="bg-gradient-to-r from-primary to-purple-600 text-white"
+              />
+            </div>
             <ModuleCard
               emoji="📋"
               title="My Tickets"
@@ -268,6 +273,12 @@ export default function Dashboard() {
           )}
         </motion.div>
       </main>
+
+      {/* New Ticket Modal */}
+      <NewTicketModal isOpen={showNewTicketModal} onClose={() => setShowNewTicketModal(false)} />
+
+      {/* Toast Notifications */}
+      <Toaster position="top-right" richColors />
     </div>
   )
 }
