@@ -1,5 +1,5 @@
 import { db } from './index.js'
-import { tenants, users, products, tenantProducts, epics, features, devTasks, taskAssignments } from './schema.js'
+import { tenants, users, products, tenantProducts, userProducts, epics, features, devTasks, taskAssignments } from './schema.js'
 import bcrypt from 'bcryptjs'
 import { nanoid } from 'nanoid'
 
@@ -134,14 +134,16 @@ async function seed() {
     { email: 'deepa@acme.com', name: 'Deepa', role: 'company_admin' },
   ]
 
+  const createdAcmeUsers: any[] = []
   for (const u of acmeUsers) {
-    await db.insert(users).values({
+    const [user] = await db.insert(users).values({
       email: u.email,
       passwordHash,
       name: u.name,
       role: u.role as any,
       tenantId: acmeTenant.id,
-    })
+    }).returning()
+    createdAcmeUsers.push(user)
   }
   console.log('Created 5 Acme Corp users')
 
@@ -153,14 +155,16 @@ async function seed() {
     { email: 'mike@techcorp.com', name: 'Mike', role: 'company_admin' },
   ]
 
+  const createdTechcorpUsers: any[] = []
   for (const u of techcorpUsers) {
-    await db.insert(users).values({
+    const [user] = await db.insert(users).values({
       email: u.email,
       passwordHash,
       name: u.name,
       role: u.role as any,
       tenantId: techcorpTenant.id,
-    })
+    }).returning()
+    createdTechcorpUsers.push(user)
   }
   console.log('Created 3 TechCorp users')
 
@@ -297,6 +301,77 @@ async function seed() {
   ])
 
   console.log('Created 2 epics, 3 features, 7 tasks with assignments')
+
+  // === USER PRODUCT ASSIGNMENTS ===
+
+  // Internal users (Systech-erp.ai)
+  const rameshId = createdInternalUsers.find(u => u.email === 'ramesh@systech.com')?.id
+  const mohanId = createdInternalUsers.find(u => u.email === 'mohan@systech.com')?.id
+  const sakthiId = createdInternalUsers.find(u => u.email === 'sakthi@systech.com')?.id
+
+  await db.insert(userProducts).values([
+    // ramesh: CRM Sales only (test auto-select with 1 product)
+    { userId: rameshId, productId: findProduct('CRM Sales') },
+
+    // mohan: CRM Sales + CRM Service (test dropdown with 2 products)
+    { userId: mohanId, productId: findProduct('CRM Sales') },
+    { userId: mohanId, productId: findProduct('CRM Service') },
+
+    // sakthi: HRM v2 only
+    { userId: sakthiId, productId: findProduct('HRM v2') },
+
+    // jai: CRM Sales only
+    { userId: jaiId, productId: findProduct('CRM Sales') },
+
+    // priya: CRM Sales + HRM v2
+    { userId: priyaId, productId: findProduct('CRM Sales') },
+    { userId: priyaId, productId: findProduct('HRM v2') },
+  ])
+
+  // Acme Corp users
+  const johnId = createdAcmeUsers.find(u => u.email === 'john@acme.com')?.id
+  const janeId = createdAcmeUsers.find(u => u.email === 'jane@acme.com')?.id
+  const kumarId = createdAcmeUsers.find(u => u.email === 'kumar@acme.com')?.id
+  const lathaId = createdAcmeUsers.find(u => u.email === 'latha@acme.com')?.id
+  const deepaId = createdAcmeUsers.find(u => u.email === 'deepa@acme.com')?.id
+
+  await db.insert(userProducts).values([
+    // john: CRM Sales only (test auto-select)
+    { userId: johnId, productId: findProduct('CRM Sales') },
+
+    // jane: CRM Sales + CRM Service (test dropdown)
+    { userId: janeId, productId: findProduct('CRM Sales') },
+    { userId: janeId, productId: findProduct('CRM Service') },
+
+    // kumar: HRM v2 only
+    { userId: kumarId, productId: findProduct('HRM v2') },
+
+    // latha: CRM Sales + HRM v2
+    { userId: lathaId, productId: findProduct('CRM Sales') },
+    { userId: lathaId, productId: findProduct('HRM v2') },
+
+    // deepa: Finance v2 only
+    { userId: deepaId, productId: findProduct('Finance v2') },
+  ])
+
+  // TechCorp users
+  const alexId = createdTechcorpUsers.find(u => u.email === 'alex@techcorp.com')?.id
+  const saraId = createdTechcorpUsers.find(u => u.email === 'sara@techcorp.com')?.id
+  const mikeId = createdTechcorpUsers.find(u => u.email === 'mike@techcorp.com')?.id
+
+  await db.insert(userProducts).values([
+    // alex: MMS v2 only
+    { userId: alexId, productId: findProduct('MMS v2') },
+
+    // sara: TMS only
+    { userId: saraId, productId: findProduct('TMS') },
+
+    // mike: MMS v2 + TMS
+    { userId: mikeId, productId: findProduct('MMS v2') },
+    { userId: mikeId, productId: findProduct('TMS') },
+  ])
+
+  console.log('Assigned products to users (1-2 products each for testing)')
 
   // === SUMMARY ===
 

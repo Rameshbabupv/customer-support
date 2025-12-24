@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { db } from '../db/index.js'
-import { users } from '../db/schema.js'
+import { users, userProducts } from '../db/schema.js'
 import { eq } from 'drizzle-orm'
 import { authenticate, requireOwner } from '../middleware/auth.js'
 
@@ -138,6 +138,66 @@ userRoutes.patch('/:id/toggle', requireOwner, async (req, res) => {
     })
   } catch (error) {
     console.error('Toggle user error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Get user's assigned products
+userRoutes.get('/:id/products', async (req, res) => {
+  try {
+    const { id } = req.params
+    const userId = parseInt(id)
+
+    const assigned = await db.query.userProducts.findMany({
+      where: eq(userProducts.userId, userId),
+      with: {
+        product: true,
+      },
+    })
+
+    const productList = assigned.map((up: any) => up.product)
+    res.json(productList)
+  } catch (error) {
+    console.error('Get user products error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Update user's assigned products (owner only)
+userRoutes.put('/:id/products', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { productIds } = req.body
+    const userId = parseInt(id)
+
+    if (!Array.isArray(productIds)) {
+      return res.status(400).json({ error: 'productIds must be an array' })
+    }
+
+    // Delete existing assignments
+    await db.delete(userProducts).where(eq(userProducts.userId, userId))
+
+    // Create new assignments
+    if (productIds.length > 0) {
+      const values = productIds.map((productId: number) => ({
+        userId,
+        productId,
+      }))
+      await db.insert(userProducts).values(values)
+    }
+
+    // Return updated list
+    const assigned = await db.query.userProducts.findMany({
+      where: eq(userProducts.userId, userId),
+      with: {
+        product: true,
+      },
+    })
+
+    const productList = assigned.map((up: any) => up.product)
+    res.json(productList)
+  } catch (error) {
+    console.error('Update user products error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })

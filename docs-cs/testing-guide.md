@@ -4,21 +4,21 @@
 
 ## Test Users
 
-| Portal | Email | Role | Tenant |
-|--------|-------|------|--------|
-| Internal | ramesh@systech.com | admin | SysTech |
-| | mohan@systech.com | support | SysTech |
-| | sakthi@systech.com | integrator | SysTech |
-| | jai@systech.com | support | SysTech |
-| | priya@systech.com | support | SysTech |
-| Client | john@acme.com | user | Acme Corp |
-| | jane@acme.com | user | Acme Corp |
-| | kumar@acme.com | user | Acme Corp |
-| | latha@acme.com | company_admin | Acme Corp |
-| | deepa@acme.com | company_admin | Acme Corp |
-| Client | alex@techcorp.com | user | TechCorp |
-| | sara@techcorp.com | user | TechCorp |
-| | mike@techcorp.com | company_admin | TechCorp |
+| Portal   | Email              | Role          | Tenant    |
+| -------- | ------------------ | ------------- | --------- |
+| Internal | ramesh@systech.com | admin         | SysTech   |
+|          | mohan@systech.com  | support       | SysTech   |
+|          | sakthi@systech.com | integrator    | SysTech   |
+|          | jai@systech.com    | support       | SysTech   |
+|          | priya@systech.com  | support       | SysTech   |
+| Client   | john@acme.com      | user          | Acme Corp |
+|          | jane@acme.com      | user          | Acme Corp |
+|          | kumar@acme.com     | user          | Acme Corp |
+|          | latha@acme.com     | company_admin | Acme Corp |
+|          | deepa@acme.com     | company_admin | Acme Corp |
+| Client   | alex@techcorp.com  | user          | TechCorp  |
+|          | sara@techcorp.com  | user          | TechCorp  |
+|          | mike@techcorp.com  | company_admin | TechCorp  |
 
 ---
 

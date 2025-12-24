@@ -43,6 +43,14 @@ export const tenantProducts = sqliteTable('tenant_products', {
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 
+// User-Product assignment (many-to-many)
+export const userProducts = sqliteTable('user_products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  productId: integer('product_id').references(() => products.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
 // Ticket
 export const tickets = sqliteTable('tickets', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -165,6 +173,15 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
 
 export const productsRelations = relations(products, ({ many }) => ({
   tenantProducts: many(tenantProducts),
+  userProducts: many(userProducts),
+}))
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [users.tenantId],
+    references: [tenants.id],
+  }),
+  userProducts: many(userProducts),
 }))
 
 export const tenantProductsRelations = relations(tenantProducts, ({ one }) => ({
@@ -174,6 +191,17 @@ export const tenantProductsRelations = relations(tenantProducts, ({ one }) => ({
   }),
   product: one(products, {
     fields: [tenantProducts.productId],
+    references: [products.id],
+  }),
+}))
+
+export const userProductsRelations = relations(userProducts, ({ one }) => ({
+  user: one(users, {
+    fields: [userProducts.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [userProducts.productId],
     references: [products.id],
   }),
 }))

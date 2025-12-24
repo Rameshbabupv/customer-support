@@ -51,6 +51,8 @@ export default function Tenants() {
   const [savingUser, setSavingUser] = useState(false)
   const [userError, setUserError] = useState('')
   const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [tenantProducts, setTenantProducts] = useState<Product[]>([])
+  const [userSelectedProducts, setUserSelectedProducts] = useState<number[]>([])
   const { token } = useAuthStore()
 
   // Form state
@@ -158,16 +160,45 @@ export default function Tenants() {
     setUserRole('user')
     setUserError('')
     setUserSearchQuery('')
+    setUserSelectedProducts([])
     setShowUserModal(true)
     await fetchTenantUsers(tenant.id)
+
+    // Fetch tenant's products
+    try {
+      const res = await fetch(`/api/products/tenant/${tenant.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTenantProducts(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch tenant products:', err)
+    }
   }
 
-  const startEditUser = (user: User) => {
+  const startEditUser = async (user: User) => {
     setEditingUser(user)
     setUserName(user.name)
     setUserEmail(user.email)
     setUserRole(user.role as 'user' | 'company_admin')
     setUserError('')
+
+    // Fetch user's assigned products
+    try {
+      const res = await fetch(`/api/users/${user.id}/products`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const productIds = data.map((p: Product) => p.id)
+        setUserSelectedProducts(productIds)
+      }
+    } catch (err) {
+      console.error('Failed to fetch user products:', err)
+      setUserSelectedProducts([])
+    }
   }
 
   const cancelEditUser = () => {
@@ -176,6 +207,7 @@ export default function Tenants() {
     setUserEmail('')
     setUserRole('user')
     setUserError('')
+    setUserSelectedProducts([])
   }
 
   const handleUserSubmit = async (e: React.FormEvent) => {
@@ -185,6 +217,8 @@ export default function Tenants() {
     setSavingUser(true)
 
     try {
+      let userId: number
+
       if (editingUser) {
         // Update existing user
         const res = await fetch(`/api/users/${editingUser.id}`, {
@@ -199,6 +233,7 @@ export default function Tenants() {
           const data = await res.json()
           throw new Error(data.error || 'Failed to update user')
         }
+        userId = editingUser.id
       } else {
         // Create new user
         const res = await fetch('/api/users', {
@@ -218,6 +253,21 @@ export default function Tenants() {
           const data = await res.json()
           throw new Error(data.error || 'Failed to create user')
         }
+        const data = await res.json()
+        userId = data.id
+      }
+
+      // Update user's product assignments
+      const productsRes = await fetch(`/api/users/${userId}/products`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productIds: userSelectedProducts }),
+      })
+      if (!productsRes.ok) {
+        throw new Error('Failed to update product assignments')
       }
 
       // Refresh user list
@@ -697,6 +747,52 @@ export default function Tenants() {
                     </select>
                   </div>
                 </div>
+
+                {/* Product Assignment */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Assigned Products (1-2 products)
+                  </label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-white">
+                    {tenantProducts.length === 0 ? (
+                      <p className="text-sm text-slate-400">No products available for this tenant</p>
+                    ) : (
+                      tenantProducts.map((product) => (
+                        <label
+                          key={product.id}
+                          className="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={userSelectedProducts.includes(product.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                if (userSelectedProducts.length < 2) {
+                                  setUserSelectedProducts([...userSelectedProducts, product.id])
+                                } else {
+                                  alert('Maximum 2 products can be assigned')
+                                }
+                              } else {
+                                setUserSelectedProducts(userSelectedProducts.filter(id => id !== product.id))
+                              }
+                            }}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-slate-900">{product.name}</div>
+                            {product.description && (
+                              <div className="text-xs text-slate-500">{product.description}</div>
+                            )}
+                          </div>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Select 1-2 products this user will work on. Leave empty for all tenant products.
+                  </p>
+                </div>
+
                 <div className="flex items-center gap-3">
                   <button
                     type="submit"
