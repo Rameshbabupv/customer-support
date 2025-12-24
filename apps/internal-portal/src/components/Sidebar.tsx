@@ -2,15 +2,20 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 
 const navItems = [
-  { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { path: '/tickets', icon: 'confirmation_number', label: 'Tickets' },
-  { path: '/tenants', icon: 'group', label: 'Tenants' },
-  { path: '/products', icon: 'inventory_2', label: 'Products' },
+  { path: '/dashboard', icon: 'dashboard', label: 'Dashboard', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
+  { path: '/my-tasks', icon: 'task_alt', label: 'My Tasks', roles: ['developer'] },
+  { path: '/tickets', icon: 'confirmation_number', label: 'Tickets', roles: ['admin', 'support', 'integrator', 'ceo'] },
+  { path: '/tenants', icon: 'group', label: 'Tenants', roles: ['admin', 'support', 'integrator', 'ceo'] },
+  { path: '/products', icon: 'inventory_2', label: 'Products', roles: ['admin', 'support', 'integrator', 'ceo'] },
 ]
 
 export default function Sidebar() {
   const location = useLocation()
   const { user, logout } = useAuthStore()
+
+  const visibleNavItems = navItems.filter(item =>
+    item.roles.includes(user?.role || '')
+  )
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
@@ -27,7 +32,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-4 flex flex-col gap-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
             <Link

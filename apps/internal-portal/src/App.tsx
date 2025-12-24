@@ -6,6 +6,7 @@ import SupportQueue from './pages/SupportQueue'
 import TicketDetail from './pages/TicketDetail'
 import Tenants from './pages/Tenants'
 import Products from './pages/Products'
+import MyTasks from './pages/MyTasks'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore()
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/tickets/:id" element={<PrivateRoute><TicketDetail /></PrivateRoute>} />
         <Route path="/tenants" element={<PrivateRoute><Tenants /></PrivateRoute>} />
         <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
+        <Route path="/my-tasks" element={<PrivateRoute><MyTasks /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   )
