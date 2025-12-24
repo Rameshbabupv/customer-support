@@ -14,7 +14,6 @@ tenantRoutes.use(authenticate)
 tenantRoutes.get('/', requireOwner, async (req, res) => {
   try {
     const results = await db.select().from(tenants)
-      .where(eq(tenants.isOwner, false)) // Don't list owner tenant
 
     res.json({ tenants: results })
   } catch (error) {
