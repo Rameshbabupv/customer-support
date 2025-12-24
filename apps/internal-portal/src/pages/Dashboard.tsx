@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import Sidebar from '../components/Sidebar'
 import StatCard from '../components/StatCard'
+import ModuleCard from '../components/ModuleCard'
 import TenantCard from '../components/TenantCard'
 import { useAuthStore } from '../store/auth'
 
@@ -187,17 +189,27 @@ export default function Dashboard() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
-          <h2 className="text-lg font-bold text-slate-900">Dashboard</h2>
-          <button
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="h-16 px-6 border-b border-slate-200 bg-gradient-to-r from-white to-purple-50/30 flex items-center justify-between shrink-0"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl" aria-hidden="true">📊</span>
+            <h2 className="text-xl font-display font-bold bg-gradient-spark bg-clip-text text-transparent">Dashboard</h2>
+          </div>
+          <motion.button
             onClick={fetchDashboardData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-spark hover:opacity-90 text-white rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50"
           >
-            <span className="material-symbols-outlined text-[18px]">refresh</span>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">refresh</span>
             Refresh
-          </button>
-        </header>
+          </motion.button>
+        </motion.header>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
@@ -226,40 +238,105 @@ export default function Dashboard() {
           )}
 
           {metrics && (
-            <div className="space-y-6">
+            <div className="space-y-8">
+              {/* Quick Access */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <h3 className="text-lg font-display font-bold text-slate-900 mb-4">Quick Access</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <ModuleCard
+                    emoji="🎫"
+                    title="Tickets"
+                    description="Manage customer support tickets and track resolution progress"
+                    count={metrics.openTickets}
+                    countLabel="Open"
+                    to="/tickets"
+                    badge={metrics.openTickets > 0 ? 'Active' : undefined}
+                    badgeColor={metrics.openTickets > 5 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}
+                  />
+                  <ModuleCard
+                    emoji="💡"
+                    title="Ideas"
+                    description="Browse and contribute to the SPARK innovation pipeline"
+                    to="/ideas"
+                    badge="SPARK"
+                    badgeColor="bg-gradient-spark text-white"
+                  />
+                  <ModuleCard
+                    emoji="📦"
+                    title="Products"
+                    description="View and manage product catalog and assignments"
+                    count={metrics.totalProducts}
+                    countLabel="Total"
+                    to="/products"
+                  />
+                  <ModuleCard
+                    emoji="🏢"
+                    title="Tenants"
+                    description="Monitor tenant accounts and subscription tiers"
+                    count={metrics.activeTenants}
+                    countLabel="Active"
+                    to="/tenants"
+                  />
+                </div>
+              </motion.div>
+
               {/* Overview Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                  icon="group_work"
-                  label="Total Tenants"
-                  value={metrics.totalTenants}
-                  color="bg-blue-50 text-blue-600"
-                />
-                <StatCard
-                  icon="group"
-                  label="Active Users"
-                  value={metrics.activeUsers}
-                  color="bg-emerald-50 text-emerald-600"
-                />
-                <StatCard
-                  icon="confirmation_number"
-                  label="Open Tickets"
-                  value={metrics.openTickets}
-                  color="bg-amber-50 text-amber-600"
-                />
-                <StatCard
-                  icon="inventory_2"
-                  label="Products"
-                  value={metrics.totalProducts}
-                  color="bg-purple-50 text-purple-600"
-                />
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h3 className="text-lg font-display font-bold text-slate-900 mb-4">Key Metrics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <StatCard
+                    icon="group_work"
+                    emoji="🏢"
+                    label="Total Tenants"
+                    value={metrics.totalTenants}
+                    color="bg-blue-50 text-blue-600"
+                  />
+                  <StatCard
+                    icon="group"
+                    emoji="👥"
+                    label="Active Users"
+                    value={metrics.activeUsers}
+                    color="bg-emerald-50 text-emerald-600"
+                  />
+                  <StatCard
+                    icon="confirmation_number"
+                    emoji="🎫"
+                    label="Open Tickets"
+                    value={metrics.openTickets}
+                    color="bg-amber-50 text-amber-600"
+                    trend={metrics.openTickets > 10 ? { value: -5, label: 'vs last week' } : undefined}
+                  />
+                  <StatCard
+                    icon="inventory_2"
+                    emoji="📦"
+                    label="Products"
+                    value={metrics.totalProducts}
+                    color="bg-purple-50 text-purple-600"
+                  />
+                </div>
+              </motion.div>
 
               {/* Workload Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              >
                 {/* Ticket Workload by Status */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Ticket Workload</h3>
+                <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl" aria-hidden="true">📈</span>
+                    <h3 className="text-lg font-display font-bold text-slate-900">Ticket Workload</h3>
+                  </div>
                   <div className="space-y-3">
                     {[
                       { status: 'open', label: 'Open', count: metrics.ticketsByStatus.open, color: 'bg-slate-200 text-slate-700' },
@@ -278,8 +355,11 @@ export default function Dashboard() {
                 </div>
 
                 {/* Priority Distribution */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Priority Distribution</h3>
+                <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl" aria-hidden="true">🎯</span>
+                    <h3 className="text-lg font-display font-bold text-slate-900">Priority Distribution</h3>
+                  </div>
                   <div className="space-y-3">
                     {metrics.ticketsByPriority.map((item) => {
                       const priorityColors = [
@@ -302,23 +382,37 @@ export default function Dashboard() {
                     })}
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Tenant Cards Grid */}
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Tenants Overview</h3>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xl" aria-hidden="true">🏢</span>
+                  <h3 className="text-lg font-display font-bold text-slate-900">Tenants Overview</h3>
+                </div>
                 {metrics.tenantCards.length === 0 ? (
                   <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
                     <p className="text-slate-400">No tenants found</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {metrics.tenantCards.map((tenant) => (
-                      <TenantCard key={tenant.id} tenant={tenant} />
+                    {metrics.tenantCards.map((tenant, index) => (
+                      <motion.div
+                        key={tenant.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 + index * 0.05 }}
+                      >
+                        <TenantCard tenant={tenant} />
+                      </motion.div>
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
             </div>
           )}
         </div>
