@@ -30,7 +30,8 @@ export default function ModuleCard({
     >
       <Link
         to={to}
-        className="block bg-white rounded-xl border border-slate-200 p-6 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all group relative overflow-hidden"
+        className="block rounded-xl border p-6 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all group relative overflow-hidden"
+        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
       >
         {/* Gradient shimmer overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -47,12 +48,12 @@ export default function ModuleCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors" style={{ color: 'var(--text-primary)' }}>
             {title}
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+          <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
             {description}
           </p>
 
@@ -62,7 +63,7 @@ export default function ModuleCard({
               <span className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                 {count}
               </span>
-              <span className="text-sm text-slate-500">{countLabel}</span>
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{countLabel}</span>
             </div>
           )}
 

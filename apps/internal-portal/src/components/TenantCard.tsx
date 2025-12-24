@@ -31,7 +31,10 @@ export default function TenantCard({ tenant }: TenantCardProps) {
   const gradient = gradients[tenant.id % gradients.length]
 
   return (
-    <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden cursor-pointer">
+    <div
+      className="group rounded-xl border shadow-sm hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden cursor-pointer"
+      style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
+    >
       {/* Header with gradient */}
       <div className={`h-24 bg-gradient-to-r ${gradient} relative`}>
         <div className="absolute top-3 right-3">
@@ -48,8 +51,14 @@ export default function TenantCard({ tenant }: TenantCardProps) {
       <div className="px-5 pb-5 flex-1 flex flex-col">
         {/* Logo placeholder */}
         <div className="relative -mt-10 mb-3">
-          <div className="size-16 rounded-xl bg-white p-1 shadow-sm">
-            <div className="w-full h-full rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-xl border border-slate-100">
+          <div
+            className="size-16 rounded-xl p-1 shadow-sm"
+            style={{ backgroundColor: 'var(--bg-card)' }}
+          >
+            <div
+              className="w-full h-full rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center font-bold text-xl border"
+              style={{ color: 'var(--text-secondary)', borderColor: 'var(--border-primary)' }}
+            >
               {tenant.name.charAt(0)}
             </div>
           </div>
@@ -57,7 +66,12 @@ export default function TenantCard({ tenant }: TenantCardProps) {
 
         {/* Tenant name */}
         <div className="flex items-center gap-2 mb-1">
-          <h3 className="text-lg font-bold text-slate-900 truncate">{tenant.name}</h3>
+          <h3
+            className="text-lg font-bold truncate"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {tenant.name}
+          </h3>
         </div>
 
         {/* Tier badge */}
@@ -68,19 +82,52 @@ export default function TenantCard({ tenant }: TenantCardProps) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 py-4 border-t border-slate-100 mb-4">
+        <div
+          className="grid grid-cols-2 gap-4 py-4 border-t mb-4"
+          style={{ borderColor: 'var(--border-primary)' }}
+        >
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Users</span>
+            <span
+              className="text-xs uppercase font-semibold tracking-wider"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Users
+            </span>
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px] text-slate-400">group</span>
-              <span className="text-sm font-semibold text-slate-900">{tenant.userCount}</span>
+              <span
+                className="material-symbols-outlined text-[18px]"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                group
+              </span>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                {tenant.userCount}
+              </span>
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Tickets</span>
+            <span
+              className="text-xs uppercase font-semibold tracking-wider"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Tickets
+            </span>
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px] text-slate-400">confirmation_number</span>
-              <span className="text-sm font-semibold text-slate-900">{tenant.ticketCount}</span>
+              <span
+                className="material-symbols-outlined text-[18px]"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                confirmation_number
+              </span>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                {tenant.ticketCount}
+              </span>
             </div>
           </div>
         </div>
@@ -89,7 +136,8 @@ export default function TenantCard({ tenant }: TenantCardProps) {
         <div className="mt-auto">
           <button
             onClick={() => navigate('/tenants')}
-            className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent py-2 px-4 text-sm font-bold text-slate-900 shadow-sm hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-lg border bg-transparent py-2 px-4 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
+            style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}
           >
             <span className="material-symbols-outlined text-[18px]">settings</span>
             Configure
