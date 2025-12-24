@@ -33,6 +33,8 @@ export default function DevUserSwitcher() {
   const switchUser = async (devUser: DevUser) => {
     setSwitching(true)
     try {
+      console.log('[DevSwitcher] Switching to:', devUser.email)
+
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -42,14 +44,24 @@ export default function DevUserSwitcher() {
         }),
       })
 
-      if (!res.ok) throw new Error('Failed to switch user')
+      console.log('[DevSwitcher] Response status:', res.status)
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('[DevSwitcher] Error response:', errorData)
+        throw new Error(errorData.error || `HTTP ${res.status}`)
+      }
 
       const data = await res.json()
+      console.log('[DevSwitcher] Login successful, user:', data.user)
+
       login(data.user, data.token)
+
+      console.log('[DevSwitcher] Reloading page...')
       window.location.reload()
-    } catch (error) {
-      console.error('Failed to switch user:', error)
-      alert('Failed to switch user')
+    } catch (error: any) {
+      console.error('[DevSwitcher] Failed to switch user:', error)
+      alert(`Failed to switch user: ${error.message || error}`)
     } finally {
       setSwitching(false)
     }
