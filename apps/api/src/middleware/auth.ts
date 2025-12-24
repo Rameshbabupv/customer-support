@@ -41,6 +41,13 @@ export function requireOwner(req: Request, res: Response, next: NextFunction) {
   next()
 }
 
+export function requireDeveloper(req: Request, res: Response, next: NextFunction) {
+  if (req.user?.role !== 'developer') {
+    return res.status(403).json({ error: 'Forbidden: Developer access required' })
+  }
+  next()
+}
+
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {

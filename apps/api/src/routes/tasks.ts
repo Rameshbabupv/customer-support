@@ -103,13 +103,12 @@ taskRoutes.patch('/:id', async (req, res) => {
 
     // Check access: owner or assigned developer
     if (!isOwner) {
-      const assignment = await db.select().from(taskAssignments)
+      const assignments = await db.select().from(taskAssignments)
         .where(eq(taskAssignments.taskId, parseInt(id)))
-        .limit(1)
 
-      const userAssignment = assignment.find(a => a.userId === userId)
+      const userAssignment = assignments.find(a => a.userId === userId)
       if (!userAssignment) {
-        return res.status(403).json({ error: 'Forbidden' })
+        return res.status(403).json({ error: 'Forbidden: Not assigned to this task' })
       }
     }
 
