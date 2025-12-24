@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import NewTicket from './pages/NewTicket'
 import TicketDetail from './pages/TicketDetail'
+import DevUserSwitcher from './components/DevUserSwitcher'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -13,32 +14,35 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/tickets/new"
-        element={
-          <ProtectedRoute>
-            <NewTicket />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/tickets/:id"
-        element={
-          <ProtectedRoute>
-            <TicketDetail />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tickets/new"
+          element={
+            <ProtectedRoute>
+              <NewTicket />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tickets/:id"
+          element={
+            <ProtectedRoute>
+              <TicketDetail />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <DevUserSwitcher />
+    </>
   )
 }

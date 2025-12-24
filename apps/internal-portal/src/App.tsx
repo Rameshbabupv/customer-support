@@ -8,6 +8,7 @@ import Tenants from './pages/Tenants'
 import Products from './pages/Products'
 import ProductDashboard from './pages/ProductDashboard'
 import MyTasks from './pages/MyTasks'
+import DevUserSwitcher from './components/DevUserSwitcher'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore()
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/products/:id/dashboard" element={<PrivateRoute><ProductDashboard /></PrivateRoute>} />
         <Route path="/my-tasks" element={<PrivateRoute><MyTasks /></PrivateRoute>} />
       </Routes>
+      <DevUserSwitcher />
     </BrowserRouter>
   )
 }
