@@ -11,12 +11,14 @@ import { userRoutes } from './routes/users.js'
 import { epicRoutes } from './routes/epics.js'
 import { featureRoutes } from './routes/features.js'
 import { taskRoutes } from './routes/tasks.js'
+import { ideaRoutes } from './routes/ideas.js'
+import { teamRoutes } from './routes/teams.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
-const PORT = process.env.PORT || 4000
+const PORT = parseInt(process.env.PORT || '4000')
 const HOST = process.env.HOST || '0.0.0.0'
 
 // Middleware
@@ -35,6 +37,8 @@ app.use('/api/users', userRoutes)
 app.use('/api/epics', epicRoutes)
 app.use('/api/features', featureRoutes)
 app.use('/api/tasks', taskRoutes)
+app.use('/api/ideas', ideaRoutes)
+app.use('/api/teams', teamRoutes)
 
 // Health check
 app.get('/health', (_, res) => res.json({ status: 'ok' }))
