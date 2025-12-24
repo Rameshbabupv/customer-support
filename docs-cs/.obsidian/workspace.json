@@ -193,8 +193,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "30cfdf5b5abc10b1",
+  "active": "7f50b3f79349f7ce",
   "lastOpenFiles": [
+    "deploy.md",
     "api.md",
     "design-prompt.md",
     "product.md",
