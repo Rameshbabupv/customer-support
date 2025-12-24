@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/auth'
 
@@ -134,21 +135,30 @@ export default function Products() {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:border-slate-300 transition-all cursor-pointer group"
-                  onClick={() => openEditModal(product)}
+                  className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:border-slate-300 transition-all group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-primary">
                       <span className="material-symbols-outlined">inventory_2</span>
                     </div>
-                    <button className="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
                       <span className="material-symbols-outlined text-[20px]">edit</span>
                     </button>
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{product.name}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-2">
+                  <p className="text-sm text-slate-500 line-clamp-2 mb-3">
                     {product.description || 'No description'}
                   </p>
+                  <Link
+                    to={`/products/${product.id}/dashboard`}
+                    className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">dashboard</span>
+                    View Dashboard
+                  </Link>
                 </div>
               ))}
 
