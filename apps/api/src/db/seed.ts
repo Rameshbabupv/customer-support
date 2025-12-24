@@ -1,5 +1,5 @@
 import { db } from './index.js'
-import { tenants, users, products, tenantProducts } from './schema.js'
+import { tenants, users, products, tenantProducts, epics, features, devTasks, taskAssignments } from './schema.js'
 import bcrypt from 'bcryptjs'
 import { nanoid } from 'nanoid'
 
@@ -97,20 +97,25 @@ async function seed() {
     { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin' },
     { email: 'mohan@systech.com', name: 'Mohan', role: 'support' },
     { email: 'sakthi@systech.com', name: 'Sakthi', role: 'integrator' },
-    { email: 'jai@systech.com', name: 'Jai', role: 'support' },
-    { email: 'priya@systech.com', name: 'Priya', role: 'support' },
+    { email: 'jai@systech.com', name: 'Jai', role: 'developer' },
+    { email: 'priya@systech.com', name: 'Priya', role: 'developer' },
   ]
 
+  const createdInternalUsers: any[] = []
   for (const u of internalUsers) {
-    await db.insert(users).values({
+    const [user] = await db.insert(users).values({
       email: u.email,
       passwordHash,
       name: u.name,
       role: u.role as any,
       tenantId: ownerTenant.id,
-    })
+    }).returning()
+    createdInternalUsers.push(user)
   }
-  console.log('Created 5 internal users')
+  console.log('Created 5 internal users (2 developers)')
+
+  const jaiId = createdInternalUsers.find(u => u.email === 'jai@systech.com')?.id
+  const priyaId = createdInternalUsers.find(u => u.email === 'priya@systech.com')?.id
 
   // === CLIENT USERS (Acme Corp) ===
 
@@ -152,6 +157,140 @@ async function seed() {
   }
   console.log('Created 3 TechCorp users')
 
+  // === DEV TASKS (Internal Development) ===
+
+  // Epic 1: CRM Sales Enhancement
+  const [crmEpic] = await db.insert(epics).values({
+    productId: findProduct('CRM Sales'),
+    title: 'Lead Management & Pipeline Improvements',
+    description: 'Enhance lead tracking, scoring, and pipeline visualization',
+    status: 'in_progress',
+    priority: 1,
+  }).returning()
+
+  // Feature 1.1: Lead Scoring Engine
+  const [leadScoringFeature] = await db.insert(features).values({
+    epicId: crmEpic.id,
+    title: 'Automated Lead Scoring',
+    description: 'AI-based lead scoring based on engagement and demographics',
+    status: 'in_progress',
+    priority: 1,
+  }).returning()
+
+  // Tasks for Lead Scoring
+  const [task1] = await db.insert(devTasks).values({
+    featureId: leadScoringFeature.id,
+    title: 'Design scoring algorithm',
+    description: 'Define scoring rules and weightage for different attributes',
+    type: 'task',
+    status: 'done',
+    priority: 1,
+  }).returning()
+
+  const [task2] = await db.insert(devTasks).values({
+    featureId: leadScoringFeature.id,
+    title: 'Implement scoring API endpoint',
+    description: 'Create POST /api/leads/:id/score endpoint',
+    type: 'task',
+    status: 'in_progress',
+    priority: 1,
+  }).returning()
+
+  const [task3] = await db.insert(devTasks).values({
+    featureId: leadScoringFeature.id,
+    title: 'Build scoring dashboard UI',
+    description: 'Display lead scores in the CRM dashboard with color coding',
+    type: 'task',
+    status: 'todo',
+    priority: 2,
+  }).returning()
+
+  // Assign tasks to developers
+  await db.insert(taskAssignments).values([
+    { taskId: task1.id, userId: jaiId },
+    { taskId: task2.id, userId: jaiId },
+    { taskId: task3.id, userId: priyaId },
+  ])
+
+  // Feature 1.2: Pipeline Visualization
+  const [pipelineFeature] = await db.insert(features).values({
+    epicId: crmEpic.id,
+    title: 'Visual Pipeline Board',
+    description: 'Kanban-style pipeline view with drag-drop',
+    status: 'planned',
+    priority: 2,
+  }).returning()
+
+  const [task4] = await db.insert(devTasks).values({
+    featureId: pipelineFeature.id,
+    title: 'Design pipeline stages',
+    description: 'Define default stages and custom stage configuration',
+    type: 'task',
+    status: 'todo',
+    priority: 2,
+  }).returning()
+
+  const [task5] = await db.insert(devTasks).values({
+    featureId: pipelineFeature.id,
+    title: 'Implement drag-drop library',
+    description: 'Integrate react-beautiful-dnd for pipeline board',
+    type: 'task',
+    status: 'todo',
+    priority: 2,
+  }).returning()
+
+  await db.insert(taskAssignments).values([
+    { taskId: task4.id, userId: priyaId },
+    { taskId: task5.id, userId: jaiId },
+    { taskId: task5.id, userId: priyaId }, // Joint work
+  ])
+
+  // Epic 2: HRM v2 Attendance Module
+  const [hrmEpic] = await db.insert(epics).values({
+    productId: findProduct('HRM v2'),
+    title: 'Biometric Attendance Integration',
+    description: 'Integrate with multiple biometric devices and build attendance reports',
+    status: 'backlog',
+    priority: 3,
+  }).returning()
+
+  const [biometricFeature] = await db.insert(features).values({
+    epicId: hrmEpic.id,
+    title: 'Multi-device Biometric Sync',
+    description: 'Support for ZKTeco, eSSL, and Anviz devices',
+    status: 'backlog',
+    priority: 3,
+  }).returning()
+
+  const [task6] = await db.insert(devTasks).values({
+    featureId: biometricFeature.id,
+    title: 'Research device APIs',
+    description: 'Document API specifications for all 3 device types',
+    type: 'task',
+    status: 'todo',
+    priority: 3,
+  }).returning()
+
+  await db.insert(taskAssignments).values([
+    { taskId: task6.id, userId: jaiId },
+  ])
+
+  // Bug task
+  const [bugTask] = await db.insert(devTasks).values({
+    featureId: leadScoringFeature.id,
+    title: 'Fix lead score calculation for null values',
+    description: 'Handle null demographics gracefully without breaking scoring',
+    type: 'bug',
+    status: 'review',
+    priority: 1,
+  }).returning()
+
+  await db.insert(taskAssignments).values([
+    { taskId: bugTask.id, userId: priyaId },
+  ])
+
+  console.log('Created 2 epics, 3 features, 7 tasks with assignments')
+
   // === SUMMARY ===
 
   console.log('\n✅ Seed complete!')
@@ -162,8 +301,8 @@ async function seed() {
   console.log('│ ramesh@systech.com    admin                             │')
   console.log('│ mohan@systech.com     support                           │')
   console.log('│ sakthi@systech.com    integrator                        │')
-  console.log('│ jai@systech.com       support (dev)                     │')
-  console.log('│ priya@systech.com     support (dev)                     │')
+  console.log('│ jai@systech.com       developer (has 4 assigned tasks)  │')
+  console.log('│ priya@systech.com     developer (has 5 assigned tasks)  │')
   console.log('├─────────────────────────────────────────────────────────┤')
   console.log('│ CLIENT PORTAL (http://localhost:3000)                   │')
   console.log('├─────────────────────────────────────────────────────────┤')
