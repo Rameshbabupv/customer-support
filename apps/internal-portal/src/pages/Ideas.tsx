@@ -102,7 +102,7 @@ export default function Ideas() {
                 <h1 className="text-4xl font-display font-bold bg-gradient-spark bg-clip-text text-transparent mb-2">
                   <span className="inline-block animate-float">💡</span> SPARK Ideas
                 </h1>
-                <p className="text-slate-600 text-lg">Capture ideas without constraints. Vet them with your team.</p>
+                <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>Capture ideas without constraints. Vet them with your team.</p>
               </div>
               <motion.button
                 onClick={() => setShowCreateModal(true)}
@@ -132,8 +132,9 @@ export default function Ideas() {
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       filter === tab.key
                         ? 'bg-gradient-spark text-white shadow-lg shadow-primary/30'
-                        : 'bg-white text-slate-600 hover:bg-gradient-shimmer border border-slate-200 hover:border-primary/30'
+                        : 'hover:bg-gradient-shimmer border hover:border-primary/30'
                     }`}
+                    style={filter !== tab.key ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border-primary)' } : {}}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -146,7 +147,8 @@ export default function Ideas() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
               >
                 <option value="all">All Status</option>
                 <option value="inbox">Inbox</option>
@@ -162,12 +164,12 @@ export default function Ideas() {
           {loading ? (
             <div className="grid gap-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
-                  <div className="h-6 bg-slate-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/2 mb-4"></div>
+                <div key={i} className="rounded-xl border p-6 animate-pulse" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+                  <div className="h-6 rounded w-3/4 mb-3" style={{ backgroundColor: 'var(--bg-tertiary)' }}></div>
+                  <div className="h-4 rounded w-1/2 mb-4" style={{ backgroundColor: 'var(--bg-tertiary)' }}></div>
                   <div className="flex gap-4">
-                    <div className="h-4 bg-slate-200 rounded w-24"></div>
-                    <div className="h-4 bg-slate-200 rounded w-24"></div>
+                    <div className="h-4 rounded w-24" style={{ backgroundColor: 'var(--bg-tertiary)' }}></div>
+                    <div className="h-4 rounded w-24" style={{ backgroundColor: 'var(--bg-tertiary)' }}></div>
                   </div>
                 </div>
               ))}
@@ -185,10 +187,10 @@ export default function Ideas() {
                   <div className="absolute inset-0 bg-yellow-200 rounded-full blur-3xl opacity-30 animate-pulse-slow"></div>
                   <div className="relative text-8xl animate-float">💡</div>
                 </div>
-                <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
+                <h3 className="text-2xl font-bold font-display mb-3" style={{ color: 'var(--text-primary)' }}>
                   No ideas yet
                 </h3>
-                <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
+                <p className="mb-8 max-w-md mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
                   Start capturing your brilliant thoughts! Ideas can be kept private, shared with your team, or published for everyone.
                 </p>
                 <motion.button
@@ -214,26 +216,27 @@ export default function Ideas() {
                   >
                     <Link
                       to={`/ideas/${idea.id}`}
-                      className="block bg-white rounded-xl border border-slate-200 p-6 card-hover relative overflow-hidden group"
+                      className="block rounded-xl border p-6 card-hover relative overflow-hidden group"
+                      style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
                     >
                       <div className="absolute inset-0 bg-gradient-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                       <div className="relative flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           {/* Title */}
-                          <h3 className="text-lg font-bold font-display text-slate-900 mb-2 truncate">
+                          <h3 className="text-lg font-bold font-display mb-2 truncate" style={{ color: 'var(--text-primary)' }}>
                             {idea.title}
                           </h3>
 
                           {/* Description */}
                           {idea.description && (
-                            <p className="text-slate-600 text-sm mb-3 line-clamp-2">
+                            <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
                               {idea.description}
                             </p>
                           )}
 
                           {/* Meta */}
-                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">person</span>
                               <span>{idea.creator.name}</span>
@@ -252,7 +255,7 @@ export default function Ideas() {
                             <span className={`material-symbols-outlined text-[18px] ${visibilityIcons[idea.visibility].color}`} aria-hidden="true">
                               {visibilityIcons[idea.visibility].icon}
                             </span>
-                            <span className="text-xs font-medium text-slate-700">
+                            <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                               {idea.visibility === 'team' && idea.team ? idea.team.name : visibilityIcons[idea.visibility].label}
                             </span>
                           </div>
@@ -263,7 +266,7 @@ export default function Ideas() {
                           </span>
 
                           {/* Stats */}
-                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">thumb_up</span>
                               <span className="font-medium">{idea.voteCount}</span>
@@ -350,16 +353,18 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', duration: 0.3 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: 'var(--bg-card)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50">
+        <div className="p-6 border-b flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50" style={{ borderColor: 'var(--border-primary)' }}>
           <h2 className="text-2xl font-display font-bold bg-gradient-spark bg-clip-text text-transparent">
             💡 New Idea
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg p-2 transition-all"
+            className="rounded-lg p-2 transition-all hover:bg-white"
+            style={{ color: 'var(--text-muted)' }}
             aria-label="Close modal"
           >
             <span className="material-symbols-outlined" aria-hidden="true">close</span>
@@ -368,7 +373,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label htmlFor="idea-title" className="block text-sm font-semibold text-slate-700 mb-2">
+            <label htmlFor="idea-title" className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>
               Title *
             </label>
             <input
@@ -384,7 +389,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
           </div>
 
           <div>
-            <label htmlFor="idea-description" className="block text-sm font-semibold text-slate-700 mb-2">
+            <label htmlFor="idea-description" className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>
               Description
             </label>
             <textarea
@@ -398,7 +403,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>
               Who can see this?
             </label>
             <div className="space-y-3">
@@ -412,8 +417,9 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
                   className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     visibility === option.value
                       ? 'border-primary bg-gradient-shimmer shadow-md'
-                      : 'border-slate-200 hover:border-primary/30 hover:bg-slate-50'
+                      : 'hover:border-primary/30'
                   } ${option.value === 'team' ? 'opacity-60' : ''}`}
+                  style={visibility !== option.value ? { borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-tertiary)' } : {}}
                 >
                   <input
                     type="radio"
@@ -427,9 +433,9 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{option.icon}</span>
-                      <span className="font-semibold text-slate-900">{option.label}</span>
+                      <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{option.label}</span>
                     </div>
-                    <p className="text-sm text-slate-600">{option.desc}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{option.desc}</p>
                   </div>
                 </label>
               ))}

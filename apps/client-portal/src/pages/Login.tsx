@@ -38,36 +38,36 @@ export default function Login() {
   }
 
   return (
-    <div className="bg-background-light min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* Logo */}
       <div className="flex items-center gap-3 mb-8">
         <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-white">
           <span className="material-symbols-outlined text-2xl">support_agent</span>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900">Support Desk</h2>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Support Desk</h2>
       </div>
 
       {/* Card */}
-      <div className="bg-white py-10 px-6 shadow-card rounded-xl w-full max-w-[480px] sm:px-10 border border-slate-200">
+      <div className="py-10 px-6 shadow-card rounded-xl w-full max-w-[480px] sm:px-10 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
         <div className="mb-8 text-center">
-          <h1 className="text-[28px] font-bold text-slate-900 pb-2">Welcome back</h1>
-          <p className="text-slate-500">Enter your credentials to access the portal.</p>
+          <h1 className="text-[28px] font-bold pb-2" style={{ color: 'var(--text-primary)' }}>Welcome back</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Enter your credentials to access the portal.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="px-4 py-3 rounded-lg text-sm" style={{ backgroundColor: 'var(--error-bg)', color: 'var(--error-text)' }}>
               {error}
             </div>
           )}
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
               Work Email
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{ color: 'var(--text-muted)' }}>
                 <span className="material-symbols-outlined text-[20px]">mail</span>
               </div>
               <input
@@ -76,7 +76,8 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
                 required
-                className="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary bg-slate-50 text-sm"
+                className="block w-full rounded-lg border-0 py-3 pl-10 ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-primary text-sm"
+                style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', borderColor: 'var(--border-primary)' }}
               />
             </div>
           </div>
@@ -84,13 +85,13 @@ export default function Login() {
           {/* Password */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-slate-700">Password</label>
+              <label className="block text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Password</label>
               <a href="#" className="text-sm font-semibold text-primary hover:text-blue-500">
                 Forgot password?
               </a>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{ color: 'var(--text-muted)' }}>
                 <span className="material-symbols-outlined text-[20px]">lock</span>
               </div>
               <input
@@ -99,7 +100,8 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary bg-slate-50 text-sm"
+                className="block w-full rounded-lg border-0 py-3 pl-10 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-primary text-sm"
+                style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', borderColor: 'var(--border-primary)' }}
               />
             </div>
           </div>
@@ -114,7 +116,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-slate-500">
+        <p className="mt-8 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
           Don't have an account?{' '}
           <a href="#" className="font-semibold text-primary hover:text-blue-500">
             Contact Admin
@@ -123,7 +125,7 @@ export default function Login() {
       </div>
 
       {/* Footer */}
-      <p className="mt-8 text-center text-xs text-slate-400">
+      <p className="mt-8 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
         © 2024 Support Desk Inc. All rights reserved.
       </p>
     </div>

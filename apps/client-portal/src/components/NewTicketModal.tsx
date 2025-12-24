@@ -223,10 +223,11 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', duration: 0.3 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+                style={{ backgroundColor: 'var(--bg-card)' }}
+                className="rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
               >
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-white to-purple-50/30">
+                <div style={{ borderBottomColor: 'var(--border-primary)', backgroundColor: 'var(--bg-card)' }} className="px-6 py-4 border-b bg-gradient-to-r from-white to-purple-50/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center shadow-lg">
@@ -236,14 +237,15 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                         <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                           New Support Ticket
                         </h2>
-                        <p className="text-sm text-slate-500">Submit a new issue to our team</p>
+                        <p style={{ color: 'var(--text-secondary)' }} className="text-sm">Submit a new issue to our team</p>
                       </div>
                     </div>
                     <motion.button
                       onClick={onClose}
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       whileTap={{ scale: 0.9 }}
-                      className="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                      style={{ color: 'var(--text-muted)' }}
+                      className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                       aria-label="Close"
                     >
                       <span className="material-symbols-outlined" aria-hidden="true">close</span>
@@ -256,7 +258,7 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                   <form onSubmit={handleSubmit} id="new-ticket-form" className="space-y-6">
                     {/* Subject */}
                     <div>
-                      <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label htmlFor="title" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">
                         Subject *
                       </label>
                       <input
@@ -266,13 +268,18 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
                         placeholder="Briefly summarize the issue (e.g. Login page timeout)"
                         required
-                        className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-primary bg-white text-sm"
+                        style={{
+                          color: 'var(--text-primary)',
+                          backgroundColor: 'var(--bg-card)',
+                          borderColor: 'var(--border-primary)'
+                        }}
+                        className="block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-primary text-sm"
                       />
                     </div>
 
                     {/* Description */}
                     <div>
-                      <label htmlFor="description" className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label htmlFor="description" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">
                         Description
                       </label>
                       <textarea
@@ -281,17 +288,22 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                         placeholder="Please provide detailed steps to reproduce the issue..."
                         rows={5}
-                        className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-primary bg-white text-sm"
+                        style={{
+                          color: 'var(--text-primary)',
+                          backgroundColor: 'var(--bg-card)',
+                          borderColor: 'var(--border-primary)'
+                        }}
+                        className="block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-primary text-sm"
                       />
                     </div>
 
                     {/* Product */}
                     <div>
-                      <label htmlFor="product" className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label htmlFor="product" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">
                         Product *
                       </label>
                       {loadingProducts ? (
-                        <div className="block w-full rounded-lg border-0 py-3 px-4 text-slate-400 ring-1 ring-inset ring-slate-300 bg-slate-50 text-sm">
+                        <div style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }} className="block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset text-sm">
                           Loading products...
                         </div>
                       ) : products.length === 0 ? (
@@ -305,8 +317,13 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                           onChange={(e) => setForm({ ...form, productId: parseInt(e.target.value) })}
                           required
                           disabled={products.length === 1}
-                          className={`block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-primary text-sm ${
-                            products.length === 1 ? 'bg-slate-50 cursor-not-allowed' : 'bg-white'
+                          style={{
+                            color: 'var(--text-primary)',
+                            backgroundColor: products.length === 1 ? 'var(--bg-tertiary)' : 'var(--bg-card)',
+                            borderColor: 'var(--border-primary)'
+                          }}
+                          className={`block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset focus:ring-2 focus:ring-primary text-sm ${
+                            products.length === 1 ? 'cursor-not-allowed' : ''
                           }`}
                         >
                           <option value={0}>Select a product...</option>
@@ -318,7 +335,7 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                         </select>
                       )}
                       {products.length === 1 && (
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p style={{ color: 'var(--text-secondary)' }} className="text-xs mt-1">
                           ℹ️ Auto-selected based on your account
                         </p>
                       )}
@@ -327,14 +344,19 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                     {/* Priority & Severity */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="priority" className="block text-sm font-semibold text-slate-700 mb-2">
+                        <label htmlFor="priority" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">
                           Priority
                         </label>
                         <select
                           id="priority"
                           value={form.clientPriority}
                           onChange={(e) => setForm({ ...form, clientPriority: parseInt(e.target.value) })}
-                          className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-primary bg-white text-sm"
+                          style={{
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--bg-card)',
+                            borderColor: 'var(--border-primary)'
+                          }}
+                          className="block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset focus:ring-2 focus:ring-primary text-sm"
                         >
                           <option value={1}>P1 - Critical</option>
                           <option value={2}>P2 - High</option>
@@ -343,14 +365,19 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                         </select>
                       </div>
                       <div>
-                        <label htmlFor="severity" className="block text-sm font-semibold text-slate-700 mb-2">
+                        <label htmlFor="severity" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">
                           Severity
                         </label>
                         <select
                           id="severity"
                           value={form.clientSeverity}
                           onChange={(e) => setForm({ ...form, clientSeverity: parseInt(e.target.value) })}
-                          className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-primary bg-white text-sm"
+                          style={{
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--bg-card)',
+                            borderColor: 'var(--border-primary)'
+                          }}
+                          className="block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset focus:ring-2 focus:ring-primary text-sm"
                         >
                           <option value={1}>S1 - Critical</option>
                           <option value={2}>S2 - Major</option>
@@ -362,7 +389,7 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
 
                     {/* File Upload */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Attachments</label>
+                      <label style={{ color: 'var(--text-secondary)' }} className="block text-sm font-semibold mb-2">Attachments</label>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -373,11 +400,12 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                       />
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary hover:bg-slate-50 transition-all"
+                        style={{ borderColor: 'var(--border-primary)' }}
+                        className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary hover:bg-slate-50 transition-all"
                       >
-                        <span className="material-symbols-outlined text-3xl text-slate-400 mb-2" aria-hidden="true">cloud_upload</span>
-                        <p className="text-sm text-slate-600 font-medium">Click to upload</p>
-                        <p className="text-xs text-slate-400">PNG, JPG, GIF, SVG (max. 5 files, 5MB each)</p>
+                        <span style={{ color: 'var(--text-muted)' }} className="material-symbols-outlined text-3xl mb-2" aria-hidden="true">cloud_upload</span>
+                        <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium">Click to upload</p>
+                        <p style={{ color: 'var(--text-muted)' }} className="text-xs">PNG, JPG, GIF, SVG (max. 5 files, 5MB each)</p>
                       </div>
 
                       {/* Selected Files */}
@@ -387,7 +415,8 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                             <div key={index} className="relative group">
                               <div
                                 onClick={() => setModalImage({ url: previewUrls[index], name: file.name, size: file.size })}
-                                className="aspect-square rounded-lg overflow-hidden bg-slate-100 border-2 border-slate-200 cursor-pointer hover:border-primary transition-colors"
+                                style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}
+                                className="aspect-square rounded-lg overflow-hidden border-2 cursor-pointer hover:border-primary transition-colors"
                               >
                                 <img src={previewUrls[index]} alt={file.name} className="w-full h-full object-cover" />
                               </div>
@@ -398,10 +427,10 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                               >
                                 <span className="material-symbols-outlined text-[14px]" aria-hidden="true">close</span>
                               </button>
-                              <p className="text-xs text-slate-600 truncate mt-1" title={file.name}>
+                              <p style={{ color: 'var(--text-secondary)' }} className="text-xs truncate mt-1" title={file.name}>
                                 {file.name}
                               </p>
-                              <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+                              <p style={{ color: 'var(--text-muted)' }} className="text-xs">{formatFileSize(file.size)}</p>
                             </div>
                           ))}
                         </div>
@@ -411,13 +440,14 @@ export default function NewTicketModal({ isOpen, onClose }: NewTicketModalProps)
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+                <div style={{ borderTopColor: 'var(--border-primary)', backgroundColor: 'var(--bg-tertiary)' }} className="px-6 py-4 border-t flex items-center justify-end gap-3">
                   <motion.button
                     type="button"
                     onClick={onClose}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-4 py-2.5 text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+                    style={{ color: 'var(--text-secondary)' }}
+                    className="px-4 py-2.5 text-sm font-semibold hover:bg-white rounded-lg transition-colors"
                   >
                     Cancel
                   </motion.button>

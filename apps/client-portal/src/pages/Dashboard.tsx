@@ -199,12 +199,13 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow"
+          className="rounded-xl border shadow-lg hover:shadow-xl transition-shadow"
+          style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
         >
-          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-primary)' }}>
             <div className="flex items-center gap-2">
               <span className="text-xl" aria-hidden="true">📋</span>
-              <h2 className="font-bold text-slate-900">Recent Tickets</h2>
+              <h2 className="font-bold" style={{ color: 'var(--text-primary)' }}>Recent Tickets</h2>
             </div>
             <Link to="/tickets" className="text-sm text-primary hover:text-purple-600 flex items-center gap-1 font-semibold group">
               View all
@@ -215,13 +216,13 @@ export default function Dashboard() {
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center">
               <div className="inline-block size-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-slate-500">Loading tickets...</p>
+              <p style={{ color: 'var(--text-secondary)' }}>Loading tickets...</p>
             </div>
           ) : tickets.length === 0 ? (
             <div className="p-12 text-center">
               <div className="text-6xl mb-4">🎫</div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">No tickets yet</h3>
-              <p className="text-slate-500 mb-6">Get started by creating your first support ticket</p>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>No tickets yet</h3>
+              <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Get started by creating your first support ticket</p>
               <motion.button
                 onClick={() => setShowNewTicketModal(true)}
                 whileHover={{ scale: 1.05 }}
@@ -234,8 +235,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <table className="w-full">
-              <thead className="bg-slate-50">
-                <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <thead style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                <tr className="text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   <th className="px-6 py-4">ID</th>
                   <th className="px-6 py-4">Subject</th>
                   <th className="px-6 py-4">Status</th>
@@ -243,7 +244,7 @@ export default function Dashboard() {
                   <th className="px-6 py-4">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y" style={{ borderColor: 'var(--border-primary)' }}>
                 {tickets.slice(0, 5).map((ticket, index) => (
                   <motion.tr
                     key={ticket.id}
@@ -252,11 +253,12 @@ export default function Dashboard() {
                     transition={{ delay: 0.5 + index * 0.05 }}
                     className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm font-semibold text-slate-500">#{ticket.id}</td>
+                    <td className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>#{ticket.id}</td>
                     <td className="px-6 py-4">
                       <Link
                         to={`/tickets/${ticket.id}`}
-                        className="text-sm font-semibold text-slate-900 hover:text-primary transition-colors"
+                        className="text-sm font-semibold hover:text-primary transition-colors"
+                        style={{ color: 'var(--text-primary)' }}
                       >
                         {ticket.title}
                       </Link>
@@ -267,7 +269,7 @@ export default function Dashboard() {
                     <td className="px-6 py-4">
                       <PriorityPill priority={ticket.clientPriority} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                       {formatDate(ticket.createdAt)}
                     </td>
                   </motion.tr>

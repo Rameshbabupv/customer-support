@@ -411,8 +411,8 @@ export default function Tenants() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
-          <h2 className="text-lg font-bold text-slate-900">Tenants</h2>
+        <header className="h-16 px-6 border-b flex items-center justify-between shrink-0" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Tenants</h2>
           <button
             onClick={openAddModal}
             className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors"
@@ -425,24 +425,28 @@ export default function Tenants() {
         {/* Table */}
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
+            <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-secondary)' }}>Loading...</div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div className="rounded-xl border overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="border-b" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
                   <tr>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tenant Code</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tier</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Created</th>
-                    <th className="text-center px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Name</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Tenant Code</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Tier</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Type</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Created</th>
+                    <th className="text-center px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Status</th>
+                    <th className="text-right px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y" style={{ borderColor: 'var(--border-secondary)' }}>
                   {tenants.map((tenant) => (
-                    <tr key={tenant.id} className={`hover:bg-slate-50 ${!tenant.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
+                    <tr
+                      key={tenant.id}
+                      className={`hover:bg-slate-50 ${!tenant.isActive ? 'opacity-50' : ''}`}
+                      style={!tenant.isActive ? { backgroundColor: 'var(--bg-tertiary)' } : undefined}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="size-9 rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm">
@@ -457,7 +461,7 @@ export default function Tenants() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-slate-600 font-mono">{tenant.subdomain || '-'}</span>
+                        <span className="text-sm font-mono" style={{ color: 'var(--text-secondary)' }}>{tenant.subdomain || '-'}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded text-xs font-semibold border ${tierColors[tenant.tier]}`}>
@@ -471,7 +475,7 @@ export default function Tenants() {
                           {tenant.isOwner ? 'Owner' : 'Client'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500">
+                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                         {new Date(tenant.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -513,7 +517,7 @@ export default function Tenants() {
               </table>
 
               {tenants.length === 0 && (
-                <div className="text-center text-slate-400 py-12">No tenants found</div>
+                <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>No tenants found</div>
               )}
             </div>
           )}
@@ -523,12 +527,12 @@ export default function Tenants() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200">
-              <h3 className="text-lg font-bold text-slate-900">
+          <div className="rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--bg-card)' }}>
+            <div className="p-6 border-b" style={{ borderColor: 'var(--border-primary)' }}>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                 {editingTenant ? 'Edit Tenant' : 'Add New Tenant'}
               </h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
                 {editingTenant
                   ? `Tenant Code: ${editingTenant.subdomain}`
                   : 'Onboard a new client company'}
@@ -537,14 +541,14 @@ export default function Tenants() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                <div className="p-3 border rounded-lg text-sm" style={{ backgroundColor: 'var(--error-bg)', borderColor: 'var(--error-bg)', color: 'var(--error-text)' }}>
                   {error}
                 </div>
               )}
 
               {/* Company Info */}
               <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                   <span className="material-symbols-outlined text-[18px]">business</span>
                   Company Information
                 </h4>
@@ -558,24 +562,24 @@ export default function Tenants() {
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20" style={{ borderColor: 'var(--border-primary)' }}
                       required
                     />
-                    <p className="text-xs text-slate-400 mt-1">Enter your company name</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Enter your company name</p>
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Tier</label>
+                    <label className="block text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Tier</label>
                     <select
                       value={tier}
                       onChange={(e) => setTier(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20" style={{ borderColor: 'var(--border-primary)' }}
                     >
                       <option value="starter">Starter</option>
                       <option value="business">Business</option>
                       <option value="enterprise">Enterprise</option>
                     </select>
                     {!editingTenant && (
-                      <p className="text-xs text-slate-400 mt-1">Tenant ID will be auto-generated</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Tenant ID will be auto-generated</p>
                     )}
                   </div>
                 </div>
@@ -583,7 +587,7 @@ export default function Tenants() {
 
               {/* Products */}
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                   <span className="material-symbols-outlined text-[18px]">inventory_2</span>
                   Products
                 </h4>
@@ -596,22 +600,23 @@ export default function Tenants() {
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                         selectedProducts.includes(product.id)
                           ? 'bg-primary text-white border-primary'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                          : 'hover:border-slate-300'
                       }`}
+                      style={!selectedProducts.includes(product.id) ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border-primary)' } : undefined}
                     >
                       {product.name}
                     </button>
                   ))}
                 </div>
                 {products.length === 0 && (
-                  <p className="text-xs text-slate-400">No products available</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No products available</p>
                 )}
               </div>
 
               {/* Admin User - only for new tenants */}
               {!editingTenant && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                     <span className="material-symbols-outlined text-[18px]">person</span>
                     Admin User
                   </h4>
@@ -625,10 +630,10 @@ export default function Tenants() {
                         type="text"
                         value={adminName}
                         onChange={(e) => setAdminName(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                        className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20" style={{ borderColor: 'var(--border-primary)' }}
                         required
                       />
-                      <p className="text-xs text-slate-400 mt-1">Company admin name</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Company admin name</p>
                     </div>
                     <div>
                       <label className={`block text-sm font-medium mb-1 ${adminEmail ? 'text-green-600' : 'text-red-500'}`}>
@@ -638,10 +643,10 @@ export default function Tenants() {
                         type="email"
                         value={adminEmail}
                         onChange={(e) => setAdminEmail(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                        className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20" style={{ borderColor: 'var(--border-primary)' }}
                         required
                       />
-                      <p className="text-xs text-slate-400 mt-1">Your company email ID</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Your company email ID</p>
                     </div>
                   </div>
                   <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
@@ -654,11 +659,11 @@ export default function Tenants() {
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--border-primary)' }}>
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); resetForm() }}
-                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors" style={{ color: 'var(--text-secondary)' }}
                 >
                   Cancel
                 </button>
@@ -678,13 +683,13 @@ export default function Tenants() {
       {/* User Management Modal */}
       {showUserModal && userModalTenant && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--bg-card)' }}>
+            <div className="p-6 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-primary)' }}>
               <div>
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                   Users - {userModalTenant.name}
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
                   Tenant Code: <span className="font-mono">{userModalTenant.subdomain}</span>
                 </p>
               </div>
@@ -698,15 +703,15 @@ export default function Tenants() {
 
             <div className="p-6 space-y-6">
               {userError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                <div className="p-3 border rounded-lg text-sm" style={{ backgroundColor: 'var(--error-bg)', borderColor: 'var(--error-bg)', color: 'var(--error-text)' }}>
                   {userError}
                 </div>
               )}
 
               {/* Add/Edit User Form */}
               {userModalTenant.isActive ? (
-                <form onSubmit={handleUserSubmit} className="p-4 bg-slate-50 rounded-lg space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">
+                <form onSubmit={handleUserSubmit} className="p-4 rounded-lg space-y-4" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                  <h4 className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
                     {editingUser ? 'Edit User' : 'Add New User'}
                   </h4>
                 <div className="grid grid-cols-3 gap-4">
@@ -718,7 +723,7 @@ export default function Tenants() {
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                      className="w-full px-3 py-2 border rounded-lg text-sm" style={{ borderColor: 'var(--border-primary)' }}
                       required
                     />
                   </div>
@@ -730,17 +735,17 @@ export default function Tenants() {
                       type="email"
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100"
+                      className="w-full px-3 py-2 border rounded-lg text-sm disabled:bg-slate-100" style={{ borderColor: 'var(--border-primary)' }}
                       required={!editingUser}
                       disabled={!!editingUser}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Role</label>
+                    <label className="block text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Role</label>
                     <select
                       value={userRole}
                       onChange={(e) => setUserRole(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                      className="w-full px-3 py-2 border rounded-lg text-sm" style={{ borderColor: 'var(--border-primary)' }}
                     >
                       <option value="user">User</option>
                       <option value="company_admin">Company Admin</option>
@@ -750,12 +755,12 @@ export default function Tenants() {
 
                 {/* Product Assignment */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                     Assigned Products (1-2 products)
                   </label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-white">
+                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
                     {tenantProducts.length === 0 ? (
-                      <p className="text-sm text-slate-400">No products available for this tenant</p>
+                      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No products available for this tenant</p>
                     ) : (
                       tenantProducts.map((product) => (
                         <label
@@ -779,16 +784,16 @@ export default function Tenants() {
                             className="mt-0.5"
                           />
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-slate-900">{product.name}</div>
+                            <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{product.name}</div>
                             {product.description && (
-                              <div className="text-xs text-slate-500">{product.description}</div>
+                              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{product.description}</div>
                             )}
                           </div>
                         </label>
                       ))
                     )}
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                     Select 1-2 products this user will work on. Leave empty for all tenant products.
                   </p>
                 </div>
@@ -805,13 +810,13 @@ export default function Tenants() {
                     <button
                       type="button"
                       onClick={cancelEditUser}
-                      className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm"
+                      className="px-4 py-2 hover:bg-slate-200 rounded-lg text-sm" style={{ color: 'var(--text-secondary)' }}
                     >
                       Cancel
                     </button>
                   )}
                   {!editingUser && (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                       Default password: <span className="font-mono">systech@123</span>
                     </p>
                   )}
@@ -831,7 +836,7 @@ export default function Tenants() {
               {/* User List */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
                     Existing Users ({tenantUsers.filter(u =>
                       u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                       u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
@@ -847,44 +852,48 @@ export default function Tenants() {
                         value={userSearchQuery}
                         onChange={(e) => setUserSearchQuery(e.target.value)}
                         placeholder="Search users..."
-                        className="pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        className="pl-8 pr-3 py-1.5 border rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 focus:border-primary" style={{ borderColor: 'var(--border-primary)' }}
                       />
                     </div>
                   )}
                 </div>
                 {loadingUsers ? (
-                  <div className="text-center text-slate-400 py-6">Loading users...</div>
+                  <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>Loading users...</div>
                 ) : tenantUsers.length === 0 ? (
-                  <div className="text-center text-slate-400 py-6">No users found</div>
+                  <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>No users found</div>
                 ) : tenantUsers.filter(u =>
                     u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                     u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
                   ).length === 0 ? (
-                  <div className="text-center text-slate-400 py-6">
+                  <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>
                     No users match "{userSearchQuery}"
                   </div>
                 ) : (
-                  <div className="border border-slate-200 rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden" style={{ borderColor: 'var(--border-primary)' }}>
                     <table className="w-full">
-                      <thead className="bg-slate-50 border-b border-slate-200">
+                      <thead className="border-b" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
                         <tr>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Name</th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Email</th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Role</th>
-                          <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
-                          <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Actions</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Name</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Email</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Role</th>
+                          <th className="text-center px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Status</th>
+                          <th className="text-right px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y" style={{ borderColor: 'var(--border-secondary)' }}>
                         {tenantUsers
                           .filter(u =>
                             u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                             u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
                           )
                           .map((user) => (
-                          <tr key={user.id} className={`hover:bg-slate-50 ${!user.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
-                            <td className="px-4 py-3 text-sm font-medium text-slate-900">{user.name}</td>
-                            <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
+                          <tr
+                            key={user.id}
+                            className={`hover:bg-slate-50 ${!user.isActive ? 'opacity-50' : ''}`}
+                            style={!user.isActive ? { backgroundColor: 'var(--bg-tertiary)' } : undefined}
+                          >
+                            <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</td>
+                            <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
                             <td className="px-4 py-3">
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 user.role === 'company_admin'

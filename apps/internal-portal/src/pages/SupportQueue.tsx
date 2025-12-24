@@ -85,23 +85,25 @@ export default function SupportQueue() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
+        <header className="h-16 px-6 border-b flex items-center justify-between shrink-0" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
           <div className="flex items-center gap-4">
-            <h2 className="text-lg font-bold text-slate-900">Support Queue</h2>
-            <div className="h-6 w-px bg-slate-200 mx-2" />
+            <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Support Queue</h2>
+            <div className="h-6 w-px mx-2" style={{ backgroundColor: 'var(--border-primary)' }} />
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px]" style={{ color: 'var(--text-muted)' }}>search</span>
               <input
                 type="text"
                 placeholder="Search tickets..."
-                className="pl-10 pr-4 py-2 w-64 bg-slate-100 border-none rounded-lg text-sm placeholder-slate-500 focus:ring-2 focus:ring-primary/20"
+                className="pl-10 pr-4 py-2 w-64 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
               />
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={fetchTickets}
-              className="size-10 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+              className="size-10 flex items-center justify-center rounded-lg hover:bg-slate-100"
+              style={{ color: 'var(--text-secondary)' }}
             >
               <span className="material-symbols-outlined">refresh</span>
             </button>
@@ -111,7 +113,7 @@ export default function SupportQueue() {
         {/* Kanban Board */}
         <div className="flex-1 overflow-x-auto p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
+            <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-secondary)' }}>Loading...</div>
           ) : (
             <div className="flex h-full gap-4">
               {columns.map((col) => {
@@ -119,12 +121,13 @@ export default function SupportQueue() {
                 return (
                   <div
                     key={col.key}
-                    className="flex flex-col flex-1 min-w-[280px] max-w-[350px] bg-slate-100 rounded-xl border border-slate-200"
+                    className="flex flex-col flex-1 min-w-[280px] max-w-[350px] rounded-xl border"
+                    style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}
                   >
                     {/* Column Header */}
                     <div className="p-4 flex items-center justify-between shrink-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-700">{col.label}</h3>
+                        <h3 className="font-semibold" style={{ color: 'var(--text-secondary)' }}>{col.label}</h3>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${getCountColor(col.key)}`}>
                           {colTickets.length}
                         </span>
@@ -141,22 +144,23 @@ export default function SupportQueue() {
                           <Link
                             key={ticket.id}
                             to={`/tickets/${ticket.id}`}
-                            className="group bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all relative overflow-hidden"
+                            className="group p-4 rounded-lg shadow-sm border hover:shadow-md hover:border-blue-300 transition-all relative overflow-hidden"
+                            style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
                           >
                             {priority <= 2 && (
                               <div className={`absolute left-0 top-0 bottom-0 w-1 ${pConfig.stripe} rounded-l-lg`} />
                             )}
                             <div className="flex justify-between items-start mb-2">
-                              <span className="text-xs font-mono font-medium text-slate-500">#{ticket.id}</span>
+                              <span className="text-xs font-mono font-medium" style={{ color: 'var(--text-secondary)' }}>#{ticket.id}</span>
                               <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${pConfig.className}`}>
                                 {pConfig.label}
                               </div>
                             </div>
-                            <h4 className="text-sm font-semibold text-slate-900 mb-1 leading-snug">{ticket.title}</h4>
-                            <p className="text-xs text-slate-500 mb-3 line-clamp-2">{ticket.description}</p>
-                            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                              <span className="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">{ticket.tenantName}</span>
-                              <div className="flex items-center gap-1 text-slate-400 text-xs">
+                            <h4 className="text-sm font-semibold mb-1 leading-snug" style={{ color: 'var(--text-primary)' }}>{ticket.title}</h4>
+                            <p className="text-xs mb-3 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{ticket.description}</p>
+                            <div className="flex items-center justify-between border-t pt-3" style={{ borderColor: 'var(--border-secondary)' }}>
+                              <span className="text-xs px-2 py-0.5 rounded" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-tertiary)' }}>{ticket.tenantName}</span>
+                              <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                                 <span className="material-symbols-outlined text-[14px]">schedule</span>
                                 {new Date(ticket.createdAt).toLocaleDateString()}
                               </div>
@@ -166,7 +170,7 @@ export default function SupportQueue() {
                       })}
 
                       {colTickets.length === 0 && (
-                        <div className="text-center text-slate-400 text-sm py-8">No tickets</div>
+                        <div className="text-center text-sm py-8" style={{ color: 'var(--text-muted)' }}>No tickets</div>
                       )}
                     </div>
                   </div>
