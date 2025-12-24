@@ -17,6 +17,7 @@ const __dirname = dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 4000
+const HOST = process.env.HOST || '0.0.0.0'
 
 // Middleware
 app.use(cors())
@@ -38,6 +39,10 @@ app.use('/api/tasks', taskRoutes)
 // Health check
 app.get('/health', (_, res) => res.json({ status: 'ok' }))
 
-app.listen(PORT, () => {
-  console.log(`API running on http://localhost:${PORT}`)
+app.listen(PORT, HOST, () => {
+  console.log(`API server listening on ${HOST}:${PORT}`)
+  console.log(`  Local:   http://localhost:${PORT}`)
+  if (HOST === '0.0.0.0') {
+    console.log(`  Network: http://<your-ip>:${PORT}`)
+  }
 })
