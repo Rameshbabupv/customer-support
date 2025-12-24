@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuthStore } from '../store/auth'
 import type { Ticket } from '@repo/types'
 import { StatusBadge, PriorityPill } from '@repo/ui'
 import { formatDate } from '@repo/utils'
+import StatCard from '../components/StatCard'
+import ModuleCard from '../components/ModuleCard'
 
 export default function Dashboard() {
   const { user, token, logout } = useAuthStore()
@@ -42,99 +45,209 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-r from-white to-purple-50/30 border-b border-slate-200"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white">
-                <span className="material-symbols-outlined text-lg">support_agent</span>
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 text-white shadow-lg">
+                <span className="material-symbols-outlined text-xl">support_agent</span>
               </div>
-              <span className="font-bold text-slate-900">Support Desk</span>
+              <div>
+                <span className="font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Support Desk</span>
+                <p className="text-xs text-slate-500">{user?.tenant?.name || 'Client Portal'}</p>
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <Link
-                to="/tickets/new"
-                className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors"
-              >
-                <span className="material-symbols-outlined text-lg">add</span>
-                New Ticket
-              </Link>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-600">{user?.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-slate-400 hover:text-slate-600"
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="/tickets/new"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-all shadow-md hover:shadow-lg"
                 >
-                  <span className="material-symbols-outlined">logout</span>
-                </button>
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span>
+                  New Ticket
+                </Link>
+              </motion.div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                </div>
+                <motion.button
+                  onClick={handleLogout}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="text-slate-400 hover:text-primary transition-colors p-2 hover:bg-white rounded-lg"
+                  aria-label="Logout"
+                >
+                  <span className="material-symbols-outlined" aria-hidden="true">logout</span>
+                </motion.button>
               </div>
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-6">Dashboard</h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl" aria-hidden="true">📊</span>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Dashboard</h1>
+          </div>
+        </motion.div>
+
+        {/* Quick Access */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ModuleCard
+              emoji="🎫"
+              title="Create Ticket"
+              description="Submit a new support request for our team to assist you"
+              to="/tickets/new"
+              badge="Start Here"
+              badgeColor="bg-gradient-to-r from-primary to-purple-600 text-white"
+            />
+            <ModuleCard
+              emoji="📋"
+              title="My Tickets"
+              description="View and track all your support tickets in one place"
+              count={stats.total}
+              countLabel="Total"
+              to="/tickets"
+              badge={stats.open > 0 ? 'Active' : undefined}
+              badgeColor={stats.open > 5 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}
+            />
+            <ModuleCard
+              emoji="📚"
+              title="Knowledge Base"
+              description="Browse helpful articles and common solutions"
+              to="/help"
+              badge="Coming Soon"
+              badgeColor="bg-purple-100 text-purple-700"
+            />
+          </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: 'Total Tickets', value: stats.total, icon: 'confirmation_number', color: 'bg-blue-50 text-blue-600' },
-            { label: 'Open', value: stats.open, icon: 'folder_open', color: 'bg-amber-50 text-amber-600' },
-            { label: 'In Progress', value: stats.inProgress, icon: 'pending', color: 'bg-purple-50 text-purple-600' },
-            { label: 'Resolved', value: stats.resolved, icon: 'check_circle', color: 'bg-green-50 text-green-600' },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl p-6 border border-slate-200 shadow-card">
-              <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center mb-3`}>
-                <span className="material-symbols-outlined">{stat.icon}</span>
-              </div>
-              <p className="text-sm text-slate-500">{stat.label}</p>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-            </div>
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Ticket Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <StatCard
+              icon="confirmation_number"
+              emoji="🎫"
+              label="Total Tickets"
+              value={stats.total}
+              color="bg-blue-50 text-blue-600"
+            />
+            <StatCard
+              icon="folder_open"
+              emoji="📂"
+              label="Open"
+              value={stats.open}
+              color="bg-amber-50 text-amber-600"
+            />
+            <StatCard
+              icon="pending"
+              emoji="⏳"
+              label="In Progress"
+              value={stats.inProgress}
+              color="bg-purple-50 text-purple-600"
+            />
+            <StatCard
+              icon="check_circle"
+              emoji="✅"
+              label="Resolved"
+              value={stats.resolved}
+              color="bg-green-50 text-green-600"
+            />
+          </div>
+        </motion.div>
 
         {/* Tickets Table */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-card">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-xl border border-slate-200 shadow-lg hover:shadow-xl transition-shadow"
+        >
           <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Recent Tickets</h2>
-            <Link to="/tickets" className="text-sm text-primary hover:text-blue-600 flex items-center gap-1">
-              View all <span className="material-symbols-outlined text-lg">arrow_forward</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xl" aria-hidden="true">📋</span>
+              <h2 className="font-bold text-slate-900">Recent Tickets</h2>
+            </div>
+            <Link to="/tickets" className="text-sm text-primary hover:text-purple-600 flex items-center gap-1 font-semibold group">
+              View all
+              <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span>
             </Link>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading...</div>
+            <div className="p-12 flex flex-col items-center justify-center">
+              <div className="inline-block size-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-slate-500">Loading tickets...</p>
+            </div>
           ) : tickets.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              No tickets yet.{' '}
-              <Link to="/tickets/new" className="text-primary hover:text-blue-600">
+            <div className="p-12 text-center">
+              <div className="text-6xl mb-4">🎫</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">No tickets yet</h3>
+              <p className="text-slate-500 mb-6">Get started by creating your first support ticket</p>
+              <Link
+                to="/tickets/new"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-all shadow-md hover:shadow-lg"
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">add</span>
                 Create your first ticket
               </Link>
             </div>
           ) : (
             <table className="w-full">
-              <thead>
-                <tr className="text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  <th className="px-6 py-3">ID</th>
-                  <th className="px-6 py-3">Subject</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3">Priority</th>
-                  <th className="px-6 py-3">Date</th>
+              <thead className="bg-slate-50">
+                <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  <th className="px-6 py-4">ID</th>
+                  <th className="px-6 py-4">Subject</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Priority</th>
+                  <th className="px-6 py-4">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {tickets.slice(0, 5).map((ticket) => (
-                  <tr key={ticket.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 text-sm text-slate-500">#{ticket.id}</td>
+                {tickets.slice(0, 5).map((ticket, index) => (
+                  <motion.tr
+                    key={ticket.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                    className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-sm font-semibold text-slate-500">#{ticket.id}</td>
                     <td className="px-6 py-4">
                       <Link
                         to={`/tickets/${ticket.id}`}
-                        className="text-sm font-medium text-slate-900 hover:text-primary"
+                        className="text-sm font-semibold text-slate-900 hover:text-primary transition-colors"
                       >
                         {ticket.title}
                       </Link>
@@ -148,12 +261,12 @@ export default function Dashboard() {
                     <td className="px-6 py-4 text-sm text-slate-500">
                       {formatDate(ticket.createdAt)}
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
           )}
-        </div>
+        </motion.div>
       </main>
     </div>
   )
