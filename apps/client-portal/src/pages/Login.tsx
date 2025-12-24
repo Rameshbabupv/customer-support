@@ -12,10 +12,6 @@ export default function Login() {
   const { setAuth } = useAuthStore()
   const { theme } = useTheme()
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')

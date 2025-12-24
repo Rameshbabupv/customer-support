@@ -30,10 +30,6 @@ export default function NewTicket() {
   })
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
     const fetchProducts = async () => {
       if (!user?.id || !user?.tenantId || !token) return
 

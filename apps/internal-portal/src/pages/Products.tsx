@@ -23,11 +23,6 @@ export default function Products() {
   const { token } = useAuthStore()
   const { theme } = useTheme()
 
-  // Apply theme to document root
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   // Form state
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')

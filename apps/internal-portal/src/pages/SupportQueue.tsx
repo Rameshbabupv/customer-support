@@ -38,10 +38,6 @@ export default function SupportQueue() {
   const { theme } = useTheme()
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
     fetchTickets()
   }, [])
 

@@ -19,10 +19,6 @@ export default function TicketDetail() {
   const [modalImage, setModalImage] = useState<{ url: string; name: string; size?: number } | null>(null)
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
     fetchTicket()
   }, [id])
 

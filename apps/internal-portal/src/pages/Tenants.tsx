@@ -58,11 +58,6 @@ export default function Tenants() {
   const { token } = useAuthStore()
   const { theme } = useTheme()
 
-  // Set data-theme attribute
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   // Form state
   const [companyName, setCompanyName] = useState('')
   const [tier, setTier] = useState<'enterprise' | 'business' | 'starter'>('starter')

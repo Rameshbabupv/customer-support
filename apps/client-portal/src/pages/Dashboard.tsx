@@ -24,10 +24,6 @@ export default function Dashboard() {
     fetchTickets()
   }, [])
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   const fetchTickets = async () => {
     try {
       const res = await fetch('/api/tickets', {

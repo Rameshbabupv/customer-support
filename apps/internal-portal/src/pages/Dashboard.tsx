@@ -186,10 +186,6 @@ export default function Dashboard() {
     fetchDashboardData()
   }, [])
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   return (
     <div className="h-screen flex overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
       <Sidebar />

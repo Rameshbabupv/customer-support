@@ -55,10 +55,6 @@ export default function Ideas() {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
     fetchIdeas()
   }, [])
 
