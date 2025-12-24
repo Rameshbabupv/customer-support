@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname),
   server: {
+    host: '0.0.0.0',   // <--- add this line
     port: 3003,
     proxy: {
       '/api': API_URL,
@@ -15,3 +16,4 @@ export default defineConfig({
     },
   },
 })
+

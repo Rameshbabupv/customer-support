@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname),
   server: {
+    host: '0.0.0.0',   // 🔥 THIS IS THE KEY LINE
     port: 3000,
     proxy: {
       '/api': API_URL,
@@ -15,3 +16,4 @@ export default defineConfig({
     },
   },
 })
+
