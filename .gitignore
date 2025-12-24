@@ -36,3 +36,6 @@ coverage/
 # Cache
 .cache/
 .turbo/
+
+# bv (beads viewer) local config and caches
+.bv/
