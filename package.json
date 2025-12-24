@@ -11,6 +11,10 @@
     "dev:client": "cd apps/client-portal && npx vite",
     "dev:internal": "cd apps/internal-portal && npx vite",
     "build": "npm run build --workspaces --if-present",
+    "build:local": "npm run build && echo '\n✅ Build complete! Start API server and run: npm run serve:local'",
+    "serve:local": "echo '⚠️  Make sure API is running (npm run dev:api)' && concurrently -n CLIENT,INTERNAL -c green,magenta \"npm run serve:client\" \"npm run serve:internal\"",
+    "serve:client": "cd apps/client-portal && npx vite preview --port 3000",
+    "serve:internal": "cd apps/internal-portal && npx vite preview --port 3001",
     "db:push": "cd apps/api && npx drizzle-kit push:sqlite",
     "db:seed": "npx tsx apps/api/src/db/seed.ts",
     "db:studio": "cd apps/api && npx drizzle-kit studio"

@@ -1,5 +1,7 @@
 # Deployment Guide
 
+> **Testing locally?** See [LOCAL_BUILD_TESTING.md](./LOCAL_BUILD_TESTING.md) for testing production builds on your machine.
+
 ## Environment Variables
 
 ### API Server (`apps/api`)
