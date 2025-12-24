@@ -220,13 +220,15 @@ export default function Dashboard() {
               <div className="text-6xl mb-4">🎫</div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">No tickets yet</h3>
               <p className="text-slate-500 mb-6">Get started by creating your first support ticket</p>
-              <Link
-                to="/tickets/new"
+              <motion.button
+                onClick={() => setShowNewTicketModal(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-all shadow-md hover:shadow-lg"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">add</span>
                 Create your first ticket
-              </Link>
+              </motion.button>
             </div>
           ) : (
             <table className="w-full">
