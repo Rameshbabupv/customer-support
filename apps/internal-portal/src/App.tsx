@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuthStore } from './store/auth'
+import { useTheme } from './hooks/useTheme'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import SupportQueue from './pages/SupportQueue'
@@ -35,6 +37,13 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { theme } = useTheme()
+
+  // Sync theme state to HTML element for Tailwind dark mode
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
+
   return (
     <BrowserRouter>
       <Routes>

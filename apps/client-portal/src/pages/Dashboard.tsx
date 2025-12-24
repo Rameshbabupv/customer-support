@@ -9,6 +9,7 @@ import { formatDate } from '@repo/utils'
 import StatCard from '../components/StatCard'
 import ModuleCard from '../components/ModuleCard'
 import NewTicketModal from '../components/NewTicketModal'
+import ThemeToggle from '../components/ThemeToggle'
 
 export default function Dashboard() {
   const { user, token, logout } = useAuthStore()
@@ -48,13 +49,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-r from-white to-purple-50/30 border-b border-slate-200"
+        className="bg-gradient-to-r from-white to-purple-50/30 dark:from-slate-800 dark:to-purple-900/30 border-b border-slate-200 dark:border-slate-700"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -64,7 +65,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <span className="font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Support Desk</span>
-                <p className="text-xs text-slate-500">{user?.tenant?.name || 'Client Portal'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{user?.tenant?.name || 'Client Portal'}</p>
               </div>
             </div>
 
@@ -78,10 +79,11 @@ export default function Dashboard() {
                 <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span>
                 New Ticket
               </motion.button>
+              <ThemeToggle />
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user?.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role}</p>
                 </div>
                 <motion.button
                   onClick={handleLogout}

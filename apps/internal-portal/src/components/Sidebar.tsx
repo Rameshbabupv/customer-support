@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import ThemeToggle from './ThemeToggle'
 
 const navItems = [
   { path: '/dashboard', emoji: '📊', icon: 'dashboard', label: 'Dashboard', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
@@ -32,7 +33,7 @@ export default function Sidebar() {
     <motion.aside
       animate={{ width: isCollapsed ? 80 : 256 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="bg-white border-r border-slate-200 flex flex-col shrink-0 relative"
+      className="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 relative"
     >
       {/* Logo */}
       <div className="p-6 flex items-center gap-3 justify-center">
@@ -51,7 +52,7 @@ export default function Sidebar() {
               <h1 className="font-display font-bold text-lg tracking-tight bg-gradient-spark bg-clip-text text-transparent leading-none whitespace-nowrap">
                 SupportDesk
               </h1>
-              <span className="text-xs text-slate-500 font-medium whitespace-nowrap">Internal</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Internal</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -92,7 +93,7 @@ export default function Sidebar() {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group relative ${
                   isActive
                     ? 'bg-gradient-spark text-white font-semibold shadow-md'
-                    : 'text-slate-600 hover:bg-gradient-shimmer hover:border-primary/30'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-gradient-shimmer hover:border-primary/30'
                 } ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <span className="text-xl shrink-0" aria-hidden="true">{item.emoji}</span>
@@ -142,15 +143,20 @@ export default function Sidebar() {
           exit={{ opacity: 0 }}
           className="px-4 mb-4"
         >
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-100 dark:border-green-800">
             <div className="size-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-xs font-medium text-green-700">System Online</span>
+            <span className="text-xs font-medium text-green-700 dark:text-green-400">System Online</span>
           </div>
         </motion.div>
       )}
 
+      {/* Theme Toggle */}
+      <div className={`px-4 mb-4 ${isCollapsed ? 'flex justify-center' : ''}`}>
+        <ThemeToggle />
+      </div>
+
       {/* User */}
-      <div className="p-4 border-t border-slate-200">
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-3">
             <div className="relative group/user">
@@ -186,7 +192,7 @@ export default function Sidebar() {
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gradient-to-br from-slate-50 to-purple-50/30 border border-slate-200 hover:border-primary/30 transition-all">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gradient-to-br from-slate-50 to-purple-50/30 dark:from-slate-700 dark:to-purple-900/30 border border-slate-200 dark:border-slate-600 hover:border-primary/30 transition-all">
             <div className="size-8 rounded-full bg-gradient-spark flex items-center justify-center text-white text-sm font-bold shadow-md shrink-0">
               {user?.name?.charAt(0) || 'U'}
             </div>
@@ -198,8 +204,8 @@ export default function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col overflow-hidden flex-1"
               >
-                <span className="text-sm font-semibold truncate text-slate-900">{user?.name}</span>
-                <span className="text-xs text-slate-500 truncate capitalize">{user?.role}</span>
+                <span className="text-sm font-semibold truncate text-slate-900 dark:text-slate-100">{user?.name}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 truncate capitalize">{user?.role}</span>
               </motion.div>
             </AnimatePresence>
             <motion.button
