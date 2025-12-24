@@ -157,6 +157,8 @@ productRoutes.get('/:id/dashboard', requireOwner, async (req, res) => {
     if (productEpics.length === 0) {
       return res.json({
         epics: [],
+        features: [],
+        tasks: [],
         epicProgress: [],
         taskStatusDistribution: { todo: 0, in_progress: 0, review: 0, done: 0 },
         totalTasks: 0,
