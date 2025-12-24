@@ -29,6 +29,18 @@ interface Attachment {
 const statuses = ['open', 'in_progress', 'resolved', 'closed']
 const priorities = [1, 2, 3, 4, 5]
 
+interface Epic {
+  id: number
+  productId: number
+  title: string
+}
+
+interface Feature {
+  id: number
+  epicId: number
+  title: string
+}
+
 export default function TicketDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -43,6 +55,17 @@ export default function TicketDetail() {
   const [status, setStatus] = useState('')
   const [internalPriority, setInternalPriority] = useState<number | ''>('')
   const [internalSeverity, setInternalSeverity] = useState<number | ''>('')
+
+  // Spawn task state
+  const [showSpawnModal, setShowSpawnModal] = useState(false)
+  const [epics, setEpics] = useState<Epic[]>([])
+  const [features, setFeatures] = useState<Feature[]>([])
+  const [selectedEpicId, setSelectedEpicId] = useState<number | ''>('')
+  const [selectedFeatureId, setSelectedFeatureId] = useState<number | ''>('')
+  const [taskTitle, setTaskTitle] = useState('')
+  const [taskDescription, setTaskDescription] = useState('')
+  const [spawning, setSpawning] = useState(false)
+  const [spawnError, setSpawnError] = useState('')
 
   useEffect(() => {
     fetchTicket()
@@ -90,6 +113,84 @@ export default function TicketDetail() {
     }
   }
 
+  const openSpawnModal = async () => {
+    setShowSpawnModal(true)
+    setTaskTitle(`Bug from ticket: ${ticket?.title}`)
+    setTaskDescription(ticket?.description || '')
+
+    // Fetch all epics (assuming from all products for now)
+    try {
+      const res = await fetch('/api/epics', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      setEpics(data.epics || [])
+    } catch (err) {
+      console.error('Failed to fetch epics', err)
+    }
+  }
+
+  const fetchFeatures = async (epicId: number) => {
+    try {
+      const res = await fetch(`/api/features?epicId=${epicId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      setFeatures(data.features || [])
+    } catch (err) {
+      console.error('Failed to fetch features', err)
+    }
+  }
+
+  const handleEpicChange = (epicId: string) => {
+    setSelectedEpicId(epicId)
+    setSelectedFeatureId('')
+    setFeatures([])
+    if (epicId) {
+      fetchFeatures(parseInt(epicId))
+    }
+  }
+
+  const handleSpawnTask = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedFeatureId) {
+      setSpawnError('Please select a feature')
+      return
+    }
+
+    setSpawning(true)
+    setSpawnError('')
+
+    try {
+      const res = await fetch(`/api/tasks/spawn-from-ticket/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          featureId: selectedFeatureId,
+          title: taskTitle,
+          description: taskDescription,
+          type: 'bug',
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to spawn task')
+
+      setShowSpawnModal(false)
+      setSelectedEpicId('')
+      setSelectedFeatureId('')
+      setTaskTitle('')
+      setTaskDescription('')
+      alert('Dev task created successfully!')
+    } catch (err: any) {
+      setSpawnError(err.message)
+    } finally {
+      setSpawning(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="h-screen flex overflow-hidden bg-background-light">
@@ -127,6 +228,13 @@ export default function TicketDetail() {
             <span className="text-sm text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{ticket.tenantName}</span>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={openSpawnModal}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">add_task</span>
+              Spawn Dev Task
+            </button>
             <button
               onClick={handleSave}
               disabled={saving}
@@ -284,6 +392,98 @@ export default function TicketDetail() {
           fileSize={modalImage.size}
           onClose={() => setModalImage(null)}
         />
+      )}
+
+      {/* Spawn Task Modal */}
+      {showSpawnModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900">Spawn Dev Task from Ticket</h3>
+              <p className="text-sm text-slate-500 mt-1">Create a development task from this support ticket</p>
+            </div>
+
+            <form onSubmit={handleSpawnTask} className="p-6 space-y-4">
+              {spawnError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{spawnError}</div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Epic *</label>
+                <select
+                  value={selectedEpicId}
+                  onChange={(e) => handleEpicChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  required
+                >
+                  <option value="">Select Epic...</option>
+                  {epics.map((epic) => (
+                    <option key={epic.id} value={epic.id}>{epic.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Feature *</label>
+                <select
+                  value={selectedFeatureId}
+                  onChange={(e) => setSelectedFeatureId(e.target.value ? parseInt(e.target.value) : '')}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  required
+                  disabled={!selectedEpicId}
+                >
+                  <option value="">Select Feature...</option>
+                  {features.map((feature) => (
+                    <option key={feature.id} value={feature.id}>{feature.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Task Title *</label>
+                <input
+                  type="text"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <textarea
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSpawnModal(false)
+                    setSelectedEpicId('')
+                    setSelectedFeatureId('')
+                    setSpawnError('')
+                  }}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={spawning}
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  {spawning ? 'Creating...' : 'Create Bug Task'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   )

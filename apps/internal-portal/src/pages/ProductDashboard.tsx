@@ -61,16 +61,51 @@ interface DashboardData {
   totalTasks: number
 }
 
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
 export default function ProductDashboard() {
   const { id } = useParams<{ id: string }>()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedEpics, setExpandedEpics] = useState<Set<number>>(new Set())
   const [expandedFeatures, setExpandedFeatures] = useState<Set<number>>(new Set())
+  const [developers, setDevelopers] = useState<User[]>([])
+
+  // Modal states
+  const [showEpicModal, setShowEpicModal] = useState(false)
+  const [showFeatureModal, setShowFeatureModal] = useState(false)
+  const [showTaskModal, setShowTaskModal] = useState(false)
+  const [selectedEpicId, setSelectedEpicId] = useState<number | null>(null)
+  const [selectedFeatureId, setSelectedFeatureId] = useState<number | null>(null)
+
+  // Form states
+  const [epicTitle, setEpicTitle] = useState('')
+  const [epicDescription, setEpicDescription] = useState('')
+  const [epicPriority, setEpicPriority] = useState(3)
+
+  const [featureTitle, setFeatureTitle] = useState('')
+  const [featureDescription, setFeatureDescription] = useState('')
+  const [featurePriority, setFeaturePriority] = useState(3)
+
+  const [taskTitle, setTaskTitle] = useState('')
+  const [taskDescription, setTaskDescription] = useState('')
+  const [taskType, setTaskType] = useState<'task' | 'bug'>('task')
+  const [taskPriority, setTaskPriority] = useState(3)
+  const [selectedDevelopers, setSelectedDevelopers] = useState<number[]>([])
+
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
   const { token } = useAuthStore()
 
   useEffect(() => {
     fetchDashboard()
+    fetchDevelopers()
   }, [id])
 
   const fetchDashboard = async () => {
@@ -84,6 +119,148 @@ export default function ProductDashboard() {
       console.error('Failed to fetch dashboard', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchDevelopers = async () => {
+    try {
+      // Fetch users from owner tenant (tenantId=1, assuming SysTech is first)
+      const res = await fetch('/api/users/tenant/1', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const users = await res.json()
+      const devs = users.filter((u: User) => u.role === 'developer')
+      setDevelopers(devs)
+    } catch (err) {
+      console.error('Failed to fetch developers', err)
+    }
+  }
+
+  const createEpic = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSaving(true)
+
+    try {
+      const res = await fetch('/api/epics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: parseInt(id!),
+          title: epicTitle,
+          description: epicDescription,
+          priority: epicPriority,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create epic')
+
+      setShowEpicModal(false)
+      setEpicTitle('')
+      setEpicDescription('')
+      setEpicPriority(3)
+      fetchDashboard()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const createFeature = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedEpicId) return
+    setError('')
+    setSaving(true)
+
+    try {
+      const res = await fetch('/api/features', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          epicId: selectedEpicId,
+          title: featureTitle,
+          description: featureDescription,
+          priority: featurePriority,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create feature')
+
+      setShowFeatureModal(false)
+      setFeatureTitle('')
+      setFeatureDescription('')
+      setFeaturePriority(3)
+      setSelectedEpicId(null)
+      fetchDashboard()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const createTask = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedFeatureId) return
+    setError('')
+    setSaving(true)
+
+    try {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          featureId: selectedFeatureId,
+          title: taskTitle,
+          description: taskDescription,
+          type: taskType,
+          priority: taskPriority,
+          assignees: selectedDevelopers,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create task')
+
+      setShowTaskModal(false)
+      setTaskTitle('')
+      setTaskDescription('')
+      setTaskType('task')
+      setTaskPriority(3)
+      setSelectedDevelopers([])
+      setSelectedFeatureId(null)
+      fetchDashboard()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const openFeatureModal = (epicId: number) => {
+    setSelectedEpicId(epicId)
+    setShowFeatureModal(true)
+  }
+
+  const openTaskModal = (featureId: number) => {
+    setSelectedFeatureId(featureId)
+    setShowTaskModal(true)
+  }
+
+  const toggleDeveloper = (devId: number) => {
+    if (selectedDevelopers.includes(devId)) {
+      setSelectedDevelopers(selectedDevelopers.filter(id => id !== devId))
+    } else {
+      setSelectedDevelopers([...selectedDevelopers, devId])
     }
   }
 
@@ -166,6 +343,13 @@ export default function ProductDashboard() {
               <p className="text-xs text-slate-500">Development progress and metrics</p>
             </div>
           </div>
+          <button
+            onClick={() => setShowEpicModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Create Epic
+          </button>
         </header>
 
         {/* Content */}
@@ -337,15 +521,35 @@ export default function ProductDashboard() {
                 return (
                   <div key={epic.id} className="border border-slate-200 rounded-lg overflow-hidden">
                     {/* Epic Row */}
-                    <div
-                      onClick={() => toggleEpic(epic.id)}
-                      className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 cursor-pointer transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-slate-600">
+                    <div className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 transition-colors">
+                      <span
+                        onClick={() => toggleEpic(epic.id)}
+                        className="material-symbols-outlined text-slate-600 cursor-pointer"
+                      >
                         {isExpanded ? 'expand_more' : 'chevron_right'}
                       </span>
-                      <span className="material-symbols-outlined text-purple-600">library_books</span>
-                      <span className="font-semibold text-slate-900 flex-1">{epic.title}</span>
+                      <span
+                        onClick={() => toggleEpic(epic.id)}
+                        className="material-symbols-outlined text-purple-600 cursor-pointer"
+                      >
+                        library_books
+                      </span>
+                      <span
+                        onClick={() => toggleEpic(epic.id)}
+                        className="font-semibold text-slate-900 flex-1 cursor-pointer"
+                      >
+                        {epic.title}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          openFeatureModal(epic.id)
+                        }}
+                        className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-medium flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">add</span>
+                        Feature
+                      </button>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(epic.status)}`}>
                         {epic.status}
                       </span>
@@ -362,15 +566,35 @@ export default function ProductDashboard() {
                           return (
                             <div key={feature.id} className="border-t border-slate-200">
                               {/* Feature Row */}
-                              <div
-                                onClick={() => toggleFeature(feature.id)}
-                                className="flex items-center gap-3 p-4 pl-12 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors"
-                              >
-                                <span className="material-symbols-outlined text-slate-600">
+                              <div className="flex items-center gap-3 p-4 pl-12 bg-blue-50 hover:bg-blue-100 transition-colors">
+                                <span
+                                  onClick={() => toggleFeature(feature.id)}
+                                  className="material-symbols-outlined text-slate-600 cursor-pointer"
+                                >
                                   {isFeatureExpanded ? 'expand_more' : 'chevron_right'}
                                 </span>
-                                <span className="material-symbols-outlined text-blue-600">extension</span>
-                                <span className="font-medium text-slate-900 flex-1">{feature.title}</span>
+                                <span
+                                  onClick={() => toggleFeature(feature.id)}
+                                  className="material-symbols-outlined text-blue-600 cursor-pointer"
+                                >
+                                  extension
+                                </span>
+                                <span
+                                  onClick={() => toggleFeature(feature.id)}
+                                  className="font-medium text-slate-900 flex-1 cursor-pointer"
+                                >
+                                  {feature.title}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    openTaskModal(feature.id)
+                                  }}
+                                  className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-medium flex items-center gap-1"
+                                >
+                                  <span className="material-symbols-outlined text-[14px]">add</span>
+                                  Task
+                                </button>
                                 <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(feature.status)}`}>
                                   {feature.status}
                                 </span>
@@ -420,6 +644,262 @@ export default function ProductDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Create Epic Modal */}
+      {showEpicModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900">Create New Epic</h3>
+              <p className="text-sm text-slate-500 mt-1">Add a new epic to this product</p>
+            </div>
+
+            <form onSubmit={createEpic} className="p-6 space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={epicTitle}
+                  onChange={(e) => setEpicTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  placeholder="e.g., User Authentication Module"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <textarea
+                  value={epicDescription}
+                  onChange={(e) => setEpicDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 resize-none"
+                  rows={3}
+                  placeholder="Brief description"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+                <select
+                  value={epicPriority}
+                  onChange={(e) => setEpicPriority(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value={1}>P1 - Critical</option>
+                  <option value={2}>P2 - High</option>
+                  <option value={3}>P3 - Medium</option>
+                  <option value={4}>P4 - Low</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => { setShowEpicModal(false); setError('') }}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  {saving ? 'Creating...' : 'Create Epic'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Feature Modal */}
+      {showFeatureModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900">Create New Feature</h3>
+              <p className="text-sm text-slate-500 mt-1">Add a feature to the selected epic</p>
+            </div>
+
+            <form onSubmit={createFeature} className="p-6 space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={featureTitle}
+                  onChange={(e) => setFeatureTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  placeholder="e.g., Social Login Integration"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <textarea
+                  value={featureDescription}
+                  onChange={(e) => setFeatureDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 resize-none"
+                  rows={3}
+                  placeholder="Brief description"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+                <select
+                  value={featurePriority}
+                  onChange={(e) => setFeaturePriority(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value={1}>P1 - Critical</option>
+                  <option value={2}>P2 - High</option>
+                  <option value={3}>P3 - Medium</option>
+                  <option value={4}>P4 - Low</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => { setShowFeatureModal(false); setSelectedEpicId(null); setError('') }}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  {saving ? 'Creating...' : 'Create Feature'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Task Modal */}
+      {showTaskModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900">Create New Task</h3>
+              <p className="text-sm text-slate-500 mt-1">Add a task to the selected feature</p>
+            </div>
+
+            <form onSubmit={createTask} className="p-6 space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  placeholder="e.g., Implement Google OAuth"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <textarea
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 resize-none"
+                  rows={2}
+                  placeholder="Brief description"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                  <select
+                    value={taskType}
+                    onChange={(e) => setTaskType(e.target.value as 'task' | 'bug')}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="task">Task</option>
+                    <option value="bug">Bug</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+                  <select
+                    value={taskPriority}
+                    onChange={(e) => setTaskPriority(parseInt(e.target.value))}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value={1}>P1</option>
+                    <option value={2}>P2</option>
+                    <option value={3}>P3</option>
+                    <option value={4}>P4</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Assign Developers</label>
+                <div className="space-y-2 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-3">
+                  {developers.map((dev) => (
+                    <label key={dev.id} className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        checked={selectedDevelopers.includes(dev.id)}
+                        onChange={() => toggleDeveloper(dev.id)}
+                        className="rounded border-slate-300 text-primary focus:ring-primary/20"
+                      />
+                      <span className="text-sm text-slate-700">{dev.name}</span>
+                      <span className="text-xs text-slate-400">({dev.email})</span>
+                    </label>
+                  ))}
+                  {developers.length === 0 && (
+                    <p className="text-sm text-slate-400 text-center py-2">No developers available</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTaskModal(false)
+                    setSelectedFeatureId(null)
+                    setSelectedDevelopers([])
+                    setError('')
+                  }}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  {saving ? 'Creating...' : 'Create Task'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
