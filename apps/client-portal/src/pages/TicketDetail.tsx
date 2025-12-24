@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/auth'
 import type { Ticket, Attachment, TicketComment } from '@repo/types'
 import { StatusBadge, PriorityPill } from '@repo/ui'
 import { formatDateTime } from '@repo/utils'
+import ImageModal from '../components/ImageModal'
 
 export default function TicketDetail() {
   const { id } = useParams()
@@ -13,6 +14,7 @@ export default function TicketDetail() {
   const [comments, setComments] = useState<TicketComment[]>([])
   const [loading, setLoading] = useState(true)
   const [newComment, setNewComment] = useState('')
+  const [modalImage, setModalImage] = useState<{ url: string; name: string; size?: number } | null>(null)
 
   useEffect(() => {
     fetchTicket()
@@ -198,18 +200,37 @@ export default function TicketDetail() {
                 <h3 className="font-semibold text-slate-900 mb-4">
                   Attachments ({attachments.length})
                 </h3>
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {attachments.map((att) => (
-                    <a
-                      key={att.id}
-                      href={att.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-primary hover:text-blue-600"
-                    >
-                      <span className="material-symbols-outlined text-lg">attachment</span>
-                      {att.fileName}
-                    </a>
+                    <div key={att.id} className="group">
+                      {/* Thumbnail */}
+                      <div
+                        onClick={() => setModalImage({ url: att.fileUrl, name: att.fileName, size: att.fileSize })}
+                        className="aspect-square rounded-lg overflow-hidden bg-slate-100 border-2 border-slate-200 cursor-pointer hover:border-primary transition-colors"
+                      >
+                        <img
+                          src={att.fileUrl}
+                          alt={att.fileName}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* File info */}
+                      <div className="mt-2">
+                        <p className="text-xs text-slate-600 truncate" title={att.fileName}>
+                          {att.fileName}
+                        </p>
+                        {att.fileSize && (
+                          <p className="text-xs text-slate-400">
+                            {att.fileSize < 1024
+                              ? att.fileSize + ' B'
+                              : att.fileSize < 1024 * 1024
+                              ? (att.fileSize / 1024).toFixed(1) + ' KB'
+                              : (att.fileSize / (1024 * 1024)).toFixed(1) + ' MB'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -217,6 +238,16 @@ export default function TicketDetail() {
           </div>
         </div>
       </main>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <ImageModal
+          imageUrl={modalImage.url}
+          fileName={modalImage.name}
+          fileSize={modalImage.size}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   )
 }

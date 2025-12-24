@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
+import ImageModal from '../components/ImageModal'
 
 interface Product {
   id: number
@@ -16,6 +17,8 @@ export default function NewTicket() {
   const [products, setProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [modalImage, setModalImage] = useState<{ url: string; name: string; size: number } | null>(null)
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -46,6 +49,18 @@ export default function NewTicket() {
 
     fetchProducts()
   }, [user?.tenantId, token])
+
+  // Create and cleanup preview URLs
+  useEffect(() => {
+    // Create preview URLs
+    const urls = selectedFiles.map((file) => URL.createObjectURL(file))
+    setPreviewUrls(urls)
+
+    // Cleanup function to revoke URLs
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [selectedFiles])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -273,28 +288,39 @@ export default function NewTicket() {
               <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5 files, 5MB each)</p>
             </div>
 
-            {/* Selected Files */}
+            {/* Selected Files - Thumbnail Grid */}
             {selectedFiles.length > 0 && (
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {selectedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-slate-50 rounded-lg p-3 border border-slate-200"
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className="material-symbols-outlined text-slate-400">attach_file</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
-                        <p className="text-xs text-slate-500">{formatFileSize(file.size)}</p>
-                      </div>
+                  <div key={index} className="relative group">
+                    {/* Thumbnail */}
+                    <div
+                      onClick={() => setModalImage({ url: previewUrls[index], name: file.name, size: file.size })}
+                      className="aspect-square rounded-lg overflow-hidden bg-slate-100 border-2 border-slate-200 cursor-pointer hover:border-primary transition-colors"
+                    >
+                      <img
+                        src={previewUrls[index]}
+                        alt={file.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
+
+                    {/* Remove button */}
                     <button
                       type="button"
                       onClick={() => handleRemoveFile(index)}
-                      className="text-slate-400 hover:text-red-600 transition-colors"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
                     >
-                      <span className="material-symbols-outlined text-[20px]">close</span>
+                      <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
+
+                    {/* File info */}
+                    <div className="mt-1">
+                      <p className="text-xs text-slate-600 truncate" title={file.name}>
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -320,6 +346,16 @@ export default function NewTicket() {
           </div>
         </form>
       </main>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <ImageModal
+          imageUrl={modalImage.url}
+          fileName={modalImage.name}
+          fileSize={modalImage.size}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   )
 }
