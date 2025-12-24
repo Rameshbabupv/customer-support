@@ -21,7 +21,7 @@ const DEV_USERS: DevUser[] = [
 export default function DevUserSwitcher() {
   const [isOpen, setIsOpen] = useState(false)
   const [switching, setSwitching] = useState(false)
-  const { user, login } = useAuthStore()
+  const { user, setAuth } = useAuthStore()
 
   // Only show in development
   if (import.meta.env.PROD) return null
@@ -51,7 +51,7 @@ export default function DevUserSwitcher() {
       const data = await res.json()
       console.log('[DevSwitcher] Login successful, user:', data.user)
 
-      login(data.user, data.token)
+      setAuth(data.token, data.user)
 
       console.log('[DevSwitcher] Reloading page...')
       window.location.reload()
