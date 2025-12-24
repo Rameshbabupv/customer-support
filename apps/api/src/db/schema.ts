@@ -68,6 +68,7 @@ export const tickets = sqliteTable('tickets', {
   assignedTo: integer('assigned_to').references(() => users.id),
   integratorId: integer('integrator_id').references(() => users.id),
   tenantId: integer('tenant_id').references(() => tenants.id),
+  sourceIdeaId: integer('source_idea_id').references(() => ideas.id), // SPARK: Lineage tracking
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })
@@ -153,6 +154,87 @@ export const supportTicketTasks = sqliteTable('support_ticket_tasks', {
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 
+// ========================================
+// SPARK: Idea Management Feature
+// ========================================
+
+// Team (for idea visibility)
+export const teams = sqliteTable('teams', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
+  name: text('name').notNull(),
+  productId: integer('product_id').references(() => products.id), // Optional: team can be product-based
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Team Members (many-to-many: users ↔ teams)
+export const teamMembers = sqliteTable('team_members', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  teamId: integer('team_id').references(() => teams.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  role: text('role', { enum: ['member', 'lead'] }).default('member'),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Idea (SPARK core entity)
+export const ideas = sqliteTable('ideas', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status', {
+    enum: ['inbox', 'discussing', 'vetted', 'in_progress', 'shipped', 'archived']
+  }).default('inbox'),
+  visibility: text('visibility', {
+    enum: ['private', 'team', 'public']
+  }).default('private'),
+  teamId: integer('team_id').references(() => teams.id), // Required if visibility='team'
+  createdBy: integer('created_by').references(() => users.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  publishedAt: text('published_at'), // When first shared (private → team/public)
+  voteCount: integer('vote_count').default(0),
+  commentCount: integer('comment_count').default(0),
+})
+
+// Idea Comments
+export const ideaComments = sqliteTable('idea_comments', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ideaId: integer('idea_id').references(() => ideas.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  comment: text('comment').notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Idea Reactions
+export const ideaReactions = sqliteTable('idea_reactions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ideaId: integer('idea_id').references(() => ideas.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  reaction: text('reaction', {
+    enum: ['thumbs_up', 'heart', 'fire']
+  }).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Idea-Product link (which products are affected by this idea)
+export const ideaProducts = sqliteTable('idea_products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ideaId: integer('idea_id').references(() => ideas.id).notNull(),
+  productId: integer('product_id').references(() => products.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Idea-Ticket link (lineage: which tickets came from this idea)
+export const ideaTickets = sqliteTable('idea_tickets', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  ideaId: integer('idea_id').references(() => ideas.id).notNull(),
+  ticketId: integer('ticket_id').references(() => tickets.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
 // Relations
 export const ticketsRelations = relations(tickets, ({ one }) => ({
   tenant: one(tenants, {
@@ -203,5 +285,93 @@ export const userProductsRelations = relations(userProducts, ({ one }) => ({
   product: one(products, {
     fields: [userProducts.productId],
     references: [products.id],
+  }),
+}))
+
+// SPARK Relations
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [teams.tenantId],
+    references: [tenants.id],
+  }),
+  product: one(products, {
+    fields: [teams.productId],
+    references: [products.id],
+  }),
+  members: many(teamMembers),
+  ideas: many(ideas),
+}))
+
+export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+}))
+
+export const ideasRelations = relations(ideas, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [ideas.tenantId],
+    references: [tenants.id],
+  }),
+  team: one(teams, {
+    fields: [ideas.teamId],
+    references: [teams.id],
+  }),
+  creator: one(users, {
+    fields: [ideas.createdBy],
+    references: [users.id],
+  }),
+  comments: many(ideaComments),
+  reactions: many(ideaReactions),
+  products: many(ideaProducts),
+  tickets: many(ideaTickets),
+}))
+
+export const ideaCommentsRelations = relations(ideaComments, ({ one }) => ({
+  idea: one(ideas, {
+    fields: [ideaComments.ideaId],
+    references: [ideas.id],
+  }),
+  user: one(users, {
+    fields: [ideaComments.userId],
+    references: [users.id],
+  }),
+}))
+
+export const ideaReactionsRelations = relations(ideaReactions, ({ one }) => ({
+  idea: one(ideas, {
+    fields: [ideaReactions.ideaId],
+    references: [ideas.id],
+  }),
+  user: one(users, {
+    fields: [ideaReactions.userId],
+    references: [users.id],
+  }),
+}))
+
+export const ideaProductsRelations = relations(ideaProducts, ({ one }) => ({
+  idea: one(ideas, {
+    fields: [ideaProducts.ideaId],
+    references: [ideas.id],
+  }),
+  product: one(products, {
+    fields: [ideaProducts.productId],
+    references: [products.id],
+  }),
+}))
+
+export const ideaTicketsRelations = relations(ideaTickets, ({ one }) => ({
+  idea: one(ideas, {
+    fields: [ideaTickets.ideaId],
+    references: [ideas.id],
+  }),
+  ticket: one(tickets, {
+    fields: [ideaTickets.ticketId],
+    references: [tickets.id],
   }),
 }))
