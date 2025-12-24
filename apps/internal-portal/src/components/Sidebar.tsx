@@ -85,7 +85,7 @@ export default function Sidebar() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              title={isCollapsed ? item.label : undefined}
+              className="relative group/nav"
             >
               <Link
                 to={item.path}
@@ -119,6 +119,16 @@ export default function Sidebar() {
                   <div className="absolute -right-1 top-1/2 -translate-y-1/2 size-2 rounded-full bg-white" />
                 )}
               </Link>
+
+              {/* Tooltip for collapsed state */}
+              {isCollapsed && (
+                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200 z-50">
+                  <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap shadow-lg">
+                    {item.label}
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900"></div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )
         })}
@@ -143,22 +153,37 @@ export default function Sidebar() {
       <div className="p-4 border-t border-slate-200">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-3">
-            <div
-              className="size-10 rounded-full bg-gradient-spark flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer"
-              title={user?.name}
-            >
-              {user?.name?.charAt(0) || 'U'}
+            <div className="relative group/user">
+              <div className="size-10 rounded-full bg-gradient-spark flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              {/* User tooltip */}
+              <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover/user:opacity-100 transition-opacity duration-200 z-50">
+                <div className="bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-lg">
+                  <div className="font-semibold">{user?.name}</div>
+                  <div className="text-xs text-slate-300 capitalize">{user?.role}</div>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900"></div>
+                </div>
+              </div>
             </div>
-            <motion.button
-              onClick={logout}
-              className="text-slate-400 hover:text-primary transition-colors p-2 hover:bg-slate-100 rounded-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Logout"
-              title="Logout"
-            >
-              <span className="material-symbols-outlined text-[20px]" aria-hidden="true">logout</span>
-            </motion.button>
+            <div className="relative group/logout">
+              <motion.button
+                onClick={logout}
+                className="text-slate-400 hover:text-primary transition-colors p-2 hover:bg-slate-100 rounded-lg"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Logout"
+              >
+                <span className="material-symbols-outlined text-[20px]" aria-hidden="true">logout</span>
+              </motion.button>
+              {/* Logout tooltip */}
+              <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover/logout:opacity-100 transition-opacity duration-200 z-50">
+                <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap shadow-lg">
+                  Logout
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900"></div>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gradient-to-br from-slate-50 to-purple-50/30 border border-slate-200 hover:border-primary/30 transition-all">
