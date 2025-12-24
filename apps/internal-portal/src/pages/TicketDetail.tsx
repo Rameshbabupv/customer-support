@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/auth'
+import ImageModal from '../components/ImageModal'
 
 interface Ticket {
   id: number
@@ -16,6 +17,15 @@ interface Ticket {
   createdAt: string
 }
 
+interface Attachment {
+  id: number
+  ticketId: number
+  fileUrl: string
+  fileName: string
+  fileSize?: number
+  createdAt: string
+}
+
 const statuses = ['open', 'in_progress', 'resolved', 'closed']
 const priorities = [1, 2, 3, 4, 5]
 
@@ -24,8 +34,10 @@ export default function TicketDetail() {
   const navigate = useNavigate()
   const { token } = useAuthStore()
   const [ticket, setTicket] = useState<Ticket | null>(null)
+  const [attachments, setAttachments] = useState<Attachment[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [modalImage, setModalImage] = useState<{ url: string; name: string; size?: number } | null>(null)
 
   // Form state for internal fields
   const [status, setStatus] = useState('')
@@ -44,6 +56,7 @@ export default function TicketDetail() {
       const data = await res.json()
       const t = data.ticket
       setTicket(t)
+      setAttachments(data.attachments || [])
       setStatus(t.status)
       setInternalPriority(t.internalPriority || '')
       setInternalSeverity(t.internalSeverity || '')
@@ -152,6 +165,49 @@ export default function TicketDetail() {
                   </div>
                 </div>
               </div>
+
+              {/* Attachments */}
+              {attachments.length > 0 && (
+                <div className="bg-white rounded-xl border border-slate-200 p-6">
+                  <h4 className="font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[20px]">attach_file</span>
+                    Attachments ({attachments.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {attachments.map((att) => (
+                      <div key={att.id} className="group">
+                        {/* Thumbnail */}
+                        <div
+                          onClick={() => setModalImage({ url: att.fileUrl, name: att.fileName, size: att.fileSize })}
+                          className="aspect-square rounded-lg overflow-hidden bg-slate-100 border-2 border-slate-200 cursor-pointer hover:border-primary transition-colors"
+                        >
+                          <img
+                            src={att.fileUrl}
+                            alt={att.fileName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* File info */}
+                        <div className="mt-2">
+                          <p className="text-xs text-slate-600 truncate" title={att.fileName}>
+                            {att.fileName}
+                          </p>
+                          {att.fileSize && (
+                            <p className="text-xs text-slate-400">
+                              {att.fileSize < 1024
+                                ? att.fileSize + ' B'
+                                : att.fileSize < 1024 * 1024
+                                ? (att.fileSize / 1024).toFixed(1) + ' KB'
+                                : (att.fileSize / (1024 * 1024)).toFixed(1) + ' MB'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right: Actions */}
@@ -219,6 +275,16 @@ export default function TicketDetail() {
           </div>
         </div>
       </main>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <ImageModal
+          imageUrl={modalImage.url}
+          fileName={modalImage.name}
+          fileSize={modalImage.size}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   )
 }

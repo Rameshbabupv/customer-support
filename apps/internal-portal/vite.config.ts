@@ -9,6 +9,7 @@ export default defineConfig({
     port: 3003,
     proxy: {
       '/api': 'http://localhost:4000',
+      '/uploads': 'http://localhost:4000',
     },
   },
 })
