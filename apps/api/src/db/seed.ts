@@ -13,7 +13,7 @@ async function seed() {
   // === TENANTS ===
 
   const [ownerTenant] = await db.insert(tenants).values({
-    name: 'SysTech',
+    name: 'Systech-erp.ai',
     subdomain: 'SYSTECH',  // Owner keeps fixed code
     isOwner: true,
     tier: 'enterprise',
@@ -33,7 +33,7 @@ async function seed() {
     tier: 'business',
   }).returning()
 
-  console.log('Created tenants: SysTech, Acme Corp, TechCorp')
+  console.log('Created tenants: Systech-erp.ai, Acme Corp, TechCorp')
 
   // === PRODUCTS (Our Offerings) ===
 
@@ -74,6 +74,13 @@ async function seed() {
   }
 
   // Assign products to tenants
+  // Systech-erp.ai (Owner): All products
+  const ownerProductAssignments = createdProducts.map(p => ({
+    tenantId: ownerTenant.id,
+    productId: p.id,
+  }))
+  await db.insert(tenantProducts).values(ownerProductAssignments)
+
   // Acme Corp (Enterprise): CRM Sales, CRM Service, HRM v2, Finance v2, EXIM
   await db.insert(tenantProducts).values([
     { tenantId: acmeTenant.id, productId: findProduct('CRM Sales') },
@@ -91,7 +98,7 @@ async function seed() {
   ])
   console.log('Assigned products to tenants')
 
-  // === INTERNAL USERS (SysTech - Owner) ===
+  // === INTERNAL USERS (Systech-erp.ai - Owner) ===
 
   const internalUsers = [
     { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin' },

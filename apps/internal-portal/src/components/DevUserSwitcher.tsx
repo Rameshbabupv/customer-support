@@ -11,11 +11,11 @@ interface DevUser {
 
 const DEV_USERS: DevUser[] = [
   // Internal Portal Users
-  { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin', tenant: 'SysTech', password: 'systech@123' },
-  { email: 'mohan@systech.com', name: 'Mohan', role: 'support', tenant: 'SysTech', password: 'systech@123' },
-  { email: 'sakthi@systech.com', name: 'Sakthi', role: 'integrator', tenant: 'SysTech', password: 'systech@123' },
-  { email: 'jai@systech.com', name: 'Jai', role: 'developer', tenant: 'SysTech', password: 'systech@123' },
-  { email: 'priya@systech.com', name: 'Priya', role: 'developer', tenant: 'SysTech', password: 'systech@123' },
+  { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin', tenant: 'Systech-erp.ai', password: 'systech@123' },
+  { email: 'mohan@systech.com', name: 'Mohan', role: 'support', tenant: 'Systech-erp.ai', password: 'systech@123' },
+  { email: 'sakthi@systech.com', name: 'Sakthi', role: 'integrator', tenant: 'Systech-erp.ai', password: 'systech@123' },
+  { email: 'jai@systech.com', name: 'Jai', role: 'developer', tenant: 'Systech-erp.ai', password: 'systech@123' },
+  { email: 'priya@systech.com', name: 'Priya', role: 'developer', tenant: 'Systech-erp.ai', password: 'systech@123' },
 ]
 
 export default function DevUserSwitcher() {
