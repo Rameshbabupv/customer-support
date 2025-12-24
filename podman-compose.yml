@@ -11,13 +11,18 @@ services:
       - "3000:3000"   # client portal
       - "3003:3003"   # internal portal
       - "4000:4000"   # API
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=production
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=supportdb
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-4000}
+      - HOST=${HOST:-0.0.0.0}
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME:-supportdb}
     depends_on:
       - db
 
@@ -25,10 +30,12 @@ services:
     image: docker.io/library/postgres:15
     container_name: support_db
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: supportdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME:-supportdb}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:

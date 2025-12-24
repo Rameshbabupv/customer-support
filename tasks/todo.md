@@ -1,55 +1,56 @@
-# User Product Assignment Feature
+# Deployment Fixes
 
 ## Goal
-Allow users to be assigned specific products (1-2) from their company's purchased products. Smart ticket creation: auto-select product if user has only one, show dropdown if multiple.
+Fix deployment configuration to be production-ready
 
-## Current State
-- Users can see ALL products their company purchased
-- No user-level product filtering
-- Ticket creation always shows dropdown
+## Issues Found
+1. Containerfile uses dev mode instead of production build
+2. Hardcoded database credentials
+3. Missing JWT_SECRET environment variable
+4. No .env.example for configuration reference
 
-## Planned Changes
+## Tasks
 
-### Database Schema
-- [ ] Add `user_products` table (many-to-many: users ↔ products)
-  - Columns: id, user_id, product_id, created_at
-  - Relations to users and products
-
-### API Changes
-- [ ] Create `/api/users/:userId/products` endpoint (GET/PUT)
-  - GET: Fetch user's assigned products
-  - PUT: Update user's product assignments
-- [ ] Update existing endpoint to use user products if available
-
-### Internal Portal (User Management)
-- [ ] Modify user edit modal in Tenants page
-  - Show multi-select for products
-  - Products list = tenant's purchased products only
-  - Can assign 1-2 products per user
-
-### Client Portal (Ticket Creation)
-- [ ] Update NewTicket page logic:
-  - Fetch user's assigned products instead of all tenant products
-  - If user has 1 product → auto-select, hide dropdown
-  - If user has 2+ products → show dropdown with only those products
-  - If user has 0 products assigned → fallback to all tenant products
-
-### Seed Data
-- [ ] Update seed.ts to assign products to sample users
-  - Example: john@acme.com → CRM Sales only
-  - Example: jane@acme.com → CRM Sales + CRM Service
+- [x] Fix Containerfile to use production build and start commands
+- [x] Create .env.example file with required environment variables
+- [x] Update podman-compose.yml to use .env file for configuration
+- [x] Add proper environment variable handling for JWT_SECRET and DB credentials
 
 ## Implementation Order
-1. Schema + migration
-2. API endpoints
-3. Seed data update
-4. Internal Portal UI (user management)
-5. Client Portal UI (smart ticket creation)
-6. Test complete flow
+1. Fix Containerfile (prod build/start)
+2. Create .env.example
+3. Update podman-compose.yml to reference .env
+4. Verify changes
 
-## Testing Checklist
-- [ ] User with 1 product sees auto-selected product (no dropdown)
-- [ ] User with 2 products sees dropdown with both
-- [ ] User with 0 products sees all tenant products (fallback)
-- [ ] Admin can assign/unassign products in user management
-- [ ] Product list shows only tenant's purchased products
+## Review
+
+### Changes Made
+
+1. **Containerfile** - `/home/ubuntu/customer-support/Containerfile`
+   - Changed from `npm run dev` to `npm start` for production mode
+   - Removed fallback in build command
+   - Added all port exposures (3000, 3003, 4000)
+   - Set working directory to API app for startup
+
+2. **.env.example** - `/home/ubuntu/customer-support/.env.example`
+   - Created comprehensive environment variable template
+   - Includes NODE_ENV, PORT, HOST, JWT_SECRET
+   - DB configuration for PostgreSQL
+   - Clear instructions to change default values
+
+3. **podman-compose.yml** - `/home/ubuntu/customer-support/podman-compose.yml`
+   - Added `env_file` directive to load .env
+   - Replaced hardcoded values with ${VAR} references
+   - Added sensible defaults using ${VAR:-default} syntax
+   - Applied to both app and db services
+
+### Next Steps for Deployment
+
+1. Copy .env.example to .env: `cp .env.example .env`
+2. Edit .env and set secure values for JWT_SECRET and DB_PASSWORD
+3. Build and run: `podman-compose up --build`
+
+### Security Improvements
+- No hardcoded credentials in compose file
+- JWT_SECRET must be explicitly set
+- .env file already in .gitignore (verified)

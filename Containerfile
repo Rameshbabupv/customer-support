@@ -11,12 +11,13 @@ COPY packages ./packages
 # install dependencies
 RUN npm install
 
-# build (if build script exists)
-RUN npm run build || echo "no build step"
+# build all workspaces
+RUN npm run build
 
-# expose app port (adjust if needed)
-EXPOSE 3000
+# expose ports for all services
+EXPOSE 3000 3003 4000
 
-# start app (adjust app name if needed)
-CMD ["npm", "run", "dev"]
+# start API in production mode
+WORKDIR /app/apps/api
+CMD ["npm", "start"]
 
