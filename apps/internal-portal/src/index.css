@@ -1,8 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lexend+Deca:wght@600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f5f7f8;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: #fafbfc;
+  background-image:
+    radial-gradient(at 40% 20%, rgba(102, 126, 234, 0.08) 0, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(118, 75, 162, 0.08) 0, transparent 50%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-spark text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-105 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-slate-700 font-medium px-4 py-2 rounded-lg border border-slate-200 hover:border-primary/50 hover:bg-gradient-shimmer transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10;
+  }
 }
