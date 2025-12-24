@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
+import { useTheme } from '../hooks/useTheme'
 import ImageModal from '../components/ImageModal'
 
 interface Product {
@@ -11,6 +12,7 @@ interface Product {
 
 export default function NewTicket() {
   const { token, user } = useAuthStore()
+  const { theme } = useTheme()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
@@ -26,6 +28,10 @@ export default function NewTicket() {
     clientPriority: 3,
     clientSeverity: 3,
   })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -182,17 +188,17 @@ export default function NewTicket() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background-light)' }}>
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <Link to="/" className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}>
                   <span className="material-symbols-outlined text-lg">support_agent</span>
                 </div>
-                <span className="font-bold text-slate-900">Support Desk</span>
+                <span className="font-bold" style={{ color: 'var(--color-text-primary)' }}>Support Desk</span>
               </Link>
             </div>
           </div>
@@ -203,49 +209,59 @@ export default function NewTicket() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">New Support Ticket</h1>
-            <p className="text-slate-500">Submit a new issue to our engineering team.</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>New Support Ticket</h1>
+            <p style={{ color: 'var(--color-text-secondary)' }}>Submit a new issue to our engineering team.</p>
           </div>
-          <Link to="/" className="text-primary hover:text-blue-600">
+          <Link to="/" style={{ color: 'var(--color-primary)' }} className="hover:opacity-80">
             Cancel
           </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-card p-6">
+        <form onSubmit={handleSubmit} className="rounded-xl shadow-card p-6" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
           {/* Subject */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Subject</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="Briefly summarize the issue (e.g. Login page timeout)"
               required
-              className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
+              className="block w-full rounded-lg border-0 py-3 px-4 text-sm"
+              style={{
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-input-bg)',
+                border: '1px solid var(--color-input-border)'
+              }}
             />
           </div>
 
           {/* Description */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Please provide detailed steps to reproduce the issue..."
               rows={6}
-              className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
+              className="block w-full rounded-lg border-0 py-3 px-4 text-sm"
+              style={{
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-input-bg)',
+                border: '1px solid var(--color-input-border)'
+              }}
             />
           </div>
 
           {/* Product */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Product *</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Product *</label>
             {loadingProducts ? (
-              <div className="block w-full rounded-lg border-0 py-3 px-4 text-slate-400 ring-1 ring-inset ring-slate-300 bg-slate-50 text-sm">
+              <div className="block w-full rounded-lg border-0 py-3 px-4 text-sm" style={{ color: 'var(--color-text-secondary)', border: '1px solid var(--color-input-border)', backgroundColor: 'var(--color-background-light)' }}>
                 Loading products...
               </div>
             ) : products.length === 0 ? (
-              <div className="block w-full rounded-lg border-0 py-3 px-4 text-red-600 ring-1 ring-inset ring-red-300 bg-red-50 text-sm">
+              <div className="block w-full rounded-lg border-0 py-3 px-4 text-sm" style={{ color: 'var(--color-error)', border: '1px solid var(--color-error)', backgroundColor: 'var(--color-background-light)' }}>
                 No products available. Please contact support.
               </div>
             ) : (
@@ -255,9 +271,14 @@ export default function NewTicket() {
                   onChange={(e) => setForm({ ...form, productId: parseInt(e.target.value) })}
                   required
                   disabled={products.length === 1}
-                  className={`block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-primary text-sm ${
-                    products.length === 1 ? 'bg-slate-50 cursor-not-allowed' : 'bg-white'
+                  className={`block w-full rounded-lg border-0 py-3 px-4 text-sm ${
+                    products.length === 1 ? 'cursor-not-allowed' : ''
                   }`}
+                  style={{
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: products.length === 1 ? 'var(--color-background-light)' : 'var(--color-input-bg)',
+                    border: '1px solid var(--color-input-border)'
+                  }}
                 >
                   <option value={0}>Select a product...</option>
                   {products.map((product) => (
@@ -267,7 +288,7 @@ export default function NewTicket() {
                   ))}
                 </select>
                 {products.length === 1 && (
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                     ℹ️ Auto-selected based on your account
                   </p>
                 )}
@@ -278,11 +299,16 @@ export default function NewTicket() {
           {/* Priority & Severity */}
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Priority</label>
               <select
                 value={form.clientPriority}
                 onChange={(e) => setForm({ ...form, clientPriority: parseInt(e.target.value) })}
-                className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
+                className="block w-full rounded-lg border-0 py-3 px-4 text-sm"
+                style={{
+                  color: 'var(--color-text-primary)',
+                  backgroundColor: 'var(--color-input-bg)',
+                  border: '1px solid var(--color-input-border)'
+                }}
               >
                 <option value={1}>P1 - Critical - Business blocked</option>
                 <option value={2}>P2 - High - Major impact</option>
@@ -291,11 +317,16 @@ export default function NewTicket() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Severity</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Severity</label>
               <select
                 value={form.clientSeverity}
                 onChange={(e) => setForm({ ...form, clientSeverity: parseInt(e.target.value) })}
-                className="block w-full rounded-lg border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-primary bg-white text-sm"
+                className="block w-full rounded-lg border-0 py-3 px-4 text-sm"
+                style={{
+                  color: 'var(--color-text-primary)',
+                  backgroundColor: 'var(--color-input-bg)',
+                  border: '1px solid var(--color-input-border)'
+                }}
               >
                 <option value={1}>S1 - Critical - System down</option>
                 <option value={2}>S2 - Major - Feature broken</option>
@@ -307,7 +338,7 @@ export default function NewTicket() {
 
           {/* File Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Attachments</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Attachments</label>
             <input
               ref={fileInputRef}
               type="file"
@@ -318,11 +349,12 @@ export default function NewTicket() {
             />
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-slate-400 transition-colors"
+              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:opacity-80 transition-opacity"
+              style={{ borderColor: 'var(--color-border)' }}
             >
-              <span className="material-symbols-outlined text-4xl text-slate-400 mb-2">cloud_upload</span>
-              <p className="text-sm text-slate-500">Click to upload</p>
-              <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5 files, 5MB each)</p>
+              <span className="material-symbols-outlined text-4xl mb-2" style={{ color: 'var(--color-text-secondary)' }}>cloud_upload</span>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Click to upload</p>
+              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>SVG, PNG, JPG or GIF (max. 5 files, 5MB each)</p>
             </div>
 
             {/* Selected Files - Thumbnail Grid */}
@@ -333,7 +365,11 @@ export default function NewTicket() {
                     {/* Thumbnail */}
                     <div
                       onClick={() => setModalImage({ url: previewUrls[index], name: file.name, size: file.size })}
-                      className="aspect-square rounded-lg overflow-hidden bg-slate-100 border-2 border-slate-200 cursor-pointer hover:border-primary transition-colors"
+                      className="aspect-square rounded-lg overflow-hidden border-2 cursor-pointer hover:opacity-80 transition-opacity"
+                      style={{
+                        backgroundColor: 'var(--color-background-light)',
+                        borderColor: 'var(--color-border)'
+                      }}
                     >
                       <img
                         src={previewUrls[index]}
@@ -346,17 +382,21 @@ export default function NewTicket() {
                     <button
                       type="button"
                       onClick={() => handleRemoveFile(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
+                      className="absolute -top-2 -right-2 rounded-full p-1 shadow-lg hover:opacity-80 transition-opacity"
+                      style={{
+                        backgroundColor: 'var(--color-error)',
+                        color: 'var(--color-text-inverse)'
+                      }}
                     >
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
 
                     {/* File info */}
                     <div className="mt-1">
-                      <p className="text-xs text-slate-600 truncate" title={file.name}>
+                      <p className="text-xs truncate" style={{ color: 'var(--color-text-primary)' }} title={file.name}>
                         {file.name}
                       </p>
-                      <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{formatFileSize(file.size)}</p>
                     </div>
                   </div>
                 ))}
@@ -365,17 +405,22 @@ export default function NewTicket() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
             <button
               type="button"
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900"
+              className="px-4 py-2 text-sm font-medium hover:opacity-80"
+              style={{ color: 'var(--color-text-primary)' }}
             >
               Save as Draft
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-text-inverse)'
+              }}
             >
               <span className="material-symbols-outlined text-lg">send</span>
               {loading ? 'Submitting...' : 'Submit Ticket'}

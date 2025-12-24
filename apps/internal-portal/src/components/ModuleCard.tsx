@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useTheme } from '../hooks/useTheme'
 
 interface ModuleCardProps {
   emoji: string
@@ -22,6 +23,8 @@ export default function ModuleCard({
   badge,
   badgeColor = 'bg-blue-100 text-blue-700'
 }: ModuleCardProps) {
+  const { theme } = useTheme()
+
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
@@ -30,7 +33,11 @@ export default function ModuleCard({
     >
       <Link
         to={to}
-        className="block bg-white rounded-xl border border-slate-200 p-6 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all group relative overflow-hidden"
+        className="block rounded-xl border p-6 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all group relative overflow-hidden"
+        style={{
+          backgroundColor: 'var(--card-bg)',
+          borderColor: 'var(--border-primary)'
+        }}
       >
         {/* Gradient shimmer overlay */}
         <div className="absolute inset-0 bg-gradient-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -47,12 +54,18 @@ export default function ModuleCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-display font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">
+          <h3
+            className="text-lg font-display font-bold mb-2 group-hover:text-primary transition-colors"
+            style={{ color: 'var(--text-primary)' }}
+          >
             {title}
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+          <p
+            className="text-sm mb-4 line-clamp-2"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             {description}
           </p>
 
@@ -62,7 +75,12 @@ export default function ModuleCard({
               <span className="text-3xl font-bold bg-gradient-spark bg-clip-text text-transparent">
                 {count}
               </span>
-              <span className="text-sm text-slate-500">{countLabel}</span>
+              <span
+                className="text-sm"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {countLabel}
+              </span>
             </div>
           )}
 
