@@ -4,8 +4,6 @@ import { useAuthStore } from '../store/auth'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast, Toaster } from 'sonner'
-import { useTheme } from '../context/ThemeContext'
-import ThemeToggle from '../components/ThemeToggle'
 
 interface Idea {
   id: number
@@ -47,7 +45,6 @@ const visibilityIcons = {
 
 export default function Ideas() {
   const { token } = useAuthStore()
-  const { theme } = useTheme()
   const [ideas, setIdeas] = useState<Idea[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'my' | 'team' | 'private'>('all')
@@ -87,7 +84,7 @@ export default function Ideas() {
   })
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-background-light)' }}>
+    <div className="flex h-screen bg-background-light overflow-hidden">
       <Toaster position="top-right" richColors />
       <Sidebar />
 
@@ -105,21 +102,18 @@ export default function Ideas() {
                 <h1 className="text-4xl font-display font-bold bg-gradient-spark bg-clip-text text-transparent mb-2">
                   <span className="inline-block animate-float">💡</span> SPARK Ideas
                 </h1>
-                <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>Capture ideas without constraints. Vet them with your team.</p>
+                <p className="text-slate-600 text-lg">Capture ideas without constraints. Vet them with your team.</p>
               </div>
-              <div className="flex items-center gap-3">
-                <ThemeToggle />
-                <motion.button
-                  onClick={() => setShowCreateModal(true)}
-                  className="btn-primary flex items-center gap-2 relative overflow-hidden group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="material-symbols-outlined text-[20px]">add</span>
-                  New Idea
-                  <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
-                </motion.button>
-              </div>
+              <motion.button
+                onClick={() => setShowCreateModal(true)}
+                className="btn-primary flex items-center gap-2 relative overflow-hidden group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="material-symbols-outlined text-[20px]">add</span>
+                New Idea
+                <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+              </motion.button>
             </div>
 
             {/* Filters */}
@@ -137,14 +131,9 @@ export default function Ideas() {
                     onClick={() => setFilter(tab.key as any)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       filter === tab.key
-                        ? 'text-white shadow-lg shadow-primary/30'
-                        : 'border'
-                    } ${filter === tab.key ? 'bg-gradient-spark' : ''} ${filter !== tab.key ? 'hover:bg-gradient-shimmer' : ''}`}
-                    style={filter !== tab.key ? {
-                      backgroundColor: 'var(--color-card-bg)',
-                      color: 'var(--color-text-secondary)',
-                      borderColor: 'var(--color-border)'
-                    } : {}}
+                        ? 'bg-gradient-spark text-white shadow-lg shadow-primary/30'
+                        : 'bg-white text-slate-600 hover:bg-gradient-shimmer border border-slate-200 hover:border-primary/30'
+                    }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -157,12 +146,7 @@ export default function Ideas() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                style={{
-                  backgroundColor: 'var(--color-card-bg)',
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text-primary)'
-                }}
+                className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               >
                 <option value="all">All Status</option>
                 <option value="inbox">Inbox</option>
@@ -178,19 +162,12 @@ export default function Ideas() {
           {loading ? (
             <div className="grid gap-4">
               {[1, 2, 3].map(i => (
-                <div
-                  key={i}
-                  className="rounded-xl border p-6 animate-pulse"
-                  style={{
-                    backgroundColor: 'var(--color-card-bg)',
-                    borderColor: 'var(--color-border)'
-                  }}
-                >
-                  <div className="h-6 rounded w-3/4 mb-3" style={{ backgroundColor: 'var(--color-border)' }}></div>
-                  <div className="h-4 rounded w-1/2 mb-4" style={{ backgroundColor: 'var(--color-border)' }}></div>
+                <div key={i} className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
+                  <div className="h-6 bg-slate-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/2 mb-4"></div>
                   <div className="flex gap-4">
-                    <div className="h-4 rounded w-24" style={{ backgroundColor: 'var(--color-border)' }}></div>
-                    <div className="h-4 rounded w-24" style={{ backgroundColor: 'var(--color-border)' }}></div>
+                    <div className="h-4 bg-slate-200 rounded w-24"></div>
+                    <div className="h-4 bg-slate-200 rounded w-24"></div>
                   </div>
                 </div>
               ))}
@@ -200,13 +177,7 @@ export default function Ideas() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="text-center py-20 rounded-2xl border relative overflow-hidden"
-              style={{
-                background: theme === 'dark'
-                  ? 'linear-gradient(to bottom right, var(--color-card-bg), rgb(88 28 135 / 0.1))'
-                  : 'linear-gradient(to bottom right, rgb(255 255 255), rgb(243 232 255 / 0.3))',
-                borderColor: theme === 'dark' ? 'var(--color-border)' : 'rgb(243 232 255)'
-              }}
+              className="text-center py-20 bg-gradient-to-br from-white to-purple-50/30 rounded-2xl border border-purple-100 relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-spark opacity-5"></div>
               <div className="relative">
@@ -214,10 +185,10 @@ export default function Ideas() {
                   <div className="absolute inset-0 bg-yellow-200 rounded-full blur-3xl opacity-30 animate-pulse-slow"></div>
                   <div className="relative text-8xl animate-float">💡</div>
                 </div>
-                <h3 className="text-2xl font-bold font-display mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
                   No ideas yet
                 </h3>
-                <p className="mb-8 max-w-md mx-auto text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
                   Start capturing your brilliant thoughts! Ideas can be kept private, shared with your team, or published for everyone.
                 </p>
                 <motion.button
@@ -243,30 +214,26 @@ export default function Ideas() {
                   >
                     <Link
                       to={`/ideas/${idea.id}`}
-                      className="block rounded-xl border p-6 card-hover relative overflow-hidden group"
-                      style={{
-                        backgroundColor: 'var(--color-card-bg)',
-                        borderColor: 'var(--color-border)'
-                      }}
+                      className="block bg-white rounded-xl border border-slate-200 p-6 card-hover relative overflow-hidden group"
                     >
                       <div className="absolute inset-0 bg-gradient-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                       <div className="relative flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           {/* Title */}
-                          <h3 className="text-lg font-bold font-display mb-2 truncate" style={{ color: 'var(--color-text-primary)' }}>
+                          <h3 className="text-lg font-bold font-display text-slate-900 mb-2 truncate">
                             {idea.title}
                           </h3>
 
                           {/* Description */}
                           {idea.description && (
-                            <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--color-text-secondary)' }}>
+                            <p className="text-slate-600 text-sm mb-3 line-clamp-2">
                               {idea.description}
                             </p>
                           )}
 
                           {/* Meta */}
-                          <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">person</span>
                               <span>{idea.creator.name}</span>
@@ -285,7 +252,7 @@ export default function Ideas() {
                             <span className={`material-symbols-outlined text-[18px] ${visibilityIcons[idea.visibility].color}`} aria-hidden="true">
                               {visibilityIcons[idea.visibility].icon}
                             </span>
-                            <span className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                            <span className="text-xs font-medium text-slate-700">
                               {idea.visibility === 'team' && idea.team ? idea.team.name : visibilityIcons[idea.visibility].label}
                             </span>
                           </div>
@@ -296,7 +263,7 @@ export default function Ideas() {
                           </span>
 
                           {/* Stats */}
-                          <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">thumb_up</span>
                               <span className="font-medium">{idea.voteCount}</span>
@@ -383,26 +350,16 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', duration: 0.3 }}
-        className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        style={{ backgroundColor: 'var(--color-card-bg)' }}
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50" style={{ borderColor: 'var(--color-border)' }}>
+        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50">
           <h2 className="text-2xl font-display font-bold bg-gradient-spark bg-clip-text text-transparent">
             💡 New Idea
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 transition-all"
-            style={{ color: 'var(--color-text-muted)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-secondary)'
-              e.currentTarget.style.backgroundColor = 'var(--color-card-bg)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--color-text-muted)'
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }}
+            className="text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg p-2 transition-all"
             aria-label="Close modal"
           >
             <span className="material-symbols-outlined" aria-hidden="true">close</span>
@@ -411,7 +368,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label htmlFor="idea-title" className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+            <label htmlFor="idea-title" className="block text-sm font-semibold text-slate-700 mb-2">
               Title *
             </label>
             <input
@@ -427,7 +384,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
           </div>
 
           <div>
-            <label htmlFor="idea-description" className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+            <label htmlFor="idea-description" className="block text-sm font-semibold text-slate-700 mb-2">
               Description
             </label>
             <textarea
@@ -441,7 +398,7 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
               Who can see this?
             </label>
             <div className="space-y-3">
@@ -454,13 +411,9 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
                   key={option.value}
                   className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     visibility === option.value
-                      ? 'border-primary shadow-md'
-                      : ''
-                  } ${visibility === option.value ? 'bg-gradient-shimmer' : ''} ${option.value === 'team' ? 'opacity-60' : ''}`}
-                  style={visibility !== option.value ? {
-                    borderColor: 'var(--color-border)',
-                    backgroundColor: 'var(--color-background-light)'
-                  } : {}}
+                      ? 'border-primary bg-gradient-shimmer shadow-md'
+                      : 'border-slate-200 hover:border-primary/30 hover:bg-slate-50'
+                  } ${option.value === 'team' ? 'opacity-60' : ''}`}
                 >
                   <input
                     type="radio"
@@ -474,9 +427,9 @@ function CreateIdeaModal({ onClose, onCreated }: { onClose: () => void, onCreate
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{option.icon}</span>
-                      <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{option.label}</span>
+                      <span className="font-semibold text-slate-900">{option.label}</span>
                     </div>
-                    <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{option.desc}</p>
+                    <p className="text-sm text-slate-600">{option.desc}</p>
                   </div>
                 </label>
               ))}

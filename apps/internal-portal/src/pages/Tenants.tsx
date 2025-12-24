@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/auth'
-import { useTheme } from '../contexts/ThemeContext'
-import ThemeToggle from '../components/ThemeToggle'
 
 interface Tenant {
   id: number
@@ -56,7 +54,6 @@ export default function Tenants() {
   const [tenantProducts, setTenantProducts] = useState<Product[]>([])
   const [userSelectedProducts, setUserSelectedProducts] = useState<number[]>([])
   const { token } = useAuthStore()
-  const { theme } = useTheme()
 
   // Form state
   const [companyName, setCompanyName] = useState('')
@@ -409,143 +406,80 @@ export default function Tenants() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <div className="h-screen flex overflow-hidden bg-background-light">
       <Sidebar />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b flex items-center justify-between shrink-0" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
-          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Tenants</h2>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <button
-              onClick={openAddModal}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-              style={{
-                background: theme === 'dark'
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'var(--primary)',
-                color: '#ffffff'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              <span className="material-symbols-outlined text-[18px]">add</span>
-              Add Tenant
-            </button>
-          </div>
+        <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
+          <h2 className="text-lg font-bold text-slate-900">Tenants</h2>
+          <button
+            onClick={openAddModal}
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Add Tenant
+          </button>
         </header>
 
         {/* Table */}
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-secondary)' }}>Loading...</div>
+            <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
           ) : (
-            <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
               <table className="w-full">
-                <thead className="border-b" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Name</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Tenant Code</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Tier</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Type</th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Created</th>
-                    <th className="text-center px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Status</th>
-                    <th className="text-right px-6 py-4 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Actions</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tenant Code</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tier</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Created</th>
+                    <th className="text-center px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y" style={{ borderColor: 'var(--border-secondary)' }}>
+                <tbody className="divide-y divide-slate-100">
                   {tenants.map((tenant) => (
-                    <tr
-                      key={tenant.id}
-                      className={!tenant.isActive ? 'opacity-50' : ''}
-                      style={{
-                        background: !tenant.isActive ? 'var(--bg-tertiary)' : 'transparent',
-                        cursor: 'default'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (tenant.isActive) e.currentTarget.style.background = 'var(--bg-tertiary)'
-                      }}
-                      onMouseLeave={(e) => {
-                        if (tenant.isActive) e.currentTarget.style.background = 'transparent'
-                      }}
-                    >
+                    <tr key={tenant.id} className={`hover:bg-slate-50 ${!tenant.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="size-9 rounded-lg flex items-center justify-center font-bold text-sm"
-                            style={{
-                              background: theme === 'dark'
-                                ? 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)'
-                                : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)',
-                              color: theme === 'dark' ? '#e2e8f0' : '#4a5568'
-                            }}
-                          >
+                          <div className="size-9 rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm">
                             {tenant.name.charAt(0)}
                           </div>
                           <button
                             onClick={() => openEditModal(tenant)}
-                            className="font-medium hover:underline"
-                            style={{ color: 'var(--primary)' }}
-                            onMouseOver={(e) => e.currentTarget.style.color = theme === 'dark' ? '#818cf8' : '#2563eb'}
-                            onMouseOut={(e) => e.currentTarget.style.color = 'var(--primary)'}
+                            className="font-medium text-primary hover:text-blue-700 hover:underline"
                           >
                             {tenant.name}
                           </button>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-mono" style={{ color: 'var(--text-secondary)' }}>{tenant.subdomain || '-'}</span>
+                        <span className="text-sm text-slate-600 font-mono">{tenant.subdomain || '-'}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className="px-2 py-1 rounded text-xs font-semibold border"
-                          style={{
-                            background: tenant.tier === 'enterprise'
-                              ? theme === 'dark' ? 'rgba(167, 139, 250, 0.15)' : '#f3e8ff'
-                              : tenant.tier === 'business'
-                              ? theme === 'dark' ? 'rgba(96, 165, 250, 0.15)' : '#dbeafe'
-                              : theme === 'dark' ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9',
-                            color: tenant.tier === 'enterprise'
-                              ? theme === 'dark' ? '#c4b5fd' : '#7c3aed'
-                              : tenant.tier === 'business'
-                              ? theme === 'dark' ? '#93c5fd' : '#1d4ed8'
-                              : theme === 'dark' ? '#cbd5e1' : '#475569',
-                            borderColor: tenant.tier === 'enterprise'
-                              ? theme === 'dark' ? 'rgba(167, 139, 250, 0.3)' : '#e9d5ff'
-                              : tenant.tier === 'business'
-                              ? theme === 'dark' ? 'rgba(96, 165, 250, 0.3)' : '#bfdbfe'
-                              : theme === 'dark' ? 'rgba(148, 163, 184, 0.3)' : '#e2e8f0'
-                          }}
-                        >
+                        <span className={`px-2 py-1 rounded text-xs font-semibold border ${tierColors[tenant.tier]}`}>
                           {tenant.tier}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className="px-2 py-1 rounded text-xs font-medium"
-                          style={{
-                            background: tenant.isOwner
-                              ? theme === 'dark' ? 'rgba(129, 140, 248, 0.15)' : '#e0e7ff'
-                              : theme === 'dark' ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9',
-                            color: tenant.isOwner
-                              ? theme === 'dark' ? '#a5b4fc' : '#4338ca'
-                              : theme === 'dark' ? '#cbd5e1' : '#475569'
-                          }}
-                        >
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          tenant.isOwner ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
+                        }`}>
                           {tenant.isOwner ? 'Owner' : 'Client'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <td className="px-6 py-4 text-sm text-slate-500">
                         {new Date(tenant.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => toggleTenantActive(tenant)}
-                          className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                          style={{
-                            background: tenant.isActive ? '#22c55e' : theme === 'dark' ? '#4b5563' : '#cbd5e1'
-                          }}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            tenant.isActive ? 'bg-green-500' : 'bg-slate-300'
+                          }`}
                           title={tenant.isActive ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
                         >
                           <span
@@ -559,20 +493,14 @@ export default function Tenants() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openUserModal(tenant)}
-                            className="transition-colors"
-                            style={{ color: 'var(--text-tertiary)' }}
-                            onMouseOver={(e) => e.currentTarget.style.color = 'var(--primary)'}
-                            onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-tertiary)'}
+                            className="text-slate-400 hover:text-primary"
                             title="Manage Users"
                           >
                             <span className="material-symbols-outlined">group</span>
                           </button>
                           <button
                             onClick={() => openEditModal(tenant)}
-                            className="transition-colors"
-                            style={{ color: 'var(--text-tertiary)' }}
-                            onMouseOver={(e) => e.currentTarget.style.color = 'var(--primary)'}
-                            onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-tertiary)'}
+                            className="text-slate-400 hover:text-primary"
                             title="Edit Tenant"
                           >
                             <span className="material-symbols-outlined">edit</span>
@@ -585,7 +513,7 @@ export default function Tenants() {
               </table>
 
               {tenants.length === 0 && (
-                <div className="text-center py-12" style={{ color: 'var(--text-tertiary)' }}>No tenants found</div>
+                <div className="text-center text-slate-400 py-12">No tenants found</div>
               )}
             </div>
           )}
@@ -594,13 +522,13 @@ export default function Tenants() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style={{ background: 'var(--bg-secondary)' }}>
-            <div className="p-6 border-b" style={{ borderColor: 'var(--border-primary)' }}>
-              <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900">
                 {editingTenant ? 'Edit Tenant' : 'Add New Tenant'}
               </h3>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm text-slate-500 mt-1">
                 {editingTenant
                   ? `Tenant Code: ${editingTenant.subdomain}`
                   : 'Onboard a new client company'}
@@ -609,14 +537,14 @@ export default function Tenants() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               {error && (
-                <div className="p-3 border rounded-lg text-sm" style={{ background: theme === 'dark' ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2', borderColor: theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : '#fecaca', color: theme === 'dark' ? '#fca5a5' : '#dc2626' }}>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                   {error}
                 </div>
               )}
 
               {/* Company Info */}
               <div className="space-y-4">
-                <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px]">business</span>
                   Company Information
                 </h4>
@@ -630,34 +558,24 @@ export default function Tenants() {
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2"
-                      style={{
-                        background: 'var(--bg-primary)',
-                        borderColor: 'var(--border-primary)',
-                        color: 'var(--text-primary)'
-                      }}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                       required
                     />
-                    <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Enter your company name</p>
+                    <p className="text-xs text-slate-400 mt-1">Enter your company name</p>
                   </div>
                   <div>
-                    <label className="block text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Tier</label>
+                    <label className="block text-sm text-slate-600 mb-1">Tier</label>
                     <select
                       value={tier}
                       onChange={(e) => setTier(e.target.value as any)}
-                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2"
-                      style={{
-                        background: 'var(--bg-primary)',
-                        borderColor: 'var(--border-primary)',
-                        color: 'var(--text-primary)'
-                      }}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                     >
                       <option value="starter">Starter</option>
                       <option value="business">Business</option>
                       <option value="enterprise">Enterprise</option>
                     </select>
                     {!editingTenant && (
-                      <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Tenant ID will be auto-generated</p>
+                      <p className="text-xs text-slate-400 mt-1">Tenant ID will be auto-generated</p>
                     )}
                   </div>
                 </div>
@@ -665,7 +583,7 @@ export default function Tenants() {
 
               {/* Products */}
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px]">inventory_2</span>
                   Products
                 </h4>
@@ -675,44 +593,25 @@ export default function Tenants() {
                       key={product.id}
                       type="button"
                       onClick={() => toggleProduct(product.id)}
-                      className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors"
-                      style={{
-                        background: selectedProducts.includes(product.id)
-                          ? theme === 'dark'
-                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                            : 'var(--primary)'
-                          : 'var(--bg-secondary)',
-                        color: selectedProducts.includes(product.id)
-                          ? '#ffffff'
-                          : 'var(--text-primary)',
-                        borderColor: selectedProducts.includes(product.id)
-                          ? 'transparent'
-                          : 'var(--border-primary)'
-                      }}
-                      onMouseOver={(e) => {
-                        if (!selectedProducts.includes(product.id)) {
-                          e.currentTarget.style.borderColor = 'var(--border-secondary)'
-                        }
-                      }}
-                      onMouseOut={(e) => {
-                        if (!selectedProducts.includes(product.id)) {
-                          e.currentTarget.style.borderColor = 'var(--border-primary)'
-                        }
-                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                        selectedProducts.includes(product.id)
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                      }`}
                     >
                       {product.name}
                     </button>
                   ))}
                 </div>
                 {products.length === 0 && (
-                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>No products available</p>
+                  <p className="text-xs text-slate-400">No products available</p>
                 )}
               </div>
 
               {/* Admin User - only for new tenants */}
               {!editingTenant && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                  <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                     <span className="material-symbols-outlined text-[18px]">person</span>
                     Admin User
                   </h4>
@@ -726,15 +625,10 @@ export default function Tenants() {
                         type="text"
                         value={adminName}
                         onChange={(e) => setAdminName(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2"
-                        style={{
-                          background: 'var(--bg-primary)',
-                          borderColor: 'var(--border-primary)',
-                          color: 'var(--text-primary)'
-                        }}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                         required
                       />
-                      <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Company admin name</p>
+                      <p className="text-xs text-slate-400 mt-1">Company admin name</p>
                     </div>
                     <div>
                       <label className={`block text-sm font-medium mb-1 ${adminEmail ? 'text-green-600' : 'text-red-500'}`}>
@@ -744,19 +638,14 @@ export default function Tenants() {
                         type="email"
                         value={adminEmail}
                         onChange={(e) => setAdminEmail(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2"
-                        style={{
-                          background: 'var(--bg-primary)',
-                          borderColor: 'var(--border-primary)',
-                          color: 'var(--text-primary)'
-                        }}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
                         required
                       />
-                      <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Your company email ID</p>
+                      <p className="text-xs text-slate-400 mt-1">Your company email ID</p>
                     </div>
                   </div>
-                  <div className="p-3 border rounded-lg" style={{ background: theme === 'dark' ? 'rgba(59, 130, 246, 0.1)' : '#eff6ff', borderColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.3)' : '#dbeafe' }}>
-                    <p className="text-xs" style={{ color: theme === 'dark' ? '#93c5fd' : '#1e40af' }}>
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                    <p className="text-xs text-blue-700">
                       <span className="font-medium">Note:</span> An email will be sent to verify this email address.
                       Default password: <span className="font-mono font-medium">systech@123</span>
                     </p>
@@ -765,29 +654,18 @@ export default function Tenants() {
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--border-primary)' }}>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); resetForm() }}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  style={{ color: 'var(--text-primary)' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
-                  style={{
-                    background: theme === 'dark'
-                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                      : 'var(--primary)',
-                    color: '#ffffff'
-                  }}
-                  onMouseOver={(e) => !saving && (e.currentTarget.style.opacity = '0.9')}
-                  onMouseOut={(e) => !saving && (e.currentTarget.style.opacity = '1')}
+                  className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : (editingTenant ? 'Save Changes' : 'Create Tenant')}
                 </button>
@@ -799,23 +677,20 @@ export default function Tenants() {
 
       {/* User Management Modal */}
       {showUserModal && userModalTenant && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto" style={{ background: 'var(--bg-secondary)' }}>
-            <div className="p-6 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-primary)' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-lg font-bold text-slate-900">
                   Users - {userModalTenant.name}
                 </h3>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm text-slate-500 mt-1">
                   Tenant Code: <span className="font-mono">{userModalTenant.subdomain}</span>
                 </p>
               </div>
               <button
                 onClick={() => setShowUserModal(false)}
-                className="transition-colors"
-                style={{ color: 'var(--text-tertiary)' }}
-                onMouseOver={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-tertiary)'}
+                className="text-slate-400 hover:text-slate-600"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -823,15 +698,15 @@ export default function Tenants() {
 
             <div className="p-6 space-y-6">
               {userError && (
-                <div className="p-3 border rounded-lg text-sm" style={{ background: theme === 'dark' ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2', borderColor: theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : '#fecaca', color: theme === 'dark' ? '#fca5a5' : '#dc2626' }}>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                   {userError}
                 </div>
               )}
 
               {/* Add/Edit User Form */}
               {userModalTenant.isActive ? (
-                <form onSubmit={handleUserSubmit} className="p-4 rounded-lg space-y-4" style={{ background: 'var(--bg-tertiary)' }}>
-                  <h4 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                <form onSubmit={handleUserSubmit} className="p-4 bg-slate-50 rounded-lg space-y-4">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     {editingUser ? 'Edit User' : 'Add New User'}
                   </h4>
                 <div className="grid grid-cols-3 gap-4">
@@ -843,12 +718,7 @@ export default function Tenants() {
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
-                      style={{
-                        background: 'var(--bg-secondary)',
-                        borderColor: 'var(--border-primary)',
-                        color: 'var(--text-primary)'
-                      }}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
                       required
                     />
                   </div>
@@ -860,27 +730,17 @@ export default function Tenants() {
                       type="email"
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg text-sm disabled:opacity-60"
-                      style={{
-                        background: editingUser ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-                        borderColor: 'var(--border-primary)',
-                        color: 'var(--text-primary)'
-                      }}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm disabled:bg-slate-100"
                       required={!editingUser}
                       disabled={!!editingUser}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Role</label>
+                    <label className="block text-sm text-slate-600 mb-1">Role</label>
                     <select
                       value={userRole}
                       onChange={(e) => setUserRole(e.target.value as any)}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
-                      style={{
-                        background: 'var(--bg-secondary)',
-                        borderColor: 'var(--border-primary)',
-                        color: 'var(--text-primary)'
-                      }}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
                     >
                       <option value="user">User</option>
                       <option value="company_admin">Company Admin</option>
@@ -890,19 +750,17 @@ export default function Tenants() {
 
                 {/* Product Assignment */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Assigned Products (1-2 products)
                   </label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+                  <div className="space-y-2 max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-white">
                     {tenantProducts.length === 0 ? (
-                      <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>No products available for this tenant</p>
+                      <p className="text-sm text-slate-400">No products available for this tenant</p>
                     ) : (
                       tenantProducts.map((product) => (
                         <label
                           key={product.id}
-                          className="flex items-start gap-2 cursor-pointer p-2 rounded"
-                          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          className="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded"
                         >
                           <input
                             type="checkbox"
@@ -921,16 +779,16 @@ export default function Tenants() {
                             className="mt-0.5"
                           />
                           <div className="flex-1">
-                            <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{product.name}</div>
+                            <div className="text-sm font-medium text-slate-900">{product.name}</div>
                             {product.description && (
-                              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{product.description}</div>
+                              <div className="text-xs text-slate-500">{product.description}</div>
                             )}
                           </div>
                         </label>
                       ))
                     )}
                   </div>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-xs text-slate-500 mt-1">
                     Select 1-2 products this user will work on. Leave empty for all tenant products.
                   </p>
                 </div>
@@ -939,15 +797,7 @@ export default function Tenants() {
                   <button
                     type="submit"
                     disabled={savingUser}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
-                    style={{
-                      background: theme === 'dark'
-                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        : 'var(--primary)',
-                      color: '#ffffff'
-                    }}
-                    onMouseOver={(e) => !savingUser && (e.currentTarget.style.opacity = '0.9')}
-                    onMouseOut={(e) => !savingUser && (e.currentTarget.style.opacity = '1')}
+                    className="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
                   >
                     {savingUser ? 'Saving...' : (editingUser ? 'Update User' : 'Add User')}
                   </button>
@@ -955,24 +805,21 @@ export default function Tenants() {
                     <button
                       type="button"
                       onClick={cancelEditUser}
-                      className="px-4 py-2 rounded-lg text-sm transition-colors"
-                      style={{ color: 'var(--text-secondary)' }}
-                      onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                      className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm"
                     >
                       Cancel
                     </button>
                   )}
                   {!editingUser && (
-                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    <p className="text-xs text-slate-500">
                       Default password: <span className="font-mono">systech@123</span>
                     </p>
                   )}
                 </div>
               </form>
               ) : (
-                <div className="p-4 border rounded-lg" style={{ background: theme === 'dark' ? 'rgba(251, 191, 36, 0.1)' : '#fffbeb', borderColor: theme === 'dark' ? 'rgba(251, 191, 36, 0.3)' : '#fde68a' }}>
-                  <div className="flex items-center gap-2" style={{ color: theme === 'dark' ? '#fcd34d' : '#b45309' }}>
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-amber-700">
                     <span className="material-symbols-outlined text-[20px]">info</span>
                     <p className="text-sm font-medium">
                       Tenant is inactive. Activate the tenant to manage users.
@@ -984,7 +831,7 @@ export default function Tenants() {
               {/* User List */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Existing Users ({tenantUsers.filter(u =>
                       u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                       u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
@@ -992,7 +839,7 @@ export default function Tenants() {
                   </h4>
                   {tenantUsers.length > 0 && (
                     <div className="relative">
-                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[18px]" style={{ color: 'var(--text-tertiary)' }}>
+                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
                         search
                       </span>
                       <input
@@ -1000,73 +847,50 @@ export default function Tenants() {
                         value={userSearchQuery}
                         onChange={(e) => setUserSearchQuery(e.target.value)}
                         placeholder="Search users..."
-                        className="pl-8 pr-3 py-1.5 border rounded-lg text-sm w-64 focus:ring-2"
-                        style={{
-                          background: 'var(--bg-primary)',
-                          borderColor: 'var(--border-primary)',
-                          color: 'var(--text-primary)'
-                        }}
+                        className="pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                       />
                     </div>
                   )}
                 </div>
                 {loadingUsers ? (
-                  <div className="text-center py-6" style={{ color: 'var(--text-tertiary)' }}>Loading users...</div>
+                  <div className="text-center text-slate-400 py-6">Loading users...</div>
                 ) : tenantUsers.length === 0 ? (
-                  <div className="text-center py-6" style={{ color: 'var(--text-tertiary)' }}>No users found</div>
+                  <div className="text-center text-slate-400 py-6">No users found</div>
                 ) : tenantUsers.filter(u =>
                     u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                     u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
                   ).length === 0 ? (
-                  <div className="text-center py-6" style={{ color: 'var(--text-tertiary)' }}>
+                  <div className="text-center text-slate-400 py-6">
                     No users match "{userSearchQuery}"
                   </div>
                 ) : (
-                  <div className="border rounded-lg overflow-hidden" style={{ borderColor: 'var(--border-primary)' }}>
+                  <div className="border border-slate-200 rounded-lg overflow-hidden">
                     <table className="w-full">
-                      <thead className="border-b" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
+                      <thead className="bg-slate-50 border-b border-slate-200">
                         <tr>
-                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Name</th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Email</th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Role</th>
-                          <th className="text-center px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Status</th>
-                          <th className="text-right px-4 py-3 text-xs font-semibold uppercase" style={{ color: 'var(--text-secondary)' }}>Actions</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Name</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Email</th>
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Role</th>
+                          <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                          <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y" style={{ borderColor: 'var(--border-secondary)' }}>
+                      <tbody className="divide-y divide-slate-100">
                         {tenantUsers
                           .filter(u =>
                             u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
                             u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
                           )
                           .map((user) => (
-                          <tr
-                            key={user.id}
-                            className={!user.isActive ? 'opacity-50' : ''}
-                            style={{
-                              background: !user.isActive ? 'var(--bg-tertiary)' : 'transparent'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (user.isActive) e.currentTarget.style.background = 'var(--bg-tertiary)'
-                            }}
-                            onMouseLeave={(e) => {
-                              if (user.isActive) e.currentTarget.style.background = 'transparent'
-                            }}
-                          >
-                            <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</td>
-                            <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
+                          <tr key={user.id} className={`hover:bg-slate-50 ${!user.isActive ? 'opacity-50 bg-slate-100' : ''}`}>
+                            <td className="px-4 py-3 text-sm font-medium text-slate-900">{user.name}</td>
+                            <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
                             <td className="px-4 py-3">
-                              <span
-                                className="px-2 py-1 rounded text-xs font-medium"
-                                style={{
-                                  background: user.role === 'company_admin'
-                                    ? theme === 'dark' ? 'rgba(167, 139, 250, 0.15)' : '#f3e8ff'
-                                    : theme === 'dark' ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9',
-                                  color: user.role === 'company_admin'
-                                    ? theme === 'dark' ? '#c4b5fd' : '#7c3aed'
-                                    : theme === 'dark' ? '#cbd5e1' : '#475569'
-                                }}
-                              >
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                user.role === 'company_admin'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}>
                                 {user.role === 'company_admin' ? 'Admin' : 'User'}
                               </span>
                             </td>
@@ -1074,10 +898,9 @@ export default function Tenants() {
                               <button
                                 onClick={() => toggleUserActive(user)}
                                 disabled={!userModalTenant.isActive}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                style={{
-                                  background: user.isActive ? '#22c55e' : theme === 'dark' ? '#4b5563' : '#cbd5e1'
-                                }}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  user.isActive ? 'bg-green-500' : 'bg-slate-300'
+                                } ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 title={
                                   !userModalTenant.isActive
                                     ? 'Tenant is inactive - Cannot modify users'
@@ -1097,14 +920,7 @@ export default function Tenants() {
                               <button
                                 onClick={() => startEditUser(user)}
                                 disabled={!userModalTenant.isActive}
-                                className={`transition-colors ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                style={{ color: 'var(--text-tertiary)' }}
-                                onMouseOver={(e) => {
-                                  if (userModalTenant.isActive) e.currentTarget.style.color = 'var(--primary)'
-                                }}
-                                onMouseOut={(e) => {
-                                  if (userModalTenant.isActive) e.currentTarget.style.color = 'var(--text-tertiary)'
-                                }}
+                                className={`text-slate-400 hover:text-primary ${!userModalTenant.isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 title={!userModalTenant.isActive ? 'Tenant is inactive - Cannot edit users' : 'Edit user'}
                               >
                                 <span className="material-symbols-outlined text-[18px]">edit</span>

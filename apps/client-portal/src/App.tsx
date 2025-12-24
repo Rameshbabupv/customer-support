@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
 import { useAuthStore } from './store/auth'
-import { useTheme } from './hooks/useTheme'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import NewTicket from './pages/NewTicket'
@@ -15,13 +13,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { theme } = useTheme()
-
-  // Global theme management - set data-theme attribute once for entire app
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
-
   return (
     <>
       <Routes>
