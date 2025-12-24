@@ -5,6 +5,7 @@ const navItems = [
   { path: '/dashboard', icon: 'dashboard', label: 'Dashboard', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
   { path: '/my-tasks', icon: 'task_alt', label: 'My Tasks', roles: ['developer'] },
   { path: '/tickets', icon: 'confirmation_number', label: 'Tickets', roles: ['admin', 'support', 'integrator', 'ceo'] },
+  { path: '/ideas', icon: 'lightbulb', label: 'Ideas', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
   { path: '/tenants', icon: 'group', label: 'Tenants', roles: ['admin', 'support', 'integrator', 'ceo'] },
   { path: '/products', icon: 'inventory_2', label: 'Products', roles: ['admin', 'support', 'integrator', 'ceo'] },
 ]
