@@ -12,6 +12,7 @@ featureRoutes.use(authenticate)
 // Create feature (owner only)
 featureRoutes.post('/', requireInternal, async (req, res) => {
   try {
+    const { tenantId } = req.user!
     const { epicId, title, description, priority } = req.body
 
     if (!epicId || !title) {
@@ -19,6 +20,7 @@ featureRoutes.post('/', requireInternal, async (req, res) => {
     }
 
     const [feature] = await db.insert(features).values({
+      tenantId,
       epicId,
       title,
       description,

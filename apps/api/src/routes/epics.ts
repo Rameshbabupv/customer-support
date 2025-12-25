@@ -12,6 +12,7 @@ epicRoutes.use(authenticate)
 // Create epic (owner only)
 epicRoutes.post('/', requireInternal, async (req, res) => {
   try {
+    const { tenantId } = req.user!
     const { productId, title, description, priority } = req.body
 
     if (!productId || !title) {
@@ -19,6 +20,7 @@ epicRoutes.post('/', requireInternal, async (req, res) => {
     }
 
     const [epic] = await db.insert(epics).values({
+      tenantId,
       productId,
       title,
       description,

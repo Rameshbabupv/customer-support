@@ -12,6 +12,7 @@ taskRoutes.use(authenticate)
 // Create task (owner only)
 taskRoutes.post('/', requireInternal, async (req, res) => {
   try {
+    const { tenantId } = req.user!
     const { featureId, title, description, type, priority, assignees } = req.body
 
     if (!featureId || !title) {
@@ -19,6 +20,7 @@ taskRoutes.post('/', requireInternal, async (req, res) => {
     }
 
     const [task] = await db.insert(devTasks).values({
+      tenantId,
       featureId,
       title,
       description,
@@ -31,6 +33,7 @@ taskRoutes.post('/', requireInternal, async (req, res) => {
     if (assignees && Array.isArray(assignees) && assignees.length > 0) {
       for (const userId of assignees) {
         await db.insert(taskAssignments).values({
+          tenantId,
           taskId: task.id,
           userId,
         })
