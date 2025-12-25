@@ -118,6 +118,8 @@ taskRoutes.patch('/:id', async (req, res) => {
     if (status) updateData.status = status
     if (priority !== undefined) updateData.priority = priority
     if (type) updateData.type = type
+    if (req.body.storyPoints !== undefined) updateData.storyPoints = req.body.storyPoints
+    if (req.body.sprintId !== undefined) updateData.sprintId = req.body.sprintId
 
     const [updated] = await db.update(devTasks)
       .set(updateData)
@@ -206,6 +208,64 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireOwner, async (req, res) =
     res.status(201).json({ task })
   } catch (error) {
     console.error('Spawn task from ticket error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Assign task to sprint (owner only)
+taskRoutes.patch('/:id/sprint', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { sprintId } = req.body // null to move to backlog
+
+    const [task] = await db.select().from(devTasks)
+      .where(eq(devTasks.id, parseInt(id)))
+      .limit(1)
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    const [updated] = await db.update(devTasks)
+      .set({ sprintId: sprintId ?? null, updatedAt: new Date().toISOString() })
+      .where(eq(devTasks.id, parseInt(id)))
+      .returning()
+
+    res.json({ task: updated })
+  } catch (error) {
+    console.error('Assign sprint error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Set story points (owner only)
+taskRoutes.patch('/:id/points', requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { storyPoints } = req.body
+
+    // Validate Fibonacci
+    const validPoints = [1, 2, 3, 5, 8, 13]
+    if (storyPoints !== null && !validPoints.includes(storyPoints)) {
+      return res.status(400).json({ error: 'Story points must be Fibonacci: 1, 2, 3, 5, 8, or 13' })
+    }
+
+    const [task] = await db.select().from(devTasks)
+      .where(eq(devTasks.id, parseInt(id)))
+      .limit(1)
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    const [updated] = await db.update(devTasks)
+      .set({ storyPoints, updatedAt: new Date().toISOString() })
+      .where(eq(devTasks.id, parseInt(id)))
+      .returning()
+
+    res.json({ task: updated })
+  } catch (error) {
+    console.error('Set points error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
