@@ -57,6 +57,9 @@ async function seed() {
     { name: 'HRM v2', description: 'Human Resource Management - New version with enhanced features' },
     { name: 'Finance v2', description: 'Financial Management - New version with enhanced features' },
     { name: 'EXIM', description: 'Export & Import Management - For businesses involved in international trade' },
+
+    // Internal Tools
+    { name: 'Tracklet', description: 'A unified platform to manage client-reported issues, internal feature requests, and development progress in one place. Brings clarity, accountability, and smooth flow from request to resolution—without unnecessary complexity.' },
   ]
 
   const createdProducts: { id: number; name: string }[] = []
