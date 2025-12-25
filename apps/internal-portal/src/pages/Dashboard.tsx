@@ -184,7 +184,7 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <div className="h-screen flex overflow-hidden bg-slate-50">
+    <div className="h-screen flex overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <Sidebar />
 
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -193,7 +193,8 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="h-16 px-6 border-b border-slate-200 bg-gradient-to-r from-white to-purple-50/30 flex items-center justify-between shrink-0"
+          className="h-16 px-6 border-b flex items-center justify-between shrink-0"
+          style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl" aria-hidden="true">📊</span>
@@ -217,20 +218,21 @@ export default function Dashboard() {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="inline-block size-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-slate-500">Loading dashboard...</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Loading dashboard...</p>
               </div>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 text-red-700">
+            <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: 'var(--error-bg)', borderWidth: '1px', borderColor: 'var(--error-text)' }}>
+              <div className="flex items-center gap-2" style={{ color: 'var(--error-text)' }}>
                 <span className="material-symbols-outlined text-[20px]">error</span>
                 <p className="text-sm font-medium">{error}</p>
               </div>
               <button
                 onClick={fetchDashboardData}
-                className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium"
+                className="mt-3 text-sm font-medium"
+                style={{ color: 'var(--error-text)' }}
               >
                 Try again
               </button>
@@ -245,7 +247,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <h3 className="text-lg font-display font-bold text-slate-900 mb-4">Quick Access</h3>
+                <h3 className="text-lg font-display font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Quick Access</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <ModuleCard
                     emoji="🎫"
@@ -290,7 +292,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h3 className="text-lg font-display font-bold text-slate-900 mb-4">Key Metrics</h3>
+                <h3 className="text-lg font-display font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Key Metrics</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <StatCard
                     icon="group_work"
@@ -332,10 +334,10 @@ export default function Dashboard() {
                 className="grid grid-cols-1 lg:grid-cols-2 gap-6"
               >
                 {/* Ticket Workload by Status */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg hover:border-primary/30 transition-all">
+                <div className="rounded-xl border p-6 hover:shadow-lg hover:border-primary/30 transition-all" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl" aria-hidden="true">📈</span>
-                    <h3 className="text-lg font-display font-bold text-slate-900">Ticket Workload</h3>
+                    <h3 className="text-lg font-display font-bold" style={{ color: 'var(--text-primary)' }}>Ticket Workload</h3>
                   </div>
                   <div className="space-y-3">
                     {[
@@ -348,17 +350,17 @@ export default function Dashboard() {
                         <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${item.color}`}>
                           {item.label}
                         </span>
-                        <span className="text-2xl font-bold text-slate-900">{item.count}</span>
+                        <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{item.count}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Priority Distribution */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg hover:border-primary/30 transition-all">
+                <div className="rounded-xl border p-6 hover:shadow-lg hover:border-primary/30 transition-all" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl" aria-hidden="true">🎯</span>
-                    <h3 className="text-lg font-display font-bold text-slate-900">Priority Distribution</h3>
+                    <h3 className="text-lg font-display font-bold" style={{ color: 'var(--text-primary)' }}>Priority Distribution</h3>
                   </div>
                   <div className="space-y-3">
                     {metrics.ticketsByPriority.map((item) => {
@@ -376,7 +378,7 @@ export default function Dashboard() {
                           <span className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${color}`}>
                             P{item.priority}
                           </span>
-                          <span className="text-2xl font-bold text-slate-900">{item.count}</span>
+                          <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{item.count}</span>
                         </div>
                       )
                     })}
@@ -392,11 +394,11 @@ export default function Dashboard() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xl" aria-hidden="true">🏢</span>
-                  <h3 className="text-lg font-display font-bold text-slate-900">Tenants Overview</h3>
+                  <h3 className="text-lg font-display font-bold" style={{ color: 'var(--text-primary)' }}>Tenants Overview</h3>
                 </div>
                 {metrics.tenantCards.length === 0 ? (
-                  <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-                    <p className="text-slate-400">No tenants found</p>
+                  <div className="rounded-xl border p-12 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+                    <p style={{ color: 'var(--text-muted)' }}>No tenants found</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
