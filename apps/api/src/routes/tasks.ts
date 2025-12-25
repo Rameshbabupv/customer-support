@@ -272,3 +272,55 @@ taskRoutes.patch('/:id/points', requireInternal, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
+
+// Close task with resolution
+taskRoutes.patch('/:id/close', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { resolution, resolutionNote } = req.body
+    const { userId, isInternal } = req.user!
+
+    const validResolutions = ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+    if (!resolution || !validResolutions.includes(resolution)) {
+      return res.status(400).json({
+        error: 'Valid resolution required',
+        validResolutions
+      })
+    }
+
+    const [task] = await db.select().from(devTasks)
+      .where(eq(devTasks.id, parseInt(id)))
+      .limit(1)
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Check access: owner or assigned developer
+    if (!isInternal) {
+      const assignments = await db.select().from(taskAssignments)
+        .where(eq(taskAssignments.taskId, parseInt(id)))
+
+      const userAssignment = assignments.find(a => a.userId === userId)
+      if (!userAssignment) {
+        return res.status(403).json({ error: 'Forbidden: Not assigned to this task' })
+      }
+    }
+
+    const [updated] = await db.update(devTasks)
+      .set({
+        status: 'done',
+        resolution,
+        resolutionNote: resolutionNote || null,
+        closedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(devTasks.id, parseInt(id)))
+      .returning()
+
+    res.json({ task: updated })
+  } catch (error) {
+    console.error('Close task error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})

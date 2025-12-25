@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import ItemDetailModal from '../components/ItemDetailModal'
 import { useAuthStore } from '../store/auth'
 
 interface DevTask {
@@ -39,6 +40,7 @@ export default function Backlog() {
   const [filterType, setFilterType] = useState<'all' | 'task' | 'bug'>('all')
   const [filterPoints, setFilterPoints] = useState<'all' | 'estimated' | 'unestimated'>('all')
   const [filterPriority, setFilterPriority] = useState<number | null>(null)
+  const [selectedTask, setSelectedTask] = useState<DevTask | null>(null)
   const { token } = useAuthStore()
 
   const surfaceStyles = { backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }
@@ -327,9 +329,13 @@ export default function Backlog() {
                                 {task.type === 'bug' && (
                                   <span className="material-symbols-outlined text-red-500 text-[18px]">bug_report</span>
                                 )}
-                                <h3 className="font-semibold text-sm truncate" style={textPrimary}>
+                                <button
+                                  onClick={() => setSelectedTask(task)}
+                                  className="font-semibold text-sm truncate text-left hover:text-primary hover:underline transition-colors"
+                                  style={textPrimary}
+                                >
                                   {task.title}
-                                </h3>
+                                </button>
                               </div>
                               {task.description && (
                                 <p className="text-xs line-clamp-1" style={textSecondary}>
@@ -426,6 +432,15 @@ export default function Backlog() {
           )}
         </div>
       </main>
+
+      {/* Detail Modal */}
+      {selectedTask && (
+        <ItemDetailModal
+          item={selectedTask}
+          itemType="task"
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
     </div>
   )
 }

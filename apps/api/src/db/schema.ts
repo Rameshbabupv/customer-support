@@ -148,6 +148,11 @@ export const epics = sqliteTable('epics', {
     enum: ['backlog', 'planned', 'in_progress', 'completed', 'cancelled']
   }).default('backlog'),
   priority: integer('priority').default(3),
+  resolution: text('resolution', {
+    enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+  }),
+  resolutionNote: text('resolution_note'),
+  closedAt: text('closed_at'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })
@@ -163,6 +168,11 @@ export const features = sqliteTable('features', {
     enum: ['backlog', 'planned', 'in_progress', 'completed', 'cancelled']
   }).default('backlog'),
   priority: integer('priority').default(3),
+  resolution: text('resolution', {
+    enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+  }),
+  resolutionNote: text('resolution_note'),
+  closedAt: text('closed_at'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })
@@ -183,6 +193,11 @@ export const devTasks = sqliteTable('dev_tasks', {
   }).default('todo'),
   priority: integer('priority').default(3),
   storyPoints: integer('story_points'), // Fibonacci: 1,2,3,5,8,13
+  resolution: text('resolution', {
+    enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+  }),
+  resolutionNote: text('resolution_note'),
+  closedAt: text('closed_at'),
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })

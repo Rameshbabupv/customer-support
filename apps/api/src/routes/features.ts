@@ -86,3 +86,43 @@ featureRoutes.patch('/:id', requireInternal, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
+
+// Close feature with resolution (owner only)
+featureRoutes.patch('/:id/close', requireInternal, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { resolution, resolutionNote } = req.body
+
+    const validResolutions = ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+    if (!resolution || !validResolutions.includes(resolution)) {
+      return res.status(400).json({
+        error: 'Valid resolution required',
+        validResolutions
+      })
+    }
+
+    const [feature] = await db.select().from(features)
+      .where(eq(features.id, parseInt(id)))
+      .limit(1)
+
+    if (!feature) {
+      return res.status(404).json({ error: 'Feature not found' })
+    }
+
+    const [updated] = await db.update(features)
+      .set({
+        status: 'cancelled',
+        resolution,
+        resolutionNote: resolutionNote || null,
+        closedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(features.id, parseInt(id)))
+      .returning()
+
+    res.json({ feature: updated })
+  } catch (error) {
+    console.error('Close feature error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})

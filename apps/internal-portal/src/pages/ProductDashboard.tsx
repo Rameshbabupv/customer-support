@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import ItemDetailModal from '../components/ItemDetailModal'
 import { useAuthStore } from '../store/auth'
 
 interface Epic {
@@ -100,6 +101,7 @@ export default function ProductDashboard() {
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [selectedItem, setSelectedItem] = useState<{ item: Epic | Feature | DevTask; type: 'epic' | 'feature' | 'task' } | null>(null)
 
   const { token } = useAuthStore()
 
@@ -519,9 +521,9 @@ export default function ProductDashboard() {
                 const epicFeatures = data.features.filter(f => f.epicId === epic.id)
 
                 return (
-                  <div key={epic.id} className="border border-slate-200 rounded-lg overflow-hidden">
+                  <div key={epic.id} className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
                     {/* Epic Row */}
-                    <div className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 transition-colors">
+                    <div className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors">
                       <span
                         onClick={() => toggleEpic(epic.id)}
                         className="material-symbols-outlined text-slate-600 cursor-pointer"
@@ -534,12 +536,24 @@ export default function ProductDashboard() {
                       >
                         library_books
                       </span>
-                      <span
-                        onClick={() => toggleEpic(epic.id)}
-                        className="font-semibold text-slate-900 flex-1 cursor-pointer"
+                      <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">E-{epic.id}</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedItem({ item: epic, type: 'epic' }); }}
+                        className="font-semibold flex-1 text-left hover:text-primary hover:underline transition-colors"
+                        style={{ color: 'var(--text-primary)' }}
                       >
                         {epic.title}
+                      </button>
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        epic.priority === 1 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                        epic.priority === 2 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                        epic.priority === 3 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                        'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                      }`}>P{epic.priority}</span>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(epic.status)}`}>
+                        {epic.status}
                       </span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">{epicFeatures.length} features</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
@@ -550,23 +564,19 @@ export default function ProductDashboard() {
                         <span className="material-symbols-outlined text-[14px]">add</span>
                         Feature
                       </button>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(epic.status)}`}>
-                        {epic.status}
-                      </span>
-                      <span className="text-xs text-slate-500">{epicFeatures.length} features</span>
                     </div>
 
                     {/* Features */}
                     {isExpanded && (
-                      <div className="bg-white">
+                      <div className="bg-white dark:bg-slate-800">
                         {epicFeatures.map((feature) => {
                           const isFeatureExpanded = expandedFeatures.has(feature.id)
                           const featureTasks = data.tasks.filter(t => t.featureId === feature.id)
 
                           return (
-                            <div key={feature.id} className="border-t border-slate-200">
+                            <div key={feature.id} className="border-t border-slate-200 dark:border-slate-700">
                               {/* Feature Row */}
-                              <div className="flex items-center gap-3 p-4 pl-12 bg-blue-50 hover:bg-blue-100 transition-colors">
+                              <div className="flex items-center gap-3 p-4 pl-12 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                                 <span
                                   onClick={() => toggleFeature(feature.id)}
                                   className="material-symbols-outlined text-slate-600 cursor-pointer"
@@ -579,12 +589,24 @@ export default function ProductDashboard() {
                                 >
                                   extension
                                 </span>
-                                <span
-                                  onClick={() => toggleFeature(feature.id)}
-                                  className="font-medium text-slate-900 flex-1 cursor-pointer"
+                                <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">F-{feature.id}</span>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setSelectedItem({ item: feature, type: 'feature' }); }}
+                                  className="font-medium flex-1 text-left hover:text-primary hover:underline transition-colors"
+                                  style={{ color: 'var(--text-primary)' }}
                                 >
                                   {feature.title}
+                                </button>
+                                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                  feature.priority === 1 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                  feature.priority === 2 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                                  feature.priority === 3 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                  'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                                }`}>P{feature.priority}</span>
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(feature.status)}`}>
+                                  {feature.status}
                                 </span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">{featureTasks.length} tasks</span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation()
@@ -595,23 +617,32 @@ export default function ProductDashboard() {
                                   <span className="material-symbols-outlined text-[14px]">add</span>
                                   Task
                                 </button>
-                                <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(feature.status)}`}>
-                                  {feature.status}
-                                </span>
-                                <span className="text-xs text-slate-500">{featureTasks.length} tasks</span>
                               </div>
 
                               {/* Tasks */}
                               {isFeatureExpanded && (
-                                <div className="bg-slate-50">
+                                <div className="bg-slate-50 dark:bg-slate-900/50">
                                   {featureTasks.map((task) => (
-                                    <div key={task.id} className="flex items-center gap-3 p-3 pl-20 border-t border-slate-200">
+                                    <div key={task.id} className="flex items-center gap-2 p-3 pl-20 border-t border-slate-200 dark:border-slate-700">
                                       {task.type === 'bug' ? (
                                         <span className="material-symbols-outlined text-red-500 text-[18px]">bug_report</span>
                                       ) : (
                                         <span className="material-symbols-outlined text-slate-400 text-[18px]">task</span>
                                       )}
-                                      <span className="text-sm text-slate-700 flex-1">{task.title}</span>
+                                      <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">T-{task.id}</span>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); setSelectedItem({ item: task, type: 'task' }); }}
+                                        className="text-sm flex-1 text-left hover:text-primary hover:underline transition-colors"
+                                        style={{ color: 'var(--text-secondary)' }}
+                                      >
+                                        {task.title}
+                                      </button>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                        task.priority === 1 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                        task.priority === 2 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                                        task.priority === 3 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                        'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                                      }`}>P{task.priority}</span>
                                       <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
                                         {task.status}
                                       </span>
@@ -626,7 +657,7 @@ export default function ProductDashboard() {
                           )
                         })}
                         {epicFeatures.length === 0 && (
-                          <div className="p-4 pl-12 text-sm text-slate-400 border-t border-slate-200">No features yet</div>
+                          <div className="p-4 pl-12 text-sm text-slate-400 border-t border-slate-200 dark:border-slate-700">No features yet</div>
                         )}
                       </div>
                     )}
@@ -787,6 +818,15 @@ export default function ProductDashboard() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Item Detail Modal */}
+      {selectedItem && (
+        <ItemDetailModal
+          item={selectedItem.item}
+          itemType={selectedItem.type}
+          onClose={() => setSelectedItem(null)}
+        />
       )}
 
       {/* Create Task Modal */}

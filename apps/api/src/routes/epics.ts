@@ -86,3 +86,43 @@ epicRoutes.patch('/:id', requireInternal, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
+
+// Close epic with resolution (owner only)
+epicRoutes.patch('/:id/close', requireInternal, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { resolution, resolutionNote } = req.body
+
+    const validResolutions = ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
+    if (!resolution || !validResolutions.includes(resolution)) {
+      return res.status(400).json({
+        error: 'Valid resolution required',
+        validResolutions
+      })
+    }
+
+    const [epic] = await db.select().from(epics)
+      .where(eq(epics.id, parseInt(id)))
+      .limit(1)
+
+    if (!epic) {
+      return res.status(404).json({ error: 'Epic not found' })
+    }
+
+    const [updated] = await db.update(epics)
+      .set({
+        status: 'cancelled',
+        resolution,
+        resolutionNote: resolutionNote || null,
+        closedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(epics.id, parseInt(id)))
+      .returning()
+
+    res.json({ epic: updated })
+  } catch (error) {
+    console.error('Close epic error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})

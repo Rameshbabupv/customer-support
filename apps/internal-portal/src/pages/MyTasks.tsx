@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import ItemDetailModal from '../components/ItemDetailModal'
 import { useAuthStore } from '../store/auth'
 
 interface DevTask {
@@ -31,6 +32,7 @@ const priorityConfig: Record<number, { label: string; className: string }> = {
 export default function MyTasks() {
   const [tasks, setTasks] = useState<DevTask[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedTask, setSelectedTask] = useState<DevTask | null>(null)
   const { token } = useAuthStore()
 
   useEffect(() => {
@@ -157,7 +159,12 @@ export default function MyTasks() {
                               {task.type === 'bug' && (
                                 <span className="material-symbols-outlined text-red-500 text-[18px]">bug_report</span>
                               )}
-                              <h3 className="font-semibold text-sm text-slate-900 line-clamp-2">{task.title}</h3>
+                              <button
+                                  onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
+                                  className="font-semibold text-sm text-slate-900 line-clamp-2 text-left hover:text-primary hover:underline transition-colors"
+                                >
+                                  {task.title}
+                                </button>
                             </div>
                             <span className={`px-2 py-1 rounded text-xs font-bold border ${pConfig.className} shrink-0 ml-2`}>
                               {pConfig.label}
@@ -216,6 +223,15 @@ export default function MyTasks() {
           </div>
         </div>
       </main>
+
+      {/* Detail Modal */}
+      {selectedTask && (
+        <ItemDetailModal
+          item={selectedTask}
+          itemType="task"
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
     </div>
   )
 }
