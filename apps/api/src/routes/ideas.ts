@@ -67,11 +67,11 @@ ideaRoutes.post('/', async (req, res) => {
 // List ideas (with visibility filtering)
 ideaRoutes.get('/', async (req, res) => {
   try {
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
     const { status, visibility, teamId } = req.query
 
     // Admin/Owner can see all ideas
-    const isAdmin = role === 'admin' || isOwner || tenantId === 1
+    const isAdmin = role === 'admin' || isInternal || tenantId === 1
 
     let results
 

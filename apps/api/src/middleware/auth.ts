@@ -5,8 +5,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-prod'
 
 export interface JWTPayload {
   userId: number
-  tenantId: number
-  isOwner: boolean
+  tenantId: number        // Owner company (SaaS customer)
+  clientId: number | null // null = internal user, number = client user
+  isInternal: boolean     // Convenience flag: true if clientId is null
   role: string
 }
 
@@ -34,12 +35,16 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export function requireOwner(req: Request, res: Response, next: NextFunction) {
-  if (!req.user?.isOwner) {
-    return res.status(403).json({ error: 'Forbidden: Owner access required' })
+// Requires internal user (tenant's team, not client user)
+export function requireInternal(req: Request, res: Response, next: NextFunction) {
+  if (!req.user?.isInternal) {
+    return res.status(403).json({ error: 'Forbidden: Internal access required' })
   }
   next()
 }
+
+// Backwards compatibility alias - will be removed after route updates
+export const requireOwner = requireInternal
 
 export function requireDeveloper(req: Request, res: Response, next: NextFunction) {
   if (req.user?.role !== 'developer') {
@@ -55,6 +60,14 @@ export function requireRole(...roles: string[]) {
     }
     next()
   }
+}
+
+// Requires user to be admin of their client (company_admin role + has clientId)
+export function requireClientAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.user?.clientId || req.user.role !== 'company_admin') {
+    return res.status(403).json({ error: 'Forbidden: Client admin access required' })
+  }
+  next()
 }
 
 export function generateToken(payload: JWTPayload): string {

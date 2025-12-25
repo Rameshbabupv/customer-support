@@ -6,7 +6,8 @@ interface User {
   name: string
   role: string
   tenantId: number
-  isOwner: boolean
+  clientId: number | null
+  isInternal: boolean
 }
 
 interface AuthState {

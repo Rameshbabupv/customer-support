@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { db } from '../db/index.js'
 import { epics } from '../db/schema.js'
 import { eq, desc } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const epicRoutes = Router()
 
@@ -10,7 +10,7 @@ export const epicRoutes = Router()
 epicRoutes.use(authenticate)
 
 // Create epic (owner only)
-epicRoutes.post('/', requireOwner, async (req, res) => {
+epicRoutes.post('/', requireInternal, async (req, res) => {
   try {
     const { productId, title, description, priority } = req.body
 
@@ -34,7 +34,7 @@ epicRoutes.post('/', requireOwner, async (req, res) => {
 })
 
 // Get epics by product (owner only)
-epicRoutes.get('/', requireOwner, async (req, res) => {
+epicRoutes.get('/', requireInternal, async (req, res) => {
   try {
     const { productId } = req.query
 
@@ -54,7 +54,7 @@ epicRoutes.get('/', requireOwner, async (req, res) => {
 })
 
 // Update epic (owner only)
-epicRoutes.patch('/:id', requireOwner, async (req, res) => {
+epicRoutes.patch('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { title, description, status, priority } = req.body

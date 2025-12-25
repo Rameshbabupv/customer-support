@@ -24,7 +24,7 @@ export default function Login() {
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.error || 'Login failed')
-      if (!data.user.isOwner) throw new Error('Access denied. Internal team only.')
+      if (!data.user.isInternal) throw new Error('Access denied. Internal team only.')
 
       setAuth(data.token, data.user)
       navigate('/')

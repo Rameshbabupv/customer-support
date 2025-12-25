@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import { authRoutes } from './routes/auth.js'
 import { ticketRoutes } from './routes/tickets.js'
-import { tenantRoutes } from './routes/tenants.js'
+import { clientRoutes } from './routes/clients.js'
 import { productRoutes } from './routes/products.js'
 import { userRoutes } from './routes/users.js'
 import { epicRoutes } from './routes/epics.js'
@@ -32,7 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/tickets', ticketRoutes)
-app.use('/api/tenants', tenantRoutes)
+app.use('/api/clients', clientRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/epics', epicRoutes)

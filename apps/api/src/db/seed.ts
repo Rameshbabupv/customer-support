@@ -1,7 +1,6 @@
 import { db } from './index.js'
-import { tenants, users, products, tenantProducts, userProducts, epics, features, devTasks, taskAssignments } from './schema.js'
+import { tenants, clients, users, products, clientProducts, userProducts, epics, features, devTasks, taskAssignments } from './schema.js'
 import bcrypt from 'bcryptjs'
-import { nanoid } from 'nanoid'
 
 const PASSWORD = 'systech@123'
 
@@ -10,61 +9,62 @@ async function seed() {
 
   const passwordHash = await bcrypt.hash(PASSWORD, 10)
 
-  // === TENANTS ===
+  // === TENANT (SaaS Owner - SysTech) ===
 
-  const [ownerTenant] = await db.insert(tenants).values({
-    name: 'Systech-erp.ai',
-    subdomain: 'SYSTECH',  // Owner keeps fixed code
-    isOwner: true,
-    tier: 'enterprise',
+  const [sysTechTenant] = await db.insert(tenants).values({
+    name: 'SysTech',
+    plan: 'enterprise',
   }).returning()
 
-  const [acmeTenant] = await db.insert(tenants).values({
+  console.log('Created tenant: SysTech (Owner)')
+
+  // === CLIENTS (SysTech's Customers) ===
+
+  const [acmeClient] = await db.insert(clients).values({
+    tenantId: sysTechTenant.id,
     name: 'Acme Corp',
-    subdomain: nanoid(10).toUpperCase(),
-    isOwner: false,
     tier: 'enterprise',
   }).returning()
 
-  const [techcorpTenant] = await db.insert(tenants).values({
+  const [techcorpClient] = await db.insert(clients).values({
+    tenantId: sysTechTenant.id,
     name: 'TechCorp',
-    subdomain: nanoid(10).toUpperCase(),
-    isOwner: false,
     tier: 'business',
   }).returning()
 
-  console.log('Created tenants: Systech-erp.ai, Acme Corp, TechCorp')
+  console.log('Created clients: Acme Corp, TechCorp')
 
-  // === PRODUCTS (Our Offerings) ===
+  // === PRODUCTS (Owned by Tenant) ===
 
   const productList = [
     // Legacy Products
     { name: 'CRM (legacy)', description: 'Customer Relationship Management - Marketing, lead generation, deal conversion' },
-    { name: 'SDMS (legacy)', description: 'Supply & Distribution Management - Multi-location distributors (automobile, industrial, FMCG, food)' },
-    { name: 'MMS (legacy)', description: 'Manufacturing Management System - Discrete manufacturing (machinery, fabrication, foundry, dies & moulds)' },
-    { name: 'HTMS (legacy)', description: 'Home Textile Management System - Made-ups and home textile manufacturing' },
-    { name: 'SMS (legacy)', description: 'Spinning Management System - Cotton to yarn conversion (first stage of textile supply chain)' },
-    { name: 'HRM (legacy)', description: 'Human Resource Management - Recruitment to retirement, payroll, attendance, leave management' },
-    { name: 'Finance (legacy)', description: 'Financial Management - Standalone and integrated finance module for all business metrics' },
-    { name: 'Custom', description: 'Custom-made legacy applications for exclusive businesses and customers' },
+    { name: 'SDMS (legacy)', description: 'Supply & Distribution Management - Multi-location distributors' },
+    { name: 'MMS (legacy)', description: 'Manufacturing Management System - Discrete manufacturing' },
+    { name: 'HRM (legacy)', description: 'Human Resource Management - Recruitment to retirement' },
+    { name: 'Finance (legacy)', description: 'Financial Management - Standalone and integrated finance module' },
 
     // New/v2 Products
     { name: 'CRM Sales', description: 'Customer Relationship Management v2 - Pre-sale customer engagement' },
-    { name: 'CRM Service', description: 'Customer Relationship Management v2 - Post-sale customer support and service' },
-    { name: 'SDMS v2', description: 'Supply & Distribution Management System - New version with enhanced features' },
-    { name: 'MMS v2', description: 'Manufacturing Management System - New version with enhanced features' },
-    { name: 'TMS', description: 'Textile Management System - Comprehensive solution for spinning, processing, weaving, knitting, apparel' },
-    { name: 'HRM v2', description: 'Human Resource Management - New version with enhanced features' },
-    { name: 'Finance v2', description: 'Financial Management - New version with enhanced features' },
-    { name: 'EXIM', description: 'Export & Import Management - For businesses involved in international trade' },
+    { name: 'CRM Service', description: 'Customer Relationship Management v2 - Post-sale customer support' },
+    { name: 'SDMS v2', description: 'Supply & Distribution Management System v2' },
+    { name: 'MMS v2', description: 'Manufacturing Management System v2' },
+    { name: 'TMS', description: 'Textile Management System - spinning, processing, weaving, knitting, apparel' },
+    { name: 'HRM v2', description: 'Human Resource Management v2' },
+    { name: 'Finance v2', description: 'Financial Management v2' },
+    { name: 'EXIM', description: 'Export & Import Management' },
 
     // Internal Tools
-    { name: 'Tracklet', description: 'A unified platform to manage client-reported issues, internal feature requests, and development progress in one place. Brings clarity, accountability, and smooth flow from request to resolution—without unnecessary complexity.' },
+    { name: 'Tracklet', description: 'Unified platform for client issues, internal requests, and development progress' },
   ]
 
   const createdProducts: { id: number; name: string }[] = []
   for (const p of productList) {
-    const [prod] = await db.insert(products).values(p).returning()
+    const [prod] = await db.insert(products).values({
+      tenantId: sysTechTenant.id,
+      name: p.name,
+      description: p.description,
+    }).returning()
     createdProducts.push({ id: prod.id, name: prod.name })
   }
   console.log(`Created ${productList.length} products`)
@@ -76,32 +76,25 @@ async function seed() {
     return product.id
   }
 
-  // Assign products to tenants
-  // Systech-erp.ai (Owner): All products
-  const ownerProductAssignments = createdProducts.map(p => ({
-    tenantId: ownerTenant.id,
-    productId: p.id,
-  }))
-  await db.insert(tenantProducts).values(ownerProductAssignments)
-
-  // Acme Corp (Enterprise): CRM Sales, CRM Service, HRM v2, Finance v2, EXIM
-  await db.insert(tenantProducts).values([
-    { tenantId: acmeTenant.id, productId: findProduct('CRM Sales') },
-    { tenantId: acmeTenant.id, productId: findProduct('CRM Service') },
-    { tenantId: acmeTenant.id, productId: findProduct('HRM v2') },
-    { tenantId: acmeTenant.id, productId: findProduct('Finance v2') },
-    { tenantId: acmeTenant.id, productId: findProduct('EXIM') },
+  // Assign products to clients
+  // Acme Corp: CRM Sales, CRM Service, HRM v2, Finance v2, EXIM
+  await db.insert(clientProducts).values([
+    { tenantId: sysTechTenant.id, clientId: acmeClient.id, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, clientId: acmeClient.id, productId: findProduct('CRM Service') },
+    { tenantId: sysTechTenant.id, clientId: acmeClient.id, productId: findProduct('HRM v2') },
+    { tenantId: sysTechTenant.id, clientId: acmeClient.id, productId: findProduct('Finance v2') },
+    { tenantId: sysTechTenant.id, clientId: acmeClient.id, productId: findProduct('EXIM') },
   ])
 
-  // TechCorp (Business): MMS v2, TMS, HRM v2
-  await db.insert(tenantProducts).values([
-    { tenantId: techcorpTenant.id, productId: findProduct('MMS v2') },
-    { tenantId: techcorpTenant.id, productId: findProduct('TMS') },
-    { tenantId: techcorpTenant.id, productId: findProduct('HRM v2') },
+  // TechCorp: MMS v2, TMS, HRM v2
+  await db.insert(clientProducts).values([
+    { tenantId: sysTechTenant.id, clientId: techcorpClient.id, productId: findProduct('MMS v2') },
+    { tenantId: sysTechTenant.id, clientId: techcorpClient.id, productId: findProduct('TMS') },
+    { tenantId: sysTechTenant.id, clientId: techcorpClient.id, productId: findProduct('HRM v2') },
   ])
-  console.log('Assigned products to tenants')
+  console.log('Assigned products to clients')
 
-  // === INTERNAL USERS (Systech-erp.ai - Owner) ===
+  // === INTERNAL USERS (SysTech Team - clientId = null) ===
 
   const internalUsers = [
     { email: 'ramesh@systech.com', name: 'Ramesh', role: 'admin' },
@@ -118,11 +111,12 @@ async function seed() {
       passwordHash,
       name: u.name,
       role: u.role as any,
-      tenantId: ownerTenant.id,
+      tenantId: sysTechTenant.id,
+      clientId: null, // Internal user - no client
     }).returning()
     createdInternalUsers.push(user)
   }
-  console.log('Created 5 internal users (2 developers)')
+  console.log('Created 5 internal users (SysTech team)')
 
   const jaiId = createdInternalUsers.find(u => u.email === 'jai@systech.com')?.id
   const priyaId = createdInternalUsers.find(u => u.email === 'priya@systech.com')?.id
@@ -144,7 +138,8 @@ async function seed() {
       passwordHash,
       name: u.name,
       role: u.role as any,
-      tenantId: acmeTenant.id,
+      tenantId: sysTechTenant.id,
+      clientId: acmeClient.id, // Belongs to Acme Corp
     }).returning()
     createdAcmeUsers.push(user)
   }
@@ -165,7 +160,8 @@ async function seed() {
       passwordHash,
       name: u.name,
       role: u.role as any,
-      tenantId: techcorpTenant.id,
+      tenantId: sysTechTenant.id,
+      clientId: techcorpClient.id, // Belongs to TechCorp
     }).returning()
     createdTechcorpUsers.push(user)
   }
@@ -175,6 +171,7 @@ async function seed() {
 
   // Epic 1: CRM Sales Enhancement
   const [crmEpic] = await db.insert(epics).values({
+    tenantId: sysTechTenant.id,
     productId: findProduct('CRM Sales'),
     title: 'Lead Management & Pipeline Improvements',
     description: 'Enhance lead tracking, scoring, and pipeline visualization',
@@ -184,6 +181,7 @@ async function seed() {
 
   // Feature 1.1: Lead Scoring Engine
   const [leadScoringFeature] = await db.insert(features).values({
+    tenantId: sysTechTenant.id,
     epicId: crmEpic.id,
     title: 'Automated Lead Scoring',
     description: 'AI-based lead scoring based on engagement and demographics',
@@ -193,41 +191,48 @@ async function seed() {
 
   // Tasks for Lead Scoring
   const [task1] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: leadScoringFeature.id,
     title: 'Design scoring algorithm',
     description: 'Define scoring rules and weightage for different attributes',
     type: 'task',
     status: 'done',
     priority: 1,
+    storyPoints: 3,
   }).returning()
 
   const [task2] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: leadScoringFeature.id,
     title: 'Implement scoring API endpoint',
     description: 'Create POST /api/leads/:id/score endpoint',
     type: 'task',
     status: 'in_progress',
     priority: 1,
+    storyPoints: 5,
   }).returning()
 
   const [task3] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: leadScoringFeature.id,
     title: 'Build scoring dashboard UI',
     description: 'Display lead scores in the CRM dashboard with color coding',
     type: 'task',
     status: 'todo',
     priority: 2,
+    storyPoints: 5,
   }).returning()
 
   // Assign tasks to developers
   await db.insert(taskAssignments).values([
-    { taskId: task1.id, userId: jaiId },
-    { taskId: task2.id, userId: jaiId },
-    { taskId: task3.id, userId: priyaId },
+    { tenantId: sysTechTenant.id, taskId: task1.id, userId: jaiId },
+    { tenantId: sysTechTenant.id, taskId: task2.id, userId: jaiId },
+    { tenantId: sysTechTenant.id, taskId: task3.id, userId: priyaId },
   ])
 
   // Feature 1.2: Pipeline Visualization
   const [pipelineFeature] = await db.insert(features).values({
+    tenantId: sysTechTenant.id,
     epicId: crmEpic.id,
     title: 'Visual Pipeline Board',
     description: 'Kanban-style pipeline view with drag-drop',
@@ -236,31 +241,36 @@ async function seed() {
   }).returning()
 
   const [task4] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: pipelineFeature.id,
     title: 'Design pipeline stages',
     description: 'Define default stages and custom stage configuration',
     type: 'task',
     status: 'todo',
     priority: 2,
+    storyPoints: 2,
   }).returning()
 
   const [task5] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: pipelineFeature.id,
     title: 'Implement drag-drop library',
     description: 'Integrate react-beautiful-dnd for pipeline board',
     type: 'task',
     status: 'todo',
     priority: 2,
+    storyPoints: 8,
   }).returning()
 
   await db.insert(taskAssignments).values([
-    { taskId: task4.id, userId: priyaId },
-    { taskId: task5.id, userId: jaiId },
-    { taskId: task5.id, userId: priyaId }, // Joint work
+    { tenantId: sysTechTenant.id, taskId: task4.id, userId: priyaId },
+    { tenantId: sysTechTenant.id, taskId: task5.id, userId: jaiId },
+    { tenantId: sysTechTenant.id, taskId: task5.id, userId: priyaId },
   ])
 
   // Epic 2: HRM v2 Attendance Module
   const [hrmEpic] = await db.insert(epics).values({
+    tenantId: sysTechTenant.id,
     productId: findProduct('HRM v2'),
     title: 'Biometric Attendance Integration',
     description: 'Integrate with multiple biometric devices and build attendance reports',
@@ -269,6 +279,7 @@ async function seed() {
   }).returning()
 
   const [biometricFeature] = await db.insert(features).values({
+    tenantId: sysTechTenant.id,
     epicId: hrmEpic.id,
     title: 'Multi-device Biometric Sync',
     description: 'Support for ZKTeco, eSSL, and Anviz devices',
@@ -277,58 +288,52 @@ async function seed() {
   }).returning()
 
   const [task6] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: biometricFeature.id,
     title: 'Research device APIs',
     description: 'Document API specifications for all 3 device types',
     type: 'task',
     status: 'todo',
     priority: 3,
+    storyPoints: 3,
   }).returning()
 
   await db.insert(taskAssignments).values([
-    { taskId: task6.id, userId: jaiId },
+    { tenantId: sysTechTenant.id, taskId: task6.id, userId: jaiId },
   ])
 
   // Bug task
   const [bugTask] = await db.insert(devTasks).values({
+    tenantId: sysTechTenant.id,
     featureId: leadScoringFeature.id,
     title: 'Fix lead score calculation for null values',
     description: 'Handle null demographics gracefully without breaking scoring',
     type: 'bug',
     status: 'review',
     priority: 1,
+    storyPoints: 2,
   }).returning()
 
   await db.insert(taskAssignments).values([
-    { taskId: bugTask.id, userId: priyaId },
+    { tenantId: sysTechTenant.id, taskId: bugTask.id, userId: priyaId },
   ])
 
   console.log('Created 2 epics, 3 features, 7 tasks with assignments')
 
   // === USER PRODUCT ASSIGNMENTS ===
 
-  // Internal users (Systech-erp.ai)
   const rameshId = createdInternalUsers.find(u => u.email === 'ramesh@systech.com')?.id
   const mohanId = createdInternalUsers.find(u => u.email === 'mohan@systech.com')?.id
   const sakthiId = createdInternalUsers.find(u => u.email === 'sakthi@systech.com')?.id
 
   await db.insert(userProducts).values([
-    // ramesh: CRM Sales only (test auto-select with 1 product)
-    { userId: rameshId, productId: findProduct('CRM Sales') },
-
-    // mohan: CRM Sales + CRM Service (test dropdown with 2 products)
-    { userId: mohanId, productId: findProduct('CRM Sales') },
-    { userId: mohanId, productId: findProduct('CRM Service') },
-
-    // sakthi: HRM v2 only
-    { userId: sakthiId, productId: findProduct('HRM v2') },
-
-    // jai: CRM Sales only
-    { userId: jaiId, productId: findProduct('CRM Sales') },
-
-    // priya: CRM Sales + HRM v2
-    { userId: priyaId, productId: findProduct('CRM Sales') },
-    { userId: priyaId, productId: findProduct('HRM v2') },
+    { tenantId: sysTechTenant.id, userId: rameshId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: mohanId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: mohanId, productId: findProduct('CRM Service') },
+    { tenantId: sysTechTenant.id, userId: sakthiId, productId: findProduct('HRM v2') },
+    { tenantId: sysTechTenant.id, userId: jaiId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: priyaId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: priyaId, productId: findProduct('HRM v2') },
   ])
 
   // Acme Corp users
@@ -339,22 +344,13 @@ async function seed() {
   const deepaId = createdAcmeUsers.find(u => u.email === 'deepa@acme.com')?.id
 
   await db.insert(userProducts).values([
-    // john: CRM Sales only (test auto-select)
-    { userId: johnId, productId: findProduct('CRM Sales') },
-
-    // jane: CRM Sales + CRM Service (test dropdown)
-    { userId: janeId, productId: findProduct('CRM Sales') },
-    { userId: janeId, productId: findProduct('CRM Service') },
-
-    // kumar: HRM v2 only
-    { userId: kumarId, productId: findProduct('HRM v2') },
-
-    // latha: CRM Sales + HRM v2
-    { userId: lathaId, productId: findProduct('CRM Sales') },
-    { userId: lathaId, productId: findProduct('HRM v2') },
-
-    // deepa: Finance v2 only
-    { userId: deepaId, productId: findProduct('Finance v2') },
+    { tenantId: sysTechTenant.id, userId: johnId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: janeId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: janeId, productId: findProduct('CRM Service') },
+    { tenantId: sysTechTenant.id, userId: kumarId, productId: findProduct('HRM v2') },
+    { tenantId: sysTechTenant.id, userId: lathaId, productId: findProduct('CRM Sales') },
+    { tenantId: sysTechTenant.id, userId: lathaId, productId: findProduct('HRM v2') },
+    { tenantId: sysTechTenant.id, userId: deepaId, productId: findProduct('Finance v2') },
   ])
 
   // TechCorp users
@@ -363,44 +359,39 @@ async function seed() {
   const mikeId = createdTechcorpUsers.find(u => u.email === 'mike@techcorp.com')?.id
 
   await db.insert(userProducts).values([
-    // alex: MMS v2 only
-    { userId: alexId, productId: findProduct('MMS v2') },
-
-    // sara: TMS only
-    { userId: saraId, productId: findProduct('TMS') },
-
-    // mike: MMS v2 + TMS
-    { userId: mikeId, productId: findProduct('MMS v2') },
-    { userId: mikeId, productId: findProduct('TMS') },
+    { tenantId: sysTechTenant.id, userId: alexId, productId: findProduct('MMS v2') },
+    { tenantId: sysTechTenant.id, userId: saraId, productId: findProduct('TMS') },
+    { tenantId: sysTechTenant.id, userId: mikeId, productId: findProduct('MMS v2') },
+    { tenantId: sysTechTenant.id, userId: mikeId, productId: findProduct('TMS') },
   ])
 
-  console.log('Assigned products to users (1-2 products each for testing)')
+  console.log('Assigned products to users')
 
   // === SUMMARY ===
 
   console.log('\n✅ Seed complete!')
   console.log('\n📋 All users password: systech@123')
   console.log('\n┌─────────────────────────────────────────────────────────┐')
-  console.log('│ INTERNAL PORTAL (http://localhost:3001)                 │')
+  console.log('│ TENANT: SysTech (Owner)                                 │')
   console.log('├─────────────────────────────────────────────────────────┤')
-  console.log('│ ramesh@systech.com    admin                             │')
-  console.log('│ mohan@systech.com     support                           │')
-  console.log('│ sakthi@systech.com    integrator                        │')
-  console.log('│ jai@systech.com       developer (has 4 assigned tasks)  │')
-  console.log('│ priya@systech.com     developer (has 5 assigned tasks)  │')
+  console.log('│ INTERNAL PORTAL (http://localhost:3003)                 │')
+  console.log('│   ramesh@systech.com    admin                           │')
+  console.log('│   mohan@systech.com     support                         │')
+  console.log('│   sakthi@systech.com    integrator                      │')
+  console.log('│   jai@systech.com       developer                       │')
+  console.log('│   priya@systech.com     developer                       │')
   console.log('├─────────────────────────────────────────────────────────┤')
   console.log('│ CLIENT PORTAL (http://localhost:3000)                   │')
-  console.log('├─────────────────────────────────────────────────────────┤')
-  console.log('│ Acme Corp:                                              │')
-  console.log('│   john@acme.com       user                              │')
-  console.log('│   jane@acme.com       user                              │')
-  console.log('│   kumar@acme.com      user                              │')
-  console.log('│   latha@acme.com      company_admin                     │')
-  console.log('│   deepa@acme.com      company_admin                     │')
-  console.log('│ TechCorp:                                               │')
-  console.log('│   alex@techcorp.com   user                              │')
-  console.log('│   sara@techcorp.com   user                              │')
-  console.log('│   mike@techcorp.com   company_admin                     │')
+  console.log('│ Client: Acme Corp                                       │')
+  console.log('│   john@acme.com         user                            │')
+  console.log('│   jane@acme.com         user                            │')
+  console.log('│   kumar@acme.com        user                            │')
+  console.log('│   latha@acme.com        company_admin                   │')
+  console.log('│   deepa@acme.com        company_admin                   │')
+  console.log('│ Client: TechCorp                                        │')
+  console.log('│   alex@techcorp.com     user                            │')
+  console.log('│   sara@techcorp.com     user                            │')
+  console.log('│   mike@techcorp.com     company_admin                   │')
   console.log('└─────────────────────────────────────────────────────────┘')
 }
 

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { db } from '../db/index.js'
 import { features } from '../db/schema.js'
 import { eq, desc } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const featureRoutes = Router()
 
@@ -10,7 +10,7 @@ export const featureRoutes = Router()
 featureRoutes.use(authenticate)
 
 // Create feature (owner only)
-featureRoutes.post('/', requireOwner, async (req, res) => {
+featureRoutes.post('/', requireInternal, async (req, res) => {
   try {
     const { epicId, title, description, priority } = req.body
 
@@ -34,7 +34,7 @@ featureRoutes.post('/', requireOwner, async (req, res) => {
 })
 
 // Get features by epic (owner only)
-featureRoutes.get('/', requireOwner, async (req, res) => {
+featureRoutes.get('/', requireInternal, async (req, res) => {
   try {
     const { epicId } = req.query
 
@@ -54,7 +54,7 @@ featureRoutes.get('/', requireOwner, async (req, res) => {
 })
 
 // Update feature (owner only)
-featureRoutes.patch('/:id', requireOwner, async (req, res) => {
+featureRoutes.patch('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { title, description, status, priority } = req.body

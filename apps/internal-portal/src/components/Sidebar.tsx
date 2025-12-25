@@ -11,7 +11,7 @@ const navItems = [
   { path: '/backlog', emoji: '📋', icon: 'list', label: 'Backlog', roles: ['admin', 'ceo', 'developer'] },
   { path: '/tickets', emoji: '🎫', icon: 'confirmation_number', label: 'Tickets', roles: ['admin', 'support', 'integrator', 'ceo'] },
   { path: '/ideas', emoji: '💡', icon: 'lightbulb', label: 'Ideas', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
-  { path: '/tenants', emoji: '🏢', icon: 'group', label: 'Tenants', roles: ['admin', 'support', 'integrator', 'ceo'] },
+  { path: '/clients', emoji: '🏢', icon: 'group', label: 'Clients', roles: ['admin', 'support', 'integrator', 'ceo'] },
   { path: '/products', emoji: '📦', icon: 'inventory_2', label: 'Products', roles: ['admin', 'support', 'integrator', 'ceo'] },
 ]
 

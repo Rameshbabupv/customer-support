@@ -80,7 +80,7 @@ export default function Dashboard() {
     try {
       // Fetch core data in parallel
       const [tenantsRes, ticketsRes, productsRes] = await Promise.all([
-        fetch('/api/tenants', {
+        fetch('/api/clients', {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch('/api/tickets/all', {
@@ -277,11 +277,11 @@ export default function Dashboard() {
                   />
                   <ModuleCard
                     emoji="🏢"
-                    title="Tenants"
-                    description="Monitor tenant accounts and subscription tiers"
+                    title="Clients"
+                    description="Monitor client accounts and subscription tiers"
                     count={metrics.activeTenants}
                     countLabel="Active"
-                    to="/tenants"
+                    to="/clients"
                   />
                 </div>
               </motion.div>
@@ -297,7 +297,7 @@ export default function Dashboard() {
                   <StatCard
                     icon="group_work"
                     emoji="🏢"
-                    label="Total Tenants"
+                    label="Total Clients"
                     value={metrics.totalTenants}
                     color="bg-blue-50 text-blue-600"
                   />

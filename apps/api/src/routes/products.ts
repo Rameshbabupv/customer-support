@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { db } from '../db/index.js'
-import { products, tenantProducts, epics, features, devTasks } from '../db/schema.js'
+import { products, clientProducts, epics, features, devTasks } from '../db/schema.js'
 import { eq } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const productRoutes = Router()
 
@@ -21,7 +21,7 @@ productRoutes.get('/', async (req, res) => {
 })
 
 // Create new product (owner only)
-productRoutes.post('/', requireOwner, async (req, res) => {
+productRoutes.post('/', requireInternal, async (req, res) => {
   try {
     const { name, description } = req.body
 
@@ -45,7 +45,7 @@ productRoutes.post('/', requireOwner, async (req, res) => {
 })
 
 // Update product (owner only)
-productRoutes.patch('/:id', requireOwner, async (req, res) => {
+productRoutes.patch('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { name, description } = req.body
@@ -70,7 +70,7 @@ productRoutes.patch('/:id', requireOwner, async (req, res) => {
 })
 
 // Assign products to tenant (owner only)
-productRoutes.post('/assign', requireOwner, async (req, res) => {
+productRoutes.post('/assign', requireInternal, async (req, res) => {
   try {
     const { tenantId, productIds } = req.body
 
@@ -84,7 +84,7 @@ productRoutes.post('/assign', requireOwner, async (req, res) => {
       productId,
     }))
 
-    await db.insert(tenantProducts).values(assignments)
+    await db.insert(clientProducts).values(assignments)
 
     res.status(201).json({ message: 'Products assigned', count: productIds.length })
   } catch (error) {
@@ -98,8 +98,8 @@ productRoutes.get('/tenant/:tenantId', async (req, res) => {
   try {
     const { tenantId } = req.params
 
-    const assigned = await db.query.tenantProducts.findMany({
-      where: eq(tenantProducts.tenantId, parseInt(tenantId)),
+    const assigned = await db.query.clientProducts.findMany({
+      where: eq(clientProducts.tenantId, parseInt(tenantId)),
       with: {
         product: true,
       },
@@ -114,7 +114,7 @@ productRoutes.get('/tenant/:tenantId', async (req, res) => {
 })
 
 // Update products for a tenant (replace all assignments)
-productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
+productRoutes.put('/tenant/:tenantId', requireInternal, async (req, res) => {
   try {
     const { tenantId } = req.params
     const { productIds } = req.body
@@ -126,7 +126,7 @@ productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
     const tid = parseInt(tenantId)
 
     // Delete existing assignments
-    await db.delete(tenantProducts).where(eq(tenantProducts.tenantId, tid))
+    await db.delete(clientProducts).where(eq(clientProducts.tenantId, tid))
 
     // Insert new assignments
     if (productIds.length > 0) {
@@ -134,7 +134,7 @@ productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
         tenantId: tid,
         productId,
       }))
-      await db.insert(tenantProducts).values(assignments)
+      await db.insert(clientProducts).values(assignments)
     }
 
     res.json({ message: 'Products updated', count: productIds.length })
@@ -145,7 +145,7 @@ productRoutes.put('/tenant/:tenantId', requireOwner, async (req, res) => {
 })
 
 // Get product dashboard metrics (owner only)
-productRoutes.get('/:id/dashboard', requireOwner, async (req, res) => {
+productRoutes.get('/:id/dashboard', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const productId = parseInt(id)

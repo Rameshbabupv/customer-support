@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { db } from '../db/index.js'
 import { sprints, sprintRetros, sprintCapacity, devTasks, taskAssignments, users } from '../db/schema.js'
 import { eq, isNull, desc, and, inArray } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const sprintRoutes = Router()
 
@@ -30,7 +30,7 @@ function calculateEndDate(startDate: Date): Date {
 // ============================================
 
 // List all sprints
-sprintRoutes.get('/', requireOwner, async (req, res) => {
+sprintRoutes.get('/', requireInternal, async (req, res) => {
   try {
     const { status } = req.query
 
@@ -51,7 +51,7 @@ sprintRoutes.get('/', requireOwner, async (req, res) => {
 })
 
 // Get active sprint
-sprintRoutes.get('/active', requireOwner, async (req, res) => {
+sprintRoutes.get('/active', requireInternal, async (req, res) => {
   try {
     const [sprint] = await db.select().from(sprints)
       .where(eq(sprints.status, 'active'))
@@ -73,7 +73,7 @@ sprintRoutes.get('/active', requireOwner, async (req, res) => {
 })
 
 // Get sprint by ID with tasks and capacity
-sprintRoutes.get('/:id', requireOwner, async (req, res) => {
+sprintRoutes.get('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -107,7 +107,7 @@ sprintRoutes.get('/:id', requireOwner, async (req, res) => {
 })
 
 // Create sprint
-sprintRoutes.post('/', requireOwner, async (req, res) => {
+sprintRoutes.post('/', requireInternal, async (req, res) => {
   try {
     const { name, goal, startDate } = req.body
 
@@ -135,7 +135,7 @@ sprintRoutes.post('/', requireOwner, async (req, res) => {
 })
 
 // Update sprint
-sprintRoutes.patch('/:id', requireOwner, async (req, res) => {
+sprintRoutes.patch('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { name, goal, startDate, endDate } = req.body
@@ -167,7 +167,7 @@ sprintRoutes.patch('/:id', requireOwner, async (req, res) => {
 })
 
 // Delete sprint (only if planning)
-sprintRoutes.delete('/:id', requireOwner, async (req, res) => {
+sprintRoutes.delete('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -206,7 +206,7 @@ sprintRoutes.delete('/:id', requireOwner, async (req, res) => {
 // ============================================
 
 // Start sprint
-sprintRoutes.post('/:id/start', requireOwner, async (req, res) => {
+sprintRoutes.post('/:id/start', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -244,7 +244,7 @@ sprintRoutes.post('/:id/start', requireOwner, async (req, res) => {
 })
 
 // Complete sprint
-sprintRoutes.post('/:id/complete', requireOwner, async (req, res) => {
+sprintRoutes.post('/:id/complete', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { moveIncompleteTo } = req.body // 'backlog' | 'next' | sprintId
@@ -326,7 +326,7 @@ sprintRoutes.post('/:id/complete', requireOwner, async (req, res) => {
 // ============================================
 
 // Get capacity for sprint
-sprintRoutes.get('/:id/capacity', requireOwner, async (req, res) => {
+sprintRoutes.get('/:id/capacity', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -350,7 +350,7 @@ sprintRoutes.get('/:id/capacity', requireOwner, async (req, res) => {
 })
 
 // Set capacity for developer
-sprintRoutes.post('/:id/capacity', requireOwner, async (req, res) => {
+sprintRoutes.post('/:id/capacity', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { userId, availablePoints } = req.body
@@ -396,7 +396,7 @@ sprintRoutes.post('/:id/capacity', requireOwner, async (req, res) => {
 // ============================================
 
 // Get retro
-sprintRoutes.get('/:id/retro', requireOwner, async (req, res) => {
+sprintRoutes.get('/:id/retro', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -412,7 +412,7 @@ sprintRoutes.get('/:id/retro', requireOwner, async (req, res) => {
 })
 
 // Create/update retro
-sprintRoutes.post('/:id/retro', requireOwner, async (req, res) => {
+sprintRoutes.post('/:id/retro', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { wentWell, improvements, actionItems } = req.body
@@ -457,7 +457,7 @@ sprintRoutes.post('/:id/retro', requireOwner, async (req, res) => {
 // ============================================
 
 // Get backlog (tasks with no sprint)
-sprintRoutes.get('/backlog/tasks', requireOwner, async (req, res) => {
+sprintRoutes.get('/backlog/tasks', requireInternal, async (req, res) => {
   try {
     const tasks = await db.select().from(devTasks)
       .where(isNull(devTasks.sprintId))
@@ -481,7 +481,7 @@ sprintRoutes.get('/backlog/tasks', requireOwner, async (req, res) => {
 // ============================================
 
 // Get velocity history (last 6 completed sprints)
-sprintRoutes.get('/metrics/velocity', requireOwner, async (req, res) => {
+sprintRoutes.get('/metrics/velocity', requireInternal, async (req, res) => {
   try {
     const completedSprints = await db.select().from(sprints)
       .where(eq(sprints.status, 'completed'))
@@ -507,7 +507,7 @@ sprintRoutes.get('/metrics/velocity', requireOwner, async (req, res) => {
 })
 
 // Get burndown data for sprint
-sprintRoutes.get('/:id/burndown', requireOwner, async (req, res) => {
+sprintRoutes.get('/:id/burndown', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
 

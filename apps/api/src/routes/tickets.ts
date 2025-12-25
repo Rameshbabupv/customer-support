@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { db } from '../db/index.js'
-import { tickets, attachments, ticketComments } from '../db/schema.js'
+import { tickets, attachments, ticketComments, clients } from '../db/schema.js'
 import { eq, and, desc } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 import { upload } from '../middleware/upload.js'
 
 export const ticketRoutes = Router()
@@ -10,13 +10,16 @@ export const ticketRoutes = Router()
 // All ticket routes require authentication
 ticketRoutes.use(authenticate)
 
-// Get all tickets (owner only) - for internal portal kanban
-ticketRoutes.get('/all', requireOwner, async (req, res) => {
+// Get all tickets for tenant (internal only) - for internal portal kanban
+ticketRoutes.get('/all', requireInternal, async (req, res) => {
   try {
+    const { tenantId } = req.user!
+
     const results = await db.query.tickets.findMany({
+      where: eq(tickets.tenantId, tenantId),
       orderBy: (tickets, { desc }) => [desc(tickets.createdAt)],
       with: {
-        tenant: true,
+        client: true,
       },
     })
 
@@ -30,8 +33,9 @@ ticketRoutes.get('/all', requireOwner, async (req, res) => {
       clientSeverity: t.clientSeverity,
       internalPriority: t.internalPriority,
       internalSeverity: t.internalSeverity,
+      clientId: t.clientId,
+      clientName: t.client?.name || 'Unknown',
       tenantId: t.tenantId,
-      tenantName: t.tenant?.name || 'Unknown',
       createdAt: t.createdAt,
     }))
 
@@ -46,7 +50,7 @@ ticketRoutes.get('/all', requireOwner, async (req, res) => {
 ticketRoutes.post('/', async (req, res) => {
   try {
     const { title, description, productId, clientPriority, clientSeverity } = req.body
-    const { userId, tenantId } = req.user!
+    const { userId, tenantId, clientId } = req.user!
 
     const [ticket] = await db.insert(tickets).values({
       title,
@@ -56,6 +60,7 @@ ticketRoutes.post('/', async (req, res) => {
       clientSeverity,
       userId,
       tenantId,
+      clientId, // Will be null for internal users
       status: 'open',
     }).returning()
 
@@ -66,28 +71,33 @@ ticketRoutes.post('/', async (req, res) => {
   }
 })
 
-// List tickets (scoped by tenant, or all if owner)
+// List tickets (visibility based on user type)
 ticketRoutes.get('/', async (req, res) => {
   try {
-    const { tenantId, isOwner, userId, role } = req.user!
-    const { status, assignedTo } = req.query
+    const { tenantId, clientId, isInternal, userId, role } = req.user!
 
     let results
 
-    // Scope by tenant unless owner
-    if (!isOwner) {
-      // Regular users only see their own tickets
-      if (role === 'user') {
-        results = await db.select().from(tickets)
-          .where(and(eq(tickets.tenantId, tenantId), eq(tickets.userId, userId)))
-          .orderBy(desc(tickets.createdAt))
-      } else {
-        results = await db.select().from(tickets)
-          .where(eq(tickets.tenantId, tenantId))
-          .orderBy(desc(tickets.createdAt))
-      }
-    } else {
+    if (isInternal) {
+      // Internal users see all tickets in their tenant
       results = await db.select().from(tickets)
+        .where(eq(tickets.tenantId, tenantId))
+        .orderBy(desc(tickets.createdAt))
+    } else if (role === 'company_admin') {
+      // Client admin sees all tickets for their client
+      results = await db.select().from(tickets)
+        .where(and(
+          eq(tickets.tenantId, tenantId),
+          eq(tickets.clientId, clientId!)
+        ))
+        .orderBy(desc(tickets.createdAt))
+    } else {
+      // Regular client users only see their own tickets
+      results = await db.select().from(tickets)
+        .where(and(
+          eq(tickets.tenantId, tenantId),
+          eq(tickets.userId, userId)
+        ))
         .orderBy(desc(tickets.createdAt))
     }
 
@@ -102,29 +112,46 @@ ticketRoutes.get('/', async (req, res) => {
 ticketRoutes.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const { tenantId, isOwner } = req.user!
+    const { tenantId, clientId, isInternal, userId, role } = req.user!
 
     const [ticket] = await db.select().from(tickets)
-      .where(eq(tickets.id, parseInt(id)))
+      .where(and(
+        eq(tickets.id, parseInt(id)),
+        eq(tickets.tenantId, tenantId)
+      ))
       .limit(1)
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' })
     }
 
-    // Check access
-    if (!isOwner && ticket.tenantId !== tenantId) {
-      return res.status(403).json({ error: 'Forbidden' })
+    // Access check
+    if (!isInternal) {
+      if (role === 'company_admin') {
+        // Client admin can see their client's tickets
+        if (ticket.clientId !== clientId) {
+          return res.status(403).json({ error: 'Forbidden' })
+        }
+      } else {
+        // Regular users can only see their own tickets
+        if (ticket.userId !== userId) {
+          return res.status(403).json({ error: 'Forbidden' })
+        }
+      }
     }
 
     // Get attachments
     const ticketAttachments = await db.select().from(attachments)
       .where(eq(attachments.ticketId, ticket.id))
 
-    // Get comments
-    const comments = await db.select().from(ticketComments)
+    // Get comments (filter internal notes for client users)
+    let comments = await db.select().from(ticketComments)
       .where(eq(ticketComments.ticketId, ticket.id))
       .orderBy(ticketComments.createdAt)
+
+    if (!isInternal) {
+      comments = comments.filter((c: any) => !c.isInternal)
+    }
 
     res.json({ ticket, attachments: ticketAttachments, comments })
   } catch (error) {
@@ -138,23 +165,21 @@ ticketRoutes.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const { status, internalPriority, internalSeverity, assignedTo } = req.body
-    const { tenantId, isOwner, role } = req.user!
+    const { tenantId, isInternal, role } = req.user!
 
     const [ticket] = await db.select().from(tickets)
-      .where(eq(tickets.id, parseInt(id)))
+      .where(and(
+        eq(tickets.id, parseInt(id)),
+        eq(tickets.tenantId, tenantId)
+      ))
       .limit(1)
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' })
     }
 
-    // Check access
-    if (!isOwner && ticket.tenantId !== tenantId) {
-      return res.status(403).json({ error: 'Forbidden' })
-    }
-
-    // Only support/integrator/admin can set internal fields
-    const canSetInternal = isOwner || ['support', 'integrator', 'admin', 'ceo'].includes(role)
+    // Only internal users can set internal fields
+    const canSetInternal = isInternal
 
     const updateData: any = { updatedAt: new Date().toISOString() }
     if (status) updateData.status = status
@@ -178,17 +203,27 @@ ticketRoutes.patch('/:id', async (req, res) => {
 ticketRoutes.post('/:id/comments', async (req, res) => {
   try {
     const { id } = req.params
-    const { content, isInternal } = req.body
-    const { userId, isOwner, role } = req.user!
+    const { content, isInternal: isInternalNote } = req.body
+    const { userId, isInternal, tenantId } = req.user!
 
-    // Only owner-side users can add internal notes
-    const canAddInternal = isOwner || ['support', 'integrator', 'admin', 'ceo'].includes(role)
+    // Verify ticket belongs to tenant
+    const [ticket] = await db.select().from(tickets)
+      .where(and(
+        eq(tickets.id, parseInt(id)),
+        eq(tickets.tenantId, tenantId)
+      ))
+      .limit(1)
 
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' })
+    }
+
+    // Only internal users can add internal notes
     const [comment] = await db.insert(ticketComments).values({
       ticketId: parseInt(id),
       userId,
       content,
-      isInternal: canAddInternal ? isInternal : false,
+      isInternal: isInternal ? isInternalNote : false,
     }).returning()
 
     res.status(201).json({ comment })
@@ -202,7 +237,7 @@ ticketRoutes.post('/:id/comments', async (req, res) => {
 ticketRoutes.post('/:id/attachments', upload.array('files', 5), async (req, res) => {
   try {
     const { id } = req.params
-    const { userId, tenantId, isOwner } = req.user!
+    const { userId, tenantId, isInternal, clientId } = req.user!
     const files = req.files as Express.Multer.File[]
 
     if (!files || files.length === 0) {
@@ -211,15 +246,18 @@ ticketRoutes.post('/:id/attachments', upload.array('files', 5), async (req, res)
 
     // Check ticket exists and user has access
     const [ticket] = await db.select().from(tickets)
-      .where(eq(tickets.id, parseInt(id)))
+      .where(and(
+        eq(tickets.id, parseInt(id)),
+        eq(tickets.tenantId, tenantId)
+      ))
       .limit(1)
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' })
     }
 
-    // Check access: ticket creator or owner
-    if (!isOwner && ticket.userId !== userId && ticket.tenantId !== tenantId) {
+    // Access check: internal users, ticket creator, or same client
+    if (!isInternal && ticket.userId !== userId && ticket.clientId !== clientId) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
@@ -240,7 +278,6 @@ ticketRoutes.post('/:id/attachments', upload.array('files', 5), async (req, res)
   } catch (error: any) {
     console.error('Upload attachments error:', error)
 
-    // Handle multer errors
     if (error.message?.includes('File too large')) {
       return res.status(400).json({ error: 'File size exceeds 5MB limit' })
     }

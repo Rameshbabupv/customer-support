@@ -12,10 +12,10 @@ teamRoutes.use(authenticate)
 // Get user's teams
 teamRoutes.get('/', async (req, res) => {
   try {
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
 
     // Admin/Owner can see all teams in their tenant
-    if (isOwner || role === 'admin') {
+    if (isInternal || role === 'admin') {
       const results = await db.query.teams.findMany({
         where: eq(teams.tenantId, tenantId),
         orderBy: [desc(teams.createdAt)],
@@ -73,7 +73,7 @@ teamRoutes.get('/', async (req, res) => {
 teamRoutes.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
 
     const team = await db.query.teams.findFirst({
       where: eq(teams.id, parseInt(id)),
@@ -99,12 +99,12 @@ teamRoutes.get('/:id', async (req, res) => {
     }
 
     // Check access: must be same tenant
-    if (!isOwner && team.tenantId !== tenantId) {
+    if (!isInternal && team.tenantId !== tenantId) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
     // Regular users can only see teams they're members of
-    if (!isOwner && role !== 'admin') {
+    if (!isInternal && role !== 'admin') {
       const isMember = team.members.some(m => m.userId === userId)
       if (!isMember) {
         return res.status(403).json({ error: 'Forbidden' })
@@ -122,10 +122,10 @@ teamRoutes.get('/:id', async (req, res) => {
 teamRoutes.post('/', async (req, res) => {
   try {
     const { name, productId } = req.body
-    const { tenantId, isOwner, role } = req.user!
+    const { tenantId, isInternal, role } = req.user!
 
     // Only admin/owner can create teams
-    if (!isOwner && role !== 'admin') {
+    if (!isInternal && role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admin access required' })
     }
 
@@ -159,7 +159,7 @@ teamRoutes.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const { name, productId } = req.body
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
 
     const [team] = await db.select()
       .from(teams)
@@ -171,7 +171,7 @@ teamRoutes.patch('/:id', async (req, res) => {
     }
 
     // Check access
-    if (!isOwner && team.tenantId !== tenantId) {
+    if (!isInternal && team.tenantId !== tenantId) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
@@ -185,7 +185,7 @@ teamRoutes.patch('/:id', async (req, res) => {
       .limit(1)
 
     const isTeamLead = membership?.role === 'lead'
-    if (!isOwner && role !== 'admin' && !isTeamLead) {
+    if (!isInternal && role !== 'admin' && !isTeamLead) {
       return res.status(403).json({ error: 'Forbidden: Team lead access required' })
     }
 
@@ -229,7 +229,7 @@ teamRoutes.post('/:id/members', async (req, res) => {
   try {
     const { id } = req.params
     const { userId: newMemberId, role: memberRole = 'member' } = req.body
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
 
     if (!newMemberId) {
       return res.status(400).json({ error: 'User ID is required' })
@@ -245,7 +245,7 @@ teamRoutes.post('/:id/members', async (req, res) => {
     }
 
     // Check access
-    if (!isOwner && team.tenantId !== tenantId) {
+    if (!isInternal && team.tenantId !== tenantId) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
@@ -259,7 +259,7 @@ teamRoutes.post('/:id/members', async (req, res) => {
       .limit(1)
 
     const isTeamLead = membership?.role === 'lead'
-    if (!isOwner && role !== 'admin' && !isTeamLead) {
+    if (!isInternal && role !== 'admin' && !isTeamLead) {
       return res.status(403).json({ error: 'Forbidden: Team lead access required' })
     }
 
@@ -308,7 +308,7 @@ teamRoutes.post('/:id/members', async (req, res) => {
 teamRoutes.delete('/:id/members/:userId', async (req, res) => {
   try {
     const { id, userId: memberUserId } = req.params
-    const { userId, tenantId, isOwner, role } = req.user!
+    const { userId, tenantId, isInternal, role } = req.user!
 
     const [team] = await db.select()
       .from(teams)
@@ -320,7 +320,7 @@ teamRoutes.delete('/:id/members/:userId', async (req, res) => {
     }
 
     // Check access
-    if (!isOwner && team.tenantId !== tenantId) {
+    if (!isInternal && team.tenantId !== tenantId) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
@@ -337,7 +337,7 @@ teamRoutes.delete('/:id/members/:userId', async (req, res) => {
         .limit(1)
 
       const isTeamLead = membership?.role === 'lead'
-      if (!isOwner && role !== 'admin' && !isTeamLead) {
+      if (!isInternal && role !== 'admin' && !isTeamLead) {
         return res.status(403).json({ error: 'Forbidden: Team lead access required' })
       }
     }

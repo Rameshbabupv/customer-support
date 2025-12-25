@@ -2,8 +2,8 @@ import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { db } from '../db/index.js'
 import { users, userProducts } from '../db/schema.js'
-import { eq } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { eq, and } from 'drizzle-orm'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const userRoutes = Router()
 
@@ -12,12 +12,13 @@ const STANDARD_PASSWORD = 'systech@123'
 // All routes require authentication
 userRoutes.use(authenticate)
 
-// List users for a tenant (owner only)
-userRoutes.get('/tenant/:tenantId', requireOwner, async (req, res) => {
+// List users for a client (internal only)
+userRoutes.get('/client/:clientId', requireInternal, async (req, res) => {
   try {
-    const { tenantId } = req.params
+    const { clientId } = req.params
+    const { tenantId } = req.user!
 
-    const tenantUsers = await db.select({
+    const clientUsers = await db.select({
       id: users.id,
       email: users.email,
       name: users.name,
@@ -25,27 +26,59 @@ userRoutes.get('/tenant/:tenantId', requireOwner, async (req, res) => {
       isActive: users.isActive,
       createdAt: users.createdAt,
     }).from(users)
-      .where(eq(users.tenantId, parseInt(tenantId)))
+      .where(and(
+        eq(users.clientId, parseInt(clientId)),
+        eq(users.tenantId, tenantId)
+      ))
 
-    res.json(tenantUsers)
+    res.json(clientUsers)
   } catch (error) {
     console.error('List users error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
 
-// Create user with specific role (owner only)
-userRoutes.post('/', requireOwner, async (req, res) => {
+// List all internal users (internal only)
+userRoutes.get('/internal', requireInternal, async (req, res) => {
   try {
-    const { email, name, role, tenantId } = req.body
+    const { tenantId } = req.user!
 
-    if (!email || !name || !tenantId) {
-      return res.status(400).json({ error: 'email, name, and tenantId are required' })
+    const internalUsers = await db.select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      role: users.role,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+    }).from(users)
+      .where(and(
+        eq(users.tenantId, tenantId),
+        eq(users.clientId, null as any) // Internal users have no client
+      ))
+
+    res.json(internalUsers)
+  } catch (error) {
+    console.error('List internal users error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Create user with specific role (internal only)
+userRoutes.post('/', requireInternal, async (req, res) => {
+  try {
+    const { email, name, role, clientId } = req.body
+    const { tenantId } = req.user!
+
+    if (!email || !name) {
+      return res.status(400).json({ error: 'email and name are required' })
     }
 
     // Check if email exists in this tenant
     const existing = await db.select().from(users)
-      .where(eq(users.email, email))
+      .where(and(
+        eq(users.email, email),
+        eq(users.tenantId, tenantId)
+      ))
       .limit(1)
 
     if (existing.length > 0) {
@@ -59,6 +92,7 @@ userRoutes.post('/', requireOwner, async (req, res) => {
       name,
       role: role || 'user',
       tenantId,
+      clientId: clientId || null, // null = internal user
       passwordHash,
     }).returning()
 
@@ -68,6 +102,7 @@ userRoutes.post('/', requireOwner, async (req, res) => {
       name: user.name,
       role: user.role,
       tenantId: user.tenantId,
+      clientId: user.clientId,
     })
   } catch (error) {
     console.error('Create user error:', error)
@@ -75,11 +110,24 @@ userRoutes.post('/', requireOwner, async (req, res) => {
   }
 })
 
-// Update user (owner only)
-userRoutes.patch('/:id', requireOwner, async (req, res) => {
+// Update user (internal only)
+userRoutes.patch('/:id', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { name, role } = req.body
+    const { tenantId } = req.user!
+
+    // Verify user belongs to tenant
+    const [existing] = await db.select().from(users)
+      .where(and(
+        eq(users.id, parseInt(id)),
+        eq(users.tenantId, tenantId)
+      ))
+      .limit(1)
+
+    if (!existing) {
+      return res.status(404).json({ error: 'User not found' })
+    }
 
     const updateData: any = {}
     if (name) updateData.name = name
@@ -94,10 +142,6 @@ userRoutes.patch('/:id', requireOwner, async (req, res) => {
       .where(eq(users.id, parseInt(id)))
       .returning()
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
     res.json({
       id: user.id,
       email: user.email,
@@ -110,14 +154,18 @@ userRoutes.patch('/:id', requireOwner, async (req, res) => {
   }
 })
 
-// Toggle user active status (owner only)
-userRoutes.patch('/:id/toggle', requireOwner, async (req, res) => {
+// Toggle user active status (internal only)
+userRoutes.patch('/:id/toggle', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
+    const { tenantId } = req.user!
     const uid = parseInt(id)
 
-    // Get current status
-    const [current] = await db.select().from(users).where(eq(users.id, uid)).limit(1)
+    // Get current status (verify tenant)
+    const [current] = await db.select().from(users)
+      .where(and(eq(users.id, uid), eq(users.tenantId, tenantId)))
+      .limit(1)
+
     if (!current) {
       return res.status(404).json({ error: 'User not found' })
     }
@@ -146,7 +194,17 @@ userRoutes.patch('/:id/toggle', requireOwner, async (req, res) => {
 userRoutes.get('/:id/products', async (req, res) => {
   try {
     const { id } = req.params
+    const { tenantId } = req.user!
     const userId = parseInt(id)
+
+    // Verify user belongs to tenant
+    const [user] = await db.select().from(users)
+      .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
+      .limit(1)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
 
     const assigned = await db.query.userProducts.findMany({
       where: eq(userProducts.userId, userId),
@@ -163,12 +221,22 @@ userRoutes.get('/:id/products', async (req, res) => {
   }
 })
 
-// Update user's assigned products (owner only)
-userRoutes.put('/:id/products', requireOwner, async (req, res) => {
+// Update user's assigned products (internal only)
+userRoutes.put('/:id/products', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { productIds } = req.body
+    const { tenantId } = req.user!
     const userId = parseInt(id)
+
+    // Verify user belongs to tenant
+    const [user] = await db.select().from(users)
+      .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
+      .limit(1)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
 
     if (!Array.isArray(productIds)) {
       return res.status(400).json({ error: 'productIds must be an array' })

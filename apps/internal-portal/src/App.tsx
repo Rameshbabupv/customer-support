@@ -6,7 +6,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import SupportQueue from './pages/SupportQueue'
 import TicketDetail from './pages/TicketDetail'
-import Tenants from './pages/Tenants'
+import Clients from './pages/Clients'
 import Products from './pages/Products'
 import ProductDashboard from './pages/ProductDashboard'
 import MyTasks from './pages/MyTasks'
@@ -25,8 +25,8 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" />
   }
 
-  // Only owners can access internal portal
-  if (!user?.isOwner) {
+  // Only internal users can access internal portal
+  if (!user?.isInternal) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -59,7 +59,7 @@ export default function App() {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/tickets" element={<PrivateRoute><SupportQueue /></PrivateRoute>} />
         <Route path="/tickets/:id" element={<PrivateRoute><TicketDetail /></PrivateRoute>} />
-        <Route path="/tenants" element={<PrivateRoute><Tenants /></PrivateRoute>} />
+        <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
         <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
         <Route path="/products/:id/dashboard" element={<PrivateRoute><ProductDashboard /></PrivateRoute>} />
         <Route path="/my-tasks" element={<PrivateRoute><MyTasks /></PrivateRoute>} />

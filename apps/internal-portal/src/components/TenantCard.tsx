@@ -135,7 +135,7 @@ export default function TenantCard({ tenant }: TenantCardProps) {
         {/* Configure button */}
         <div className="mt-auto">
           <button
-            onClick={() => navigate('/tenants')}
+            onClick={() => navigate('/clients')}
             className="w-full flex items-center justify-center gap-2 rounded-lg border bg-transparent py-2 px-4 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
             style={{ borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}
           >

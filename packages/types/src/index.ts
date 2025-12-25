@@ -1,11 +1,20 @@
-// Tenant
+// Tenant (SaaS Owner Company)
 export interface Tenant {
   id: number
   name: string
-  subdomain?: string
-  isOwner: boolean
+  plan: 'free' | 'starter' | 'business' | 'enterprise'
+  isActive: boolean
+  createdAt: string
+}
+
+// Client (Customer of Tenant)
+export interface Client {
+  id: number
+  tenantId: number
+  name: string
   tier: 'enterprise' | 'business' | 'starter'
   gatekeeperEnabled: boolean
+  isActive: boolean
   createdAt: string
 }
 
@@ -16,7 +25,9 @@ export interface User {
   name: string
   role: UserRole
   tenantId: number
-  createdAt: string
+  clientId: number | null  // null = internal user
+  isInternal: boolean      // Convenience: clientId === null
+  createdAt?: string
 }
 
 export type UserRole =
@@ -28,6 +39,7 @@ export type UserRole =
   | 'support'
   | 'ceo'
   | 'admin'
+  | 'developer'
 
 // Ticket
 export interface Ticket {
@@ -44,6 +56,7 @@ export interface Ticket {
   assignedTo?: number
   integratorId?: number
   tenantId: number
+  clientId?: number  // Which client created the ticket
   createdAt: string
   updatedAt: string
 }
@@ -79,6 +92,7 @@ export interface AuthResponse {
 export interface JWTPayload {
   userId: number
   tenantId: number
-  isOwner: boolean
+  clientId: number | null
+  isInternal: boolean
   role: string
 }

@@ -224,7 +224,7 @@ export default function IdeaDetail() {
   }
 
   const isCreator = user?.userId === idea.createdBy
-  const isAdmin = user?.role === 'admin' || user?.isOwner
+  const isAdmin = user?.role === 'admin' || user?.isInternal
 
   // Group reactions by type
   const reactionCounts = idea.reactions.reduce((acc, r) => {

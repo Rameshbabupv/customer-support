@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { db } from '../db/index.js'
 import { devTasks, taskAssignments, supportTicketTasks, tickets } from '../db/schema.js'
 import { eq, desc, inArray } from 'drizzle-orm'
-import { authenticate, requireOwner } from '../middleware/auth.js'
+import { authenticate, requireInternal } from '../middleware/auth.js'
 
 export const taskRoutes = Router()
 
@@ -10,7 +10,7 @@ export const taskRoutes = Router()
 taskRoutes.use(authenticate)
 
 // Create task (owner only)
-taskRoutes.post('/', requireOwner, async (req, res) => {
+taskRoutes.post('/', requireInternal, async (req, res) => {
   try {
     const { featureId, title, description, type, priority, assignees } = req.body
 
@@ -70,7 +70,7 @@ taskRoutes.get('/my-tasks', async (req, res) => {
 })
 
 // Get tasks by product (for dashboard - owner only)
-taskRoutes.get('/by-product/:productId', requireOwner, async (req, res) => {
+taskRoutes.get('/by-product/:productId', requireInternal, async (req, res) => {
   try {
     const { productId } = req.params
 
@@ -91,7 +91,7 @@ taskRoutes.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const { title, description, status, priority, type } = req.body
-    const { userId, isOwner } = req.user!
+    const { userId, isInternal } = req.user!
 
     const [task] = await db.select().from(devTasks)
       .where(eq(devTasks.id, parseInt(id)))
@@ -102,7 +102,7 @@ taskRoutes.patch('/:id', async (req, res) => {
     }
 
     // Check access: owner or assigned developer
-    if (!isOwner) {
+    if (!isInternal) {
       const assignments = await db.select().from(taskAssignments)
         .where(eq(taskAssignments.taskId, parseInt(id)))
 
@@ -134,7 +134,7 @@ taskRoutes.patch('/:id', async (req, res) => {
 })
 
 // Assign developers to task (owner only)
-taskRoutes.post('/:id/assign', requireOwner, async (req, res) => {
+taskRoutes.post('/:id/assign', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { userIds } = req.body
@@ -171,7 +171,7 @@ taskRoutes.post('/:id/assign', requireOwner, async (req, res) => {
 })
 
 // Spawn task from support ticket (owner only)
-taskRoutes.post('/spawn-from-ticket/:ticketId', requireOwner, async (req, res) => {
+taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res) => {
   try {
     const { ticketId } = req.params
     const { featureId, title, description, type } = req.body
@@ -213,7 +213,7 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireOwner, async (req, res) =
 })
 
 // Assign task to sprint (owner only)
-taskRoutes.patch('/:id/sprint', requireOwner, async (req, res) => {
+taskRoutes.patch('/:id/sprint', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { sprintId } = req.body // null to move to backlog
@@ -239,7 +239,7 @@ taskRoutes.patch('/:id/sprint', requireOwner, async (req, res) => {
 })
 
 // Set story points (owner only)
-taskRoutes.patch('/:id/points', requireOwner, async (req, res) => {
+taskRoutes.patch('/:id/points', requireInternal, async (req, res) => {
   try {
     const { id } = req.params
     const { storyPoints } = req.body
