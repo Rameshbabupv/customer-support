@@ -125,6 +125,7 @@ export const features = sqliteTable('features', {
 export const devTasks = sqliteTable('dev_tasks', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   featureId: integer('feature_id').references(() => features.id).notNull(),
+  sprintId: integer('sprint_id'), // null = backlog, set = assigned to sprint
   title: text('title').notNull(),
   description: text('description'),
   type: text('type', {
@@ -134,6 +135,7 @@ export const devTasks = sqliteTable('dev_tasks', {
     enum: ['todo', 'in_progress', 'review', 'done']
   }).default('todo'),
   priority: integer('priority').default(3),
+  storyPoints: integer('story_points'), // Fibonacci: 1,2,3,5,8,13
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
   updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
 })
@@ -151,6 +153,45 @@ export const supportTicketTasks = sqliteTable('support_ticket_tasks', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   ticketId: integer('ticket_id').references(() => tickets.id).notNull(),
   taskId: integer('task_id').references(() => devTasks.id).notNull(),
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+})
+
+// ========================================
+// SPRINT PLANNING
+// ========================================
+
+// Sprint (2-week iteration)
+export const sprints = sqliteTable('sprints', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(), // e.g., "Jan-I-26", "Feb-II-26"
+  goal: text('goal'), // Sprint goal description
+  startDate: text('start_date').notNull(), // ISO date string
+  endDate: text('end_date').notNull(), // ISO date (2 weeks from start)
+  status: text('status', {
+    enum: ['planning', 'active', 'completed', 'cancelled']
+  }).default('planning'),
+  velocity: integer('velocity'), // Auto-calculated on completion (sum of completed story points)
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Sprint Retrospective
+export const sprintRetros = sqliteTable('sprint_retros', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  sprintId: integer('sprint_id').references(() => sprints.id).notNull(),
+  wentWell: text('went_well'), // What went well
+  improvements: text('improvements'), // What to improve
+  actionItems: text('action_items'), // Action items for next sprint
+  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+})
+
+// Sprint Capacity (per developer per sprint)
+export const sprintCapacity = sqliteTable('sprint_capacity', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  sprintId: integer('sprint_id').references(() => sprints.id).notNull(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  availablePoints: integer('available_points').default(20), // Story points capacity
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 })
 
@@ -374,4 +415,41 @@ export const ideaTicketsRelations = relations(ideaTickets, ({ one }) => ({
     fields: [ideaTickets.ticketId],
     references: [tickets.id],
   }),
+}))
+
+// Sprint Relations
+export const sprintsRelations = relations(sprints, ({ many, one }) => ({
+  tasks: many(devTasks),
+  capacities: many(sprintCapacity),
+  retro: one(sprintRetros),
+}))
+
+export const sprintRetrosRelations = relations(sprintRetros, ({ one }) => ({
+  sprint: one(sprints, {
+    fields: [sprintRetros.sprintId],
+    references: [sprints.id],
+  }),
+}))
+
+export const sprintCapacityRelations = relations(sprintCapacity, ({ one }) => ({
+  sprint: one(sprints, {
+    fields: [sprintCapacity.sprintId],
+    references: [sprints.id],
+  }),
+  user: one(users, {
+    fields: [sprintCapacity.userId],
+    references: [users.id],
+  }),
+}))
+
+export const devTasksRelations = relations(devTasks, ({ one, many }) => ({
+  feature: one(features, {
+    fields: [devTasks.featureId],
+    references: [features.id],
+  }),
+  sprint: one(sprints, {
+    fields: [devTasks.sprintId],
+    references: [sprints.id],
+  }),
+  assignments: many(taskAssignments),
 }))
