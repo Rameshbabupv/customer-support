@@ -7,6 +7,8 @@ import ThemeToggle from './ThemeToggle'
 const navItems = [
   { path: '/dashboard', emoji: '📊', icon: 'dashboard', label: 'Dashboard', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
   { path: '/my-tasks', emoji: '✅', icon: 'task_alt', label: 'My Tasks', roles: ['developer'] },
+  { path: '/sprints', emoji: '🏃', icon: 'sprint', label: 'Sprints', roles: ['admin', 'ceo', 'developer'] },
+  { path: '/backlog', emoji: '📋', icon: 'list', label: 'Backlog', roles: ['admin', 'ceo', 'developer'] },
   { path: '/tickets', emoji: '🎫', icon: 'confirmation_number', label: 'Tickets', roles: ['admin', 'support', 'integrator', 'ceo'] },
   { path: '/ideas', emoji: '💡', icon: 'lightbulb', label: 'Ideas', roles: ['admin', 'support', 'integrator', 'ceo', 'developer'] },
   { path: '/tenants', emoji: '🏢', icon: 'group', label: 'Tenants', roles: ['admin', 'support', 'integrator', 'ceo'] },
