@@ -13,6 +13,7 @@ import MyTasks from './pages/MyTasks'
 import Ideas from './pages/Ideas'
 import IdeaDetail from './pages/IdeaDetail'
 import Sprints from './pages/Sprints'
+import SprintBoard from './pages/SprintBoard'
 import DevUserSwitcher from './components/DevUserSwitcher'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/products/:id/dashboard" element={<PrivateRoute><ProductDashboard /></PrivateRoute>} />
         <Route path="/my-tasks" element={<PrivateRoute><MyTasks /></PrivateRoute>} />
         <Route path="/sprints" element={<PrivateRoute><Sprints /></PrivateRoute>} />
+        <Route path="/sprints/:id" element={<PrivateRoute><SprintBoard /></PrivateRoute>} />
         <Route path="/ideas" element={<PrivateRoute><Ideas /></PrivateRoute>} />
         <Route path="/ideas/:id" element={<PrivateRoute><IdeaDetail /></PrivateRoute>} />
       </Routes>
