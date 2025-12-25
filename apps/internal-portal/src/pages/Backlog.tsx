@@ -35,6 +35,10 @@ export default function Backlog() {
   const [loading, setLoading] = useState(true)
   const [editingPoints, setEditingPoints] = useState<number | null>(null)
   const [addingToSprint, setAddingToSprint] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterType, setFilterType] = useState<'all' | 'task' | 'bug'>('all')
+  const [filterPoints, setFilterPoints] = useState<'all' | 'estimated' | 'unestimated'>('all')
+  const [filterPriority, setFilterPriority] = useState<number | null>(null)
   const { token } = useAuthStore()
 
   const surfaceStyles = { backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }
@@ -112,8 +116,27 @@ export default function Backlog() {
     }
   }
 
-  // Group tasks by priority
-  const groupedTasks = tasks.reduce((acc, task) => {
+  // Filter tasks
+  const filteredTasks = tasks.filter((task) => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      const matchesTitle = task.title.toLowerCase().includes(query)
+      const matchesDesc = task.description?.toLowerCase().includes(query)
+      if (!matchesTitle && !matchesDesc) return false
+    }
+    // Type filter
+    if (filterType !== 'all' && task.type !== filterType) return false
+    // Points filter
+    if (filterPoints === 'estimated' && !task.storyPoints) return false
+    if (filterPoints === 'unestimated' && task.storyPoints) return false
+    // Priority filter
+    if (filterPriority !== null && task.priority !== filterPriority) return false
+    return true
+  })
+
+  // Group filtered tasks by priority
+  const groupedTasks = filteredTasks.reduce((acc, task) => {
     const priority = task.priority || 3
     if (!acc[priority]) acc[priority] = []
     acc[priority].push(task)
@@ -122,6 +145,14 @@ export default function Backlog() {
 
   const totalPoints = tasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0)
   const unestimatedCount = tasks.filter(t => !t.storyPoints).length
+  const hasActiveFilters = searchQuery || filterType !== 'all' || filterPoints !== 'all' || filterPriority !== null
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setFilterType('all')
+    setFilterPoints('all')
+    setFilterPriority(null)
+  }
 
   if (loading) {
     return (
@@ -143,22 +174,108 @@ export default function Backlog() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b flex items-center justify-between shrink-0" style={surfaceStyles}>
-          <div className="flex items-center gap-4">
-            <h2 className="text-lg font-bold" style={textPrimary}>Product Backlog</h2>
-            <div className="flex items-center gap-3">
-              <span className="text-sm px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                {tasks.length} items
-              </span>
-              <span className="text-sm px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-medium">
-                {totalPoints} pts
-              </span>
-              {unestimatedCount > 0 && (
-                <span className="text-sm px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">
-                  {unestimatedCount} unestimated
+        <header className="px-6 py-4 border-b shrink-0" style={surfaceStyles}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-bold" style={textPrimary}>Product Backlog</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-sm px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                  {filteredTasks.length}{hasActiveFilters ? `/${tasks.length}` : ''} items
                 </span>
-              )}
+                <span className="text-sm px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-medium">
+                  {totalPoints} pts
+                </span>
+                {unestimatedCount > 0 && (
+                  <span className="text-sm px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">
+                    {unestimatedCount} unestimated
+                  </span>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Search */}
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px]" style={textMuted}>search</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search tasks..."
+                className="pl-9 pr-3 py-1.5 rounded-lg border text-sm w-64"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-primary)',
+                  color: 'var(--text-primary)',
+                }}
+              />
+            </div>
+
+            {/* Type Filter */}
+            <div className="flex items-center rounded-lg border overflow-hidden" style={{ borderColor: 'var(--border-primary)' }}>
+              {(['all', 'task', 'bug'] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    filterType === type
+                      ? 'bg-primary text-white'
+                      : ''
+                  }`}
+                  style={filterType !== type ? { backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' } : {}}
+                >
+                  {type === 'all' ? 'All' : type === 'task' ? 'Tasks' : 'Bugs'}
+                </button>
+              ))}
+            </div>
+
+            {/* Points Filter */}
+            <div className="flex items-center rounded-lg border overflow-hidden" style={{ borderColor: 'var(--border-primary)' }}>
+              {(['all', 'estimated', 'unestimated'] as const).map((pts) => (
+                <button
+                  key={pts}
+                  onClick={() => setFilterPoints(pts)}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    filterPoints === pts
+                      ? 'bg-primary text-white'
+                      : ''
+                  }`}
+                  style={filterPoints !== pts ? { backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' } : {}}
+                >
+                  {pts === 'all' ? 'All Points' : pts === 'estimated' ? 'Estimated' : 'Unestimated'}
+                </button>
+              ))}
+            </div>
+
+            {/* Priority Filter */}
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setFilterPriority(filterPriority === p ? null : p)}
+                  className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
+                    filterPriority === p
+                      ? priorityConfig[p].className + ' ring-2 ring-primary'
+                      : priorityConfig[p].className + ' opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  P{p}
+                </button>
+              ))}
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[16px]">close</span>
+                Clear
+              </button>
+            )}
           </div>
         </header>
 
@@ -167,6 +284,12 @@ export default function Backlog() {
           {tasks.length === 0 ? (
             <div className="text-center py-12" style={textMuted}>
               Backlog is empty. All tasks are assigned to sprints.
+            </div>
+          ) : filteredTasks.length === 0 ? (
+            <div className="text-center py-12" style={textMuted}>
+              <span className="material-symbols-outlined text-4xl mb-2 block opacity-50">filter_list_off</span>
+              No tasks match your filters.
+              <button onClick={clearFilters} className="text-primary hover:underline ml-1">Clear filters</button>
             </div>
           ) : (
             <div className="space-y-6">

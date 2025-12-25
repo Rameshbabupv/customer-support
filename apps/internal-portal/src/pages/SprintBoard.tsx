@@ -61,6 +61,7 @@ export default function SprintBoard() {
   const [showBurndown, setShowBurndown] = useState(false)
   const [loading, setLoading] = useState(true)
   const [editingPoints, setEditingPoints] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const { token } = useAuthStore()
 
   const surfaceStyles = { backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }
@@ -140,7 +141,15 @@ export default function SprintBoard() {
     }
   }
 
-  const getColumnTasks = (status: string) => tasks.filter((t) => t.status === status)
+  // Filter tasks by search
+  const filteredTasks = searchQuery
+    ? tasks.filter((t) => {
+        const query = searchQuery.toLowerCase()
+        return t.title.toLowerCase().includes(query) || t.description?.toLowerCase().includes(query)
+      })
+    : tasks
+
+  const getColumnTasks = (status: string) => filteredTasks.filter((t) => t.status === status)
 
   const getColumnColor = (color: string) => {
     const colors: Record<string, string> = {
@@ -245,8 +254,36 @@ export default function SprintBoard() {
               </div>
             </div>
 
-            {/* Stats */}
+            {/* Search and Stats */}
             <div className="flex items-center gap-6">
+              {/* Search */}
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px]" style={textMuted}>search</span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search tasks..."
+                  className="pl-9 pr-3 py-1.5 rounded-lg border text-sm w-48"
+                  style={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-primary)',
+                    color: 'var(--text-primary)',
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[16px] hover:text-red-500"
+                    style={textMuted}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="h-10 w-px" style={{ backgroundColor: 'var(--border-primary)' }}></div>
+
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">{completedPoints}</div>
                 <div className="text-xs" style={textSecondary}>Completed</div>
@@ -261,7 +298,7 @@ export default function SprintBoard() {
               </div>
               <div className="h-10 w-px" style={{ backgroundColor: 'var(--border-primary)' }}></div>
               <div className="text-center">
-                <div className="text-2xl font-bold" style={textPrimary}>{tasks.length}</div>
+                <div className="text-2xl font-bold" style={textPrimary}>{filteredTasks.length}{searchQuery ? `/${tasks.length}` : ''}</div>
                 <div className="text-xs" style={textSecondary}>Tasks</div>
               </div>
             </div>
