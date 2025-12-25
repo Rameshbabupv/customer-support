@@ -77,6 +77,26 @@ Environment:
 - Prod: Managed PostgreSQL (Supabase/Neon/RDS)`,
       clientPriority: 1,
     },
+    {
+      beadsId: 'customer-support-bxx',
+      title: 'AWS Access & Auto Deploy Setup with Karti',
+      description: `Work with Karti to:
+- Get AWS access credentials/IAM setup
+- Configure auto-deploy pipeline for Tasklets
+- CI/CD setup (GitHub Actions → AWS)
+- Environment configuration (staging/prod)`,
+      clientPriority: 2,
+    },
+    {
+      beadsId: 'customer-support-vn0',
+      title: "Deploy Tasklets on Venkatesh's Machine",
+      description: `Local deployment of Tasklets app on Venkatesh's machine:
+- Environment setup (Node, pnpm, dependencies)
+- Database initialization
+- App configuration
+- Verify all features working`,
+      clientPriority: 2,
+    },
   ]
 
   for (const ticket of beadsTickets) {
