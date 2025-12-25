@@ -55,7 +55,7 @@ async function seed() {
     { name: 'EXIM', description: 'Export & Import Management' },
 
     // Internal Tools
-    { name: 'Tracklet', description: 'Unified platform for client issues, internal requests, and development progress' },
+    { name: 'Tasklets', description: 'Unified platform for client issues, internal requests, and development progress' },
   ]
 
   const createdProducts: { id: number; name: string }[] = []
