@@ -136,7 +136,11 @@ authRoutes.get('/me', async (req, res) => {
   try {
     const jwt = await import('jsonwebtoken')
     const token = authHeader.split(' ')[1]
-    const payload = jwt.default.verify(token, process.env.JWT_SECRET || 'dev-secret-change-in-prod') as any
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      return res.status(500).json({ error: 'Server configuration error' })
+    }
+    const payload = jwt.default.verify(token, jwtSecret) as any
 
     const [user] = await db.select().from(users)
       .where(eq(users.id, payload.userId))
