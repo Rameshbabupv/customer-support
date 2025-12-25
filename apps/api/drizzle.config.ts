@@ -1,10 +1,10 @@
-import type { Config } from 'drizzle-kit'
+import { defineConfig } from 'drizzle-kit'
 
-export default {
+export default defineConfig({
   schema: './src/db/schema.ts',
   out: './drizzle',
-  driver: 'libsql',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: 'file:./src/db/data.db'
-  }
-} satisfies Config
+    url: process.env.DATABASE_URL || 'postgres://tasklets:tasklets@localhost:5432/tasklets',
+  },
+})

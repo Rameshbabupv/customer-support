@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "productId": 6,
+    "title": "Lead Management & Pipeline Improvements",
+    "description": "Enhance lead tracking, scoring, and pipeline visualization",
+    "status": "in_progress",
+    "priority": 1,
+    "resolution": null,
+    "resolutionNote": null,
+    "closedAt": null,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "productId": 11,
+    "title": "Biometric Attendance Integration",
+    "description": "Integrate with multiple biometric devices and build attendance reports",
+    "status": "backlog",
+    "priority": 3,
+    "resolution": null,
+    "resolutionNote": null,
+    "closedAt": null,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 3,
+    "tenantId": 1,
+    "productId": 14,
+    "title": "Beads-Tracklet Integration",
+    "description": "Bidirectional sync between Tracklet tickets and beads issues",
+    "status": "backlog",
+    "priority": 1,
+    "resolution": null,
+    "resolutionNote": null,
+    "closedAt": null,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 4,
+    "tenantId": 1,
+    "productId": 14,
+    "title": "Internal Portal UI",
+    "description": "UI/UX improvements and bug fixes for internal portal",
+    "status": "backlog",
+    "priority": 3,
+    "resolution": null,
+    "resolutionNote": null,
+    "closedAt": null,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 5,
+    "tenantId": 1,
+    "productId": 14,
+    "title": "Ideas & Sparks",
+    "description": "Future feature ideas and sparks for exploration",
+    "status": "cancelled",
+    "priority": 4,
+    "resolution": "moved",
+    "resolutionNote": "Moved to Ideas page - Idea #1",
+    "closedAt": "2025-12-25T13:43:37.734Z",
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "2025-12-25T13:43:37.734Z"
+  }
+]

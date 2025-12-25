@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "userId": 1,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "userId": 2,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 3,
+    "tenantId": 1,
+    "userId": 2,
+    "productId": 7,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 4,
+    "tenantId": 1,
+    "userId": 3,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 5,
+    "tenantId": 1,
+    "userId": 4,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 6,
+    "tenantId": 1,
+    "userId": 5,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 7,
+    "tenantId": 1,
+    "userId": 5,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 8,
+    "tenantId": 1,
+    "userId": 6,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 9,
+    "tenantId": 1,
+    "userId": 7,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 10,
+    "tenantId": 1,
+    "userId": 7,
+    "productId": 7,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 11,
+    "tenantId": 1,
+    "userId": 8,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 12,
+    "tenantId": 1,
+    "userId": 9,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 13,
+    "tenantId": 1,
+    "userId": 9,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 14,
+    "tenantId": 1,
+    "userId": 10,
+    "productId": 12,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 15,
+    "tenantId": 1,
+    "userId": 11,
+    "productId": 9,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 16,
+    "tenantId": 1,
+    "userId": 12,
+    "productId": 10,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 17,
+    "tenantId": 1,
+    "userId": 13,
+    "productId": 9,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 18,
+    "tenantId": 1,
+    "userId": 13,
+    "productId": 10,
+    "createdAt": "CURRENT_TIMESTAMP"
+  }
+]

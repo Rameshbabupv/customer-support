@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { pgTable, text, integer, serial, boolean, timestamp } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // ========================================
@@ -13,26 +13,26 @@ import { relations } from 'drizzle-orm'
 // CORE: TENANTS (SaaS Customers / Owners)
 // ========================================
 
-export const tenants = sqliteTable('tenants', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const tenants = pgTable('tenants', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   plan: text('plan', { enum: ['free', 'starter', 'business', 'enterprise'] }).default('starter'),
-  isActive: integer('is_active', { mode: 'boolean' }).default(true),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
 // CLIENTS (Tenant's Customers)
 // ========================================
 
-export const clients = sqliteTable('clients', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const clients = pgTable('clients', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   name: text('name').notNull(),
   tier: text('tier', { enum: ['enterprise', 'business', 'starter'] }).default('starter'),
-  gatekeeperEnabled: integer('gatekeeper_enabled', { mode: 'boolean' }).default(false),
-  isActive: integer('is_active', { mode: 'boolean' }).default(true),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  gatekeeperEnabled: boolean('gatekeeper_enabled').default(false),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
@@ -41,8 +41,8 @@ export const clients = sqliteTable('clients', {
 // client_id = NULL → Internal user (tenant's team)
 // client_id = X → Client user
 
-export const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   clientId: integer('client_id').references(() => clients.id), // NULL = internal user
   email: text('email').notNull(),
@@ -51,46 +51,46 @@ export const users = sqliteTable('users', {
   role: text('role', {
     enum: ['user', 'gatekeeper', 'company_admin', 'approver', 'integrator', 'support', 'ceo', 'admin', 'developer']
   }).default('user'),
-  isActive: integer('is_active', { mode: 'boolean' }).default(true),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
 // PRODUCTS (Owned by Tenant)
 // ========================================
 
-export const products = sqliteTable('products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const products = pgTable('products', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   name: text('name').notNull(),
   description: text('description'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Client-Product assignment (what products client purchased)
-export const clientProducts = sqliteTable('client_products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const clientProducts = pgTable('client_products', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   clientId: integer('client_id').references(() => clients.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // User-Product assignment (which products user can access)
-export const userProducts = sqliteTable('user_products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const userProducts = pgTable('user_products', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
 // TICKETS (Client Support)
 // ========================================
 
-export const tickets = sqliteTable('tickets', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const tickets = pgTable('tickets', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   clientId: integer('client_id').references(() => clients.id).notNull(),
   title: text('title').notNull(),
@@ -107,30 +107,30 @@ export const tickets = sqliteTable('tickets', {
   assignedTo: integer('assigned_to').references(() => users.id), // Internal assignee
   integratorId: integer('integrator_id').references(() => users.id),
   sourceIdeaId: integer('source_idea_id'), // Will reference ideas.id
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Attachment
-export const attachments = sqliteTable('attachments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const attachments = pgTable('attachments', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ticketId: integer('ticket_id').references(() => tickets.id),
   fileUrl: text('file_url').notNull(),
   fileName: text('file_name').notNull(),
   fileSize: integer('file_size'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Ticket Comment
-export const ticketComments = sqliteTable('ticket_comments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ticketComments = pgTable('ticket_comments', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ticketId: integer('ticket_id').references(() => tickets.id),
   userId: integer('user_id').references(() => users.id),
   content: text('content').notNull(),
-  isInternal: integer('is_internal', { mode: 'boolean' }).default(false),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  isInternal: boolean('is_internal').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
@@ -138,8 +138,8 @@ export const ticketComments = sqliteTable('ticket_comments', {
 // ========================================
 
 // Epic (Internal development planning)
-export const epics = sqliteTable('epics', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const epics = pgTable('epics', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
   title: text('title').notNull(),
@@ -152,14 +152,14 @@ export const epics = sqliteTable('epics', {
     enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
   }),
   resolutionNote: text('resolution_note'),
-  closedAt: text('closed_at'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  closedAt: timestamp('closed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Feature (Part of an Epic)
-export const features = sqliteTable('features', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const features = pgTable('features', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   epicId: integer('epic_id').references(() => epics.id).notNull(),
   title: text('title').notNull(),
@@ -172,14 +172,14 @@ export const features = sqliteTable('features', {
     enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
   }),
   resolutionNote: text('resolution_note'),
-  closedAt: text('closed_at'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  closedAt: timestamp('closed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Dev Task (Task or Bug within a Feature)
-export const devTasks = sqliteTable('dev_tasks', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const devTasks = pgTable('dev_tasks', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   featureId: integer('feature_id').references(() => features.id).notNull(),
   sprintId: integer('sprint_id'), // null = backlog, set = assigned to sprint
@@ -197,27 +197,27 @@ export const devTasks = sqliteTable('dev_tasks', {
     enum: ['completed', 'duplicate', 'wont_do', 'moved', 'invalid', 'obsolete']
   }),
   resolutionNote: text('resolution_note'),
-  closedAt: text('closed_at'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  closedAt: timestamp('closed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Task Assignment (many-to-many: tasks ↔ developers)
-export const taskAssignments = sqliteTable('task_assignments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const taskAssignments = pgTable('task_assignments', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   taskId: integer('task_id').references(() => devTasks.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Support Ticket to Dev Task link (many-to-many)
-export const supportTicketTasks = sqliteTable('support_ticket_tasks', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const supportTicketTasks = pgTable('support_ticket_tasks', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ticketId: integer('ticket_id').references(() => tickets.id).notNull(),
   taskId: integer('task_id').references(() => devTasks.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
@@ -225,41 +225,41 @@ export const supportTicketTasks = sqliteTable('support_ticket_tasks', {
 // ========================================
 
 // Sprint (2-week iteration)
-export const sprints = sqliteTable('sprints', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const sprints = pgTable('sprints', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   name: text('name').notNull(), // e.g., "Jan-I-26", "Feb-II-26"
   goal: text('goal'), // Sprint goal description
-  startDate: text('start_date').notNull(), // ISO date string
-  endDate: text('end_date').notNull(), // ISO date (2 weeks from start)
+  startDate: timestamp('start_date').notNull(), // ISO date string
+  endDate: timestamp('end_date').notNull(), // ISO date (2 weeks from start)
   status: text('status', {
     enum: ['planning', 'active', 'completed', 'cancelled']
   }).default('planning'),
   velocity: integer('velocity'), // Auto-calculated on completion
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Sprint Retrospective
-export const sprintRetros = sqliteTable('sprint_retros', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const sprintRetros = pgTable('sprint_retros', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   sprintId: integer('sprint_id').references(() => sprints.id).notNull(),
   wentWell: text('went_well'),
   improvements: text('improvements'),
   actionItems: text('action_items'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Sprint Capacity (per developer per sprint)
-export const sprintCapacity = sqliteTable('sprint_capacity', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const sprintCapacity = pgTable('sprint_capacity', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   sprintId: integer('sprint_id').references(() => sprints.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
   availablePoints: integer('available_points').default(20),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================
@@ -267,28 +267,28 @@ export const sprintCapacity = sqliteTable('sprint_capacity', {
 // ========================================
 
 // Team (for idea visibility)
-export const teams = sqliteTable('teams', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const teams = pgTable('teams', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   name: text('name').notNull(),
   productId: integer('product_id').references(() => products.id),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Team Members (many-to-many: users ↔ teams)
-export const teamMembers = sqliteTable('team_members', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const teamMembers = pgTable('team_members', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   teamId: integer('team_id').references(() => teams.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
   role: text('role', { enum: ['member', 'lead'] }).default('member'),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Idea (SPARK core entity)
-export const ideas = sqliteTable('ideas', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ideas = pgTable('ideas', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   title: text('title').notNull(),
   description: text('description'),
@@ -300,52 +300,52 @@ export const ideas = sqliteTable('ideas', {
   }).default('private'),
   teamId: integer('team_id').references(() => teams.id),
   createdBy: integer('created_by').references(() => users.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
-  publishedAt: text('published_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  publishedAt: timestamp('published_at'),
   voteCount: integer('vote_count').default(0),
   commentCount: integer('comment_count').default(0),
 })
 
 // Idea Comments
-export const ideaComments = sqliteTable('idea_comments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ideaComments = pgTable('idea_comments', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ideaId: integer('idea_id').references(() => ideas.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
   comment: text('comment').notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
-  updatedAt: text('updated_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Idea Reactions
-export const ideaReactions = sqliteTable('idea_reactions', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ideaReactions = pgTable('idea_reactions', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ideaId: integer('idea_id').references(() => ideas.id).notNull(),
   userId: integer('user_id').references(() => users.id).notNull(),
   reaction: text('reaction', {
     enum: ['thumbs_up', 'heart', 'fire']
   }).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Idea-Product link
-export const ideaProducts = sqliteTable('idea_products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ideaProducts = pgTable('idea_products', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ideaId: integer('idea_id').references(() => ideas.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // Idea-Ticket link (lineage)
-export const ideaTickets = sqliteTable('idea_tickets', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const ideaTickets = pgTable('idea_tickets', {
+  id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   ideaId: integer('idea_id').references(() => ideas.id).notNull(),
   ticketId: integer('ticket_id').references(() => tickets.id).notNull(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ========================================

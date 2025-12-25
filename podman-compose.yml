@@ -6,10 +6,10 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    container_name: support_app
+    container_name: tasklets_app
     ports:
       - "3000:3000"   # client portal
-      - "3003:3003"   # internal portal
+      - "3001:3001"   # internal portal
       - "4000:4000"   # API
     env_file:
       - .env
@@ -18,29 +18,29 @@ services:
       - PORT=${PORT:-4000}
       - HOST=${HOST:-0.0.0.0}
       - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=${DB_HOST:-db}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME:-supportdb}
+      - DATABASE_URL=postgres://${DB_USER:-tasklets}:${DB_PASSWORD:-tasklets}@db:5432/${DB_NAME:-tasklets}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001}
     depends_on:
       - db
 
   db:
     image: docker.io/library/postgres:15
-    container_name: support_db
+    container_name: tasklets_db
     restart: always
-    env_file:
-      - .env
     environment:
-      POSTGRES_DB: ${DB_NAME:-supportdb}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-tasklets}
+      POSTGRES_USER: ${DB_USER:-tasklets}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tasklets}
     ports:
       - "5432:5432"
     volumes:
-      - support_pgdata:/var/lib/postgresql/data
+      - tasklets_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-tasklets}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  support_pgdata:
+  tasklets_pgdata:
 

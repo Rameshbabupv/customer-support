@@ -1,0 +1,100 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "name": "CRM (legacy)",
+    "description": "Customer Relationship Management - Marketing, lead generation, deal conversion",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "name": "SDMS (legacy)",
+    "description": "Supply & Distribution Management - Multi-location distributors",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 3,
+    "tenantId": 1,
+    "name": "MMS (legacy)",
+    "description": "Manufacturing Management System - Discrete manufacturing",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 4,
+    "tenantId": 1,
+    "name": "HRM (legacy)",
+    "description": "Human Resource Management - Recruitment to retirement",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 5,
+    "tenantId": 1,
+    "name": "Finance (legacy)",
+    "description": "Financial Management - Standalone and integrated finance module",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 6,
+    "tenantId": 1,
+    "name": "CRM Sales",
+    "description": "Customer Relationship Management v2 - Pre-sale customer engagement",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 7,
+    "tenantId": 1,
+    "name": "CRM Service",
+    "description": "Customer Relationship Management v2 - Post-sale customer support",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 8,
+    "tenantId": 1,
+    "name": "SDMS v2",
+    "description": "Supply & Distribution Management System v2",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 9,
+    "tenantId": 1,
+    "name": "MMS v2",
+    "description": "Manufacturing Management System v2",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 10,
+    "tenantId": 1,
+    "name": "TMS",
+    "description": "Textile Management System - spinning, processing, weaving, knitting, apparel",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 11,
+    "tenantId": 1,
+    "name": "HRM v2",
+    "description": "Human Resource Management v2",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 12,
+    "tenantId": 1,
+    "name": "Finance v2",
+    "description": "Financial Management v2",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 13,
+    "tenantId": 1,
+    "name": "EXIM",
+    "description": "Export & Import Management",
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 14,
+    "tenantId": 1,
+    "name": "Tasklets",
+    "description": "Unified platform for client issues, internal requests, and development progress",
+    "createdAt": "CURRENT_TIMESTAMP"
+  }
+]

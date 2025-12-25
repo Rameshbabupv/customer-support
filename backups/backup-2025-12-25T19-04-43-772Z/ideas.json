@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "title": "Tickets Dashboard with Charts/Metrics",
+    "description": "Create a central place to see all tickets with visual metrics.\n\nOptions:\n1. Chart.js for in-app charts\n2. External free analytics/metrics services\n\nShow: ticket trends, status distribution, response times, etc.\n\nBeads: customer-support-4av",
+    "status": "inbox",
+    "visibility": "public",
+    "teamId": null,
+    "createdBy": 1,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP",
+    "publishedAt": "2025-12-25T13:38:01.809Z",
+    "voteCount": 0,
+    "commentCount": 0
+  },
+  {
+    "id": 7,
+    "tenantId": 1,
+    "title": "Vantex Customer Onboarding Toolkit",
+    "description": "A collection of ideas to make customer onboarding quick and smooth for Vantex HRMS:\n\n## 1. Screenshot to Data Conversion\nAI/OCR-powered tool to extract data from screenshots for quick customer data entry. Upload screenshot → Extract fields → Review & import. Speeds up initial data migration.\n\n## 2. Hello World Deployment Stack\nPre-configured starter template for customer deployments. Stack: React frontend + Spring Boot backend + Keycloak auth + PostgreSQL. One-click deploy to verify infrastructure before full HRMS rollout.\n\n## 3. Network & System Performance Analyzer\nDiagnostic tool to analyze customer environment during onboarding. Check network latency, machine config, load capacity. Identify breakpoints and bottlenecks before go-live. Generate readiness report.\n\n## 4. Interactive Onboarding Checklist\nStep-by-step onboarding wizard for customers. Track progress, dependencies, blockers. Auto-validate each step. Notify team on completion/issues. Reduces manual coordination overhead.\n\n## 5. One-Click Environment Provisioning\nAutomated infrastructure setup for new customers. Select tier → Configure basics → Provision cloud resources → Deploy stack. Terraform/Pulumi based. Cuts setup time from days to hours.",
+    "status": "inbox",
+    "visibility": "public",
+    "teamId": null,
+    "createdBy": 1,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP",
+    "publishedAt": "2025-12-25T14:15:14.960Z",
+    "voteCount": 0,
+    "commentCount": 0
+  },
+  {
+    "id": 8,
+    "tenantId": 1,
+    "title": "Prompt Registry - Collaborative Prompt Management",
+    "description": "## Vision\nPrompts as first-class entities - managed, versioned, collaborative. Like Ideas/Sparks but for AI prompts.\n\n## Enhanced Model\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│  PROMPT: KISSES                                             │\n├─────────────────────────────────────────────────────────────┤\n│  owner: ramesh          │  created: 2025-12-20              │\n│  tags: [constitutional, writing]                            │\n│  load_first: true       │  visibility: public               │\n│  current_version: 3                                         │\n├─────────────────────────────────────────────────────────────┤\n│  VERSIONS:                                                  │\n│    v3 (latest) - Added \"Engaging\" to acronym                │\n│    v2 - Simplified examples                                 │\n│    v1 - Initial version                                     │\n├─────────────────────────────────────────────────────────────┤\n│  REACTIONS:                                                 │\n│    👍 12  👎 1  ❤️ 5  ⭐ 8 (favorites)                       │\n├─────────────────────────────────────────────────────────────┤\n│  COMMENTS:                                                  │\n│    @priya: \"Works great for API docs, added to my favorites\"│\n│    @dev1: \"Suggest adding Actionable - KISSESA?\"            │\n└─────────────────────────────────────────────────────────────┘\n```\n\n## User Flows\n\n```\nMy Prompts:        → Filter where owner = me\nMy Favorites:      → Filter where I starred (⭐)\nTeam Prompts:      → Filter by visibility/team\nBy Tag:            → Filter by tags (coding, testing, etc.)\nLoad Latest:       → Always fetches current_version\n```\n\n## Core Features\n\n### 1. Prompt Entity\n- id, title, description, content\n- owner, tags[], visibility (private/team/public)\n- load_first flag (auto-load on session start)\n- current_version pointer\n\n### 2. Versioning\n- Full version history (prompt_versions table)\n- Change notes per version\n- Always load latest version\n- Can rollback if needed\n\n### 3. Reactions & Favorites\n- 👍 thumbs_up, 👎 thumbs_down\n- ❤️ heart (love)\n- ⭐ star (favorite - for \"my favorites\" filter)\n\n### 4. Comments\n- Team shares experiences\n- Recommendations for improvements\n- Usage tips\n\n## Session Integration\n\n```\nSession Start (hook):\n  → Load all prompts where load_first=true\n  → Auto-inject into context\n\nDuring Session:\n  \"load KISSES\"       → Load specific prompt\n  \"load my prompts\"   → List my created prompts\n  \"load favorites\"    → List my starred prompts\n  \"load tag:testing\"  → Load by tag\n```\n\n## Data Model\n\n```\nprompts\n  id, title, description, content\n  owner_id, tenant_id, team_id\n  tags[], load_first, visibility\n  current_version, vote_count, comment_count\n\nprompt_versions\n  id, prompt_id, version_number\n  content, change_note\n  created_by, created_at\n\nprompt_comments (same pattern as idea_comments)\nprompt_reactions (same pattern as idea_reactions + star)\n```\n\n## Tag Categories\n- constitutional (KISSES, STAGE, core principles)\n- coding (code review, refactoring)\n- testing (test generation, coverage)\n- documenting (API docs, README)\n- architecture (design review, ADR)\n- onboarding (customer setup)\n\n## Example Prompts to Migrate\n- KISSES (from CLAUDE.md)\n- STAGE Protocol (from CLAUDE.md)\n- Agent Guidelines (from CLAUDE.md)",
+    "status": "inbox",
+    "visibility": "public",
+    "teamId": null,
+    "createdBy": 1,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "2025-12-25T14:49:32.392Z",
+    "publishedAt": "2025-12-25T14:41:35.840Z",
+    "voteCount": 0,
+    "commentCount": 0
+  },
+  {
+    "id": 9,
+    "tenantId": 1,
+    "title": "Insights - Process Learnings & Experience Capture",
+    "description": "## Vision\nCapture learnings, hiccups, and wisdom as they happen during processes. Institutional knowledge that grows with experience.\n\n## The Problem\n```\nDay 1:  \"We hit X issue during Vantex onboarding\"\nDay 30: \"What was that issue? How did we solve it?\"\nDay 60: New customer → Same issue → \"Didnt we solve this before?\"\n\nLearnings live in: Slack, emails, memory → LOST\n```\n\n## Enhanced Model\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│  INSIGHT: Database timeout during bulk import               │\n├─────────────────────────────────────────────────────────────┤\n│  process: Customer Onboarding                               │\n│  customer: Vantex          │  product: HRM v2               │\n│  type: hiccup              │  severity: high                │\n│  tags: [database, performance, import]                      │\n├─────────────────────────────────────────────────────────────┤\n│  WHAT HAPPENED:                                             │\n│    Bulk employee import timed out at 5000 records           │\n│                                                             │\n│  ROOT CAUSE:                                                │\n│    Single transaction, no batching                          │\n│                                                             │\n│  SOLUTION:                                                  │\n│    Batch imports in chunks of 500                           │\n│                                                             │\n│  NEXT TIME:                                                 │\n│    Pre-check record count, auto-batch if > 1000             │\n├─────────────────────────────────────────────────────────────┤\n│  REACTIONS:                                                 │\n│    👍 5  ⭐ 3 (team validated)                              │\n├─────────────────────────────────────────────────────────────┤\n│  COMMENTS:                                                  │\n│    @priya: \"Hit same issue with Acme, this fix worked\"      │\n│    @dev1: \"Added to pre-flight checklist\"                   │\n└─────────────────────────────────────────────────────────────┘\n```\n\n## User Flows\n\n```\nBy Process:      → Filter by process (onboarding, migration, deployment)\nBy Customer:     → Filter by customer (Vantex, Acme)\nBy Type:         → Filter by type (hiccup, lesson, tip, win)\nBy Product:      → Filter by product (HRM, CRM, etc.)\nMy Insights:     → Filter where contributor = me\nTeam Validated:  → Filter by high reactions/stars\n```\n\n## Insight Types\n\n| Type | Icon | Description |\n|------|------|-------------|\n| hiccup | ⚠️ | Problem encountered, with solution |\n| lesson | 📚 | Key learning from experience |\n| tip | 💡 | Helpful shortcut or best practice |\n| win | 🏆 | What went well, celebrate success |\n\n## Data Model\n\n```\ninsights\n  id, title, process, customer_id, product_id\n  type (hiccup/lesson/tip/win), severity\n  tags[], what_happened, root_cause, solution, next_time\n  contributor_id, tenant_id, team_id\n  vote_count, comment_count\n  created_at, updated_at\n\ninsight_comments (same pattern as idea_comments)\ninsight_reactions (same pattern as idea_reactions)\n```\n\n## Process Categories\n- Customer Onboarding\n- Data Migration\n- Production Deployment\n- Support Escalation\n- Feature Rollout\n- Infrastructure Setup\n\n## Session Integration\n\n```\nDuring Session:\n  \"log insight hiccup\"     → Quick capture form\n  \"show insights vantex\"   → All insights for customer\n  \"show insights onboarding\" → All onboarding learnings\n```\n\n## Future: Auto-Generated Runbooks\n- Aggregate insights by process\n- Generate checklist from hiccups\n- Living playbook that evolves with experience",
+    "status": "inbox",
+    "visibility": "public",
+    "teamId": null,
+    "createdBy": 1,
+    "createdAt": "CURRENT_TIMESTAMP",
+    "updatedAt": "CURRENT_TIMESTAMP",
+    "publishedAt": "2025-12-25T14:51:00.277Z",
+    "voteCount": 0,
+    "commentCount": 0
+  }
+]

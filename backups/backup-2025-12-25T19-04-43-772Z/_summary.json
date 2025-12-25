@@ -1,0 +1,103 @@
+{
+  "timestamp": "2025-12-25T19-04-43-772Z",
+  "dbPath": "/Users/rameshbabu/data/projects/systech/customer-support/apps/api/src/db/data.db",
+  "tables": [
+    {
+      "table": "tenants",
+      "count": 1
+    },
+    {
+      "table": "clients",
+      "count": 2
+    },
+    {
+      "table": "users",
+      "count": 13
+    },
+    {
+      "table": "products",
+      "count": 14
+    },
+    {
+      "table": "clientProducts",
+      "count": 8
+    },
+    {
+      "table": "userProducts",
+      "count": 18
+    },
+    {
+      "table": "tickets",
+      "count": 17
+    },
+    {
+      "table": "attachments",
+      "count": 0
+    },
+    {
+      "table": "ticketComments",
+      "count": 0
+    },
+    {
+      "table": "epics",
+      "count": 5
+    },
+    {
+      "table": "features",
+      "count": 9
+    },
+    {
+      "table": "devTasks",
+      "count": 20
+    },
+    {
+      "table": "taskAssignments",
+      "count": 8
+    },
+    {
+      "table": "supportTicketTasks",
+      "count": 0
+    },
+    {
+      "table": "sprints",
+      "count": 0
+    },
+    {
+      "table": "sprintRetros",
+      "count": 0
+    },
+    {
+      "table": "sprintCapacity",
+      "count": 0
+    },
+    {
+      "table": "teams",
+      "count": 0
+    },
+    {
+      "table": "teamMembers",
+      "count": 0
+    },
+    {
+      "table": "ideas",
+      "count": 4
+    },
+    {
+      "table": "ideaComments",
+      "count": 0
+    },
+    {
+      "table": "ideaReactions",
+      "count": 0
+    },
+    {
+      "table": "ideaProducts",
+      "count": 0
+    },
+    {
+      "table": "ideaTickets",
+      "count": 0
+    }
+  ],
+  "totalRows": 119
+}

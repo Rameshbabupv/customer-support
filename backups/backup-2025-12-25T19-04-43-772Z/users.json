@@ -1,0 +1,145 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "clientId": null,
+    "email": "ramesh@systech.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Ramesh",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "clientId": null,
+    "email": "mohan@systech.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Mohan",
+    "role": "support",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 3,
+    "tenantId": 1,
+    "clientId": null,
+    "email": "sakthi@systech.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Sakthi",
+    "role": "integrator",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 4,
+    "tenantId": 1,
+    "clientId": null,
+    "email": "jai@systech.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Jai",
+    "role": "developer",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 5,
+    "tenantId": 1,
+    "clientId": null,
+    "email": "priya@systech.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Priya",
+    "role": "developer",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 6,
+    "tenantId": 1,
+    "clientId": 1,
+    "email": "john@acme.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "John Doe",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 7,
+    "tenantId": 1,
+    "clientId": 1,
+    "email": "jane@acme.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Jane Smith",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 8,
+    "tenantId": 1,
+    "clientId": 1,
+    "email": "kumar@acme.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Kumar",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 9,
+    "tenantId": 1,
+    "clientId": 1,
+    "email": "latha@acme.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Latha",
+    "role": "company_admin",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 10,
+    "tenantId": 1,
+    "clientId": 1,
+    "email": "deepa@acme.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Deepa",
+    "role": "company_admin",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 11,
+    "tenantId": 1,
+    "clientId": 2,
+    "email": "alex@techcorp.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Alex",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 12,
+    "tenantId": 1,
+    "clientId": 2,
+    "email": "sara@techcorp.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Sara",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 13,
+    "tenantId": 1,
+    "clientId": 2,
+    "email": "mike@techcorp.com",
+    "passwordHash": "$2a$10$3ZYevgARq5933tDXIllVee6Nq0XA82CQQZVc41kgV1uhg0Yke2WZG",
+    "name": "Mike",
+    "role": "company_admin",
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  }
+]

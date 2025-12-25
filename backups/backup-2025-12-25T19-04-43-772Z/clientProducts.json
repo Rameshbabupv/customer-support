@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "clientId": 1,
+    "productId": 6,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "clientId": 1,
+    "productId": 7,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 3,
+    "tenantId": 1,
+    "clientId": 1,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 4,
+    "tenantId": 1,
+    "clientId": 1,
+    "productId": 12,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 5,
+    "tenantId": 1,
+    "clientId": 1,
+    "productId": 13,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 6,
+    "tenantId": 1,
+    "clientId": 2,
+    "productId": 9,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 7,
+    "tenantId": 1,
+    "clientId": 2,
+    "productId": 10,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 8,
+    "tenantId": 1,
+    "clientId": 2,
+    "productId": 11,
+    "createdAt": "CURRENT_TIMESTAMP"
+  }
+]

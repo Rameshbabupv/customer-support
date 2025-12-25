@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "tenantId": 1,
+    "name": "Acme Corp",
+    "tier": "enterprise",
+    "gatekeeperEnabled": false,
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  },
+  {
+    "id": 2,
+    "tenantId": 1,
+    "name": "TechCorp",
+    "tier": "business",
+    "gatekeeperEnabled": false,
+    "isActive": true,
+    "createdAt": "CURRENT_TIMESTAMP"
+  }
+]
