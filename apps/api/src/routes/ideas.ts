@@ -286,10 +286,11 @@ ideaRoutes.patch('/:id', async (req, res) => {
   }
 })
 
-// Delete idea (soft delete)
+// Delete idea (soft delete by default, hard delete with ?permanent=true)
 ideaRoutes.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params
+    const { permanent } = req.query
     const user = req.user!
 
     const [idea] = await db.select()
@@ -306,15 +307,22 @@ ideaRoutes.delete('/:id', async (req, res) => {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
-    // Soft delete by setting status to 'archived'
-    await db.update(ideas)
-      .set({
-        status: 'archived',
-        updatedAt: new Date().toISOString()
-      })
-      .where(eq(ideas.id, parseInt(id)))
-
-    res.json({ message: 'Idea archived successfully' })
+    if (permanent === 'true') {
+      // Hard delete - remove comments and reactions first
+      await db.delete(ideaComments).where(eq(ideaComments.ideaId, parseInt(id)))
+      await db.delete(ideaReactions).where(eq(ideaReactions.ideaId, parseInt(id)))
+      await db.delete(ideas).where(eq(ideas.id, parseInt(id)))
+      res.json({ message: `Idea ${id} permanently deleted` })
+    } else {
+      // Soft delete by setting status to 'archived'
+      await db.update(ideas)
+        .set({
+          status: 'archived',
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(ideas.id, parseInt(id)))
+      res.json({ message: 'Idea archived successfully' })
+    }
   } catch (error) {
     console.error('Delete idea error:', error)
     res.status(500).json({ error: 'Internal server error' })

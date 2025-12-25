@@ -87,6 +87,28 @@ featureRoutes.patch('/:id', requireInternal, async (req, res) => {
   }
 })
 
+// Delete feature (owner only)
+featureRoutes.delete('/:id', requireInternal, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [feature] = await db.select().from(features)
+      .where(eq(features.id, parseInt(id)))
+      .limit(1)
+
+    if (!feature) {
+      return res.status(404).json({ error: 'Feature not found' })
+    }
+
+    await db.delete(features).where(eq(features.id, parseInt(id)))
+
+    res.json({ success: true, message: `Feature ${id} deleted` })
+  } catch (error) {
+    console.error('Delete feature error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Close feature with resolution (owner only)
 featureRoutes.patch('/:id/close', requireInternal, async (req, res) => {
   try {

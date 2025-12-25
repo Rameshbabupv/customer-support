@@ -273,6 +273,31 @@ taskRoutes.patch('/:id/points', requireInternal, async (req, res) => {
   }
 })
 
+// Delete task (owner only)
+taskRoutes.delete('/:id', requireInternal, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [task] = await db.select().from(devTasks)
+      .where(eq(devTasks.id, parseInt(id)))
+      .limit(1)
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Delete task assignments first
+    await db.delete(taskAssignments).where(eq(taskAssignments.taskId, parseInt(id)))
+    // Delete the task
+    await db.delete(devTasks).where(eq(devTasks.id, parseInt(id)))
+
+    res.json({ success: true, message: `Task ${id} deleted` })
+  } catch (error) {
+    console.error('Delete task error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Close task with resolution
 taskRoutes.patch('/:id/close', async (req, res) => {
   try {

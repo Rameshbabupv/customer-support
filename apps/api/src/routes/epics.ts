@@ -87,6 +87,28 @@ epicRoutes.patch('/:id', requireInternal, async (req, res) => {
   }
 })
 
+// Delete epic (owner only)
+epicRoutes.delete('/:id', requireInternal, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [epic] = await db.select().from(epics)
+      .where(eq(epics.id, parseInt(id)))
+      .limit(1)
+
+    if (!epic) {
+      return res.status(404).json({ error: 'Epic not found' })
+    }
+
+    await db.delete(epics).where(eq(epics.id, parseInt(id)))
+
+    res.json({ success: true, message: `Epic ${id} deleted` })
+  } catch (error) {
+    console.error('Delete epic error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Close epic with resolution (owner only)
 epicRoutes.patch('/:id/close', requireInternal, async (req, res) => {
   try {
