@@ -31,6 +31,11 @@ interface Assignment {
   userId: number
 }
 
+interface BurndownData {
+  days: { date: string; day: number; ideal: number; actual: number | null }[]
+  totalPoints: number
+}
+
 const columns = [
   { key: 'todo', label: 'To Do', color: 'slate', icon: 'radio_button_unchecked' },
   { key: 'in_progress', label: 'In Progress', color: 'blue', icon: 'pending' },
@@ -52,6 +57,8 @@ export default function SprintBoard() {
   const [sprint, setSprint] = useState<Sprint | null>(null)
   const [tasks, setTasks] = useState<DevTask[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [burndownData, setBurndownData] = useState<BurndownData | null>(null)
+  const [showBurndown, setShowBurndown] = useState(false)
   const [loading, setLoading] = useState(true)
   const [editingPoints, setEditingPoints] = useState<number | null>(null)
   const { token } = useAuthStore()
@@ -59,6 +66,7 @@ export default function SprintBoard() {
   const surfaceStyles = { backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }
   const textPrimary = { color: 'var(--text-primary)' }
   const textSecondary = { color: 'var(--text-secondary)' }
+  const textMuted = { color: 'var(--text-muted)' }
 
   useEffect(() => {
     if (id) fetchSprintData()
@@ -66,13 +74,16 @@ export default function SprintBoard() {
 
   const fetchSprintData = async () => {
     try {
-      const res = await fetch(`/api/sprints/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
+      const [sprintRes, burndownRes] = await Promise.all([
+        fetch(`/api/sprints/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`/api/sprints/${id}/burndown`, { headers: { Authorization: `Bearer ${token}` } }),
+      ])
+      const data = await sprintRes.json()
+      const burndown = await burndownRes.json()
       setSprint(data.sprint)
       setTasks(data.tasks || [])
       setAssignments(data.assignments || [])
+      setBurndownData(burndown)
     } catch (err) {
       console.error('Failed to fetch sprint', err)
     } finally {
@@ -261,7 +272,109 @@ export default function SprintBoard() {
               <span className="font-medium">Goal:</span> {sprint.goal}
             </p>
           )}
+
+          {/* Burndown Toggle */}
+          {sprint.status === 'active' && burndownData && burndownData.days.length > 0 && (
+            <button
+              onClick={() => setShowBurndown(!showBurndown)}
+              className="mt-3 ml-12 flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {showBurndown ? 'expand_less' : 'trending_down'}
+              </span>
+              {showBurndown ? 'Hide Burndown' : 'Show Burndown Chart'}
+            </button>
+          )}
         </header>
+
+        {/* Burndown Chart (collapsible) */}
+        {showBurndown && burndownData && burndownData.days.length > 0 && (
+          <div className="px-6 py-4 border-b" style={surfaceStyles}>
+            <div className="rounded-xl border p-4" style={surfaceStyles}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold" style={textPrimary}>Sprint Burndown</h3>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-0.5 bg-slate-400"></div>
+                    <span className="text-xs" style={textSecondary}>Ideal</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-1 bg-primary rounded"></div>
+                    <span className="text-xs" style={textSecondary}>Actual</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <div className="relative h-40">
+                {/* Y-axis labels */}
+                <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs pr-2" style={textMuted}>
+                  <span>{burndownData.totalPoints}</span>
+                  <span>{Math.round(burndownData.totalPoints / 2)}</span>
+                  <span>0</span>
+                </div>
+
+                {/* Chart area */}
+                <div className="ml-8 h-full relative border-l border-b" style={{ borderColor: 'var(--border-primary)' }}>
+                  {/* Ideal line (dashed) */}
+                  <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                    <line
+                      x1="0"
+                      y1="0"
+                      x2="100%"
+                      y2="100%"
+                      stroke="var(--text-muted)"
+                      strokeWidth="2"
+                      strokeDasharray="5,5"
+                    />
+                  </svg>
+
+                  {/* Actual line */}
+                  <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="var(--primary)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      points={burndownData.days
+                        .filter(d => d.actual !== null)
+                        .map((d, i, arr) => {
+                          const x = (i / Math.max(burndownData.days.length - 1, 1)) * 100
+                          const y = 100 - ((d.actual || 0) / Math.max(burndownData.totalPoints, 1)) * 100
+                          return `${x}%,${y}%`
+                        })
+                        .join(' ')}
+                    />
+                  </svg>
+
+                  {/* Data points */}
+                  {burndownData.days
+                    .filter(d => d.actual !== null)
+                    .map((d, i, arr) => {
+                      const x = (i / Math.max(burndownData.days.length - 1, 1)) * 100
+                      const y = 100 - ((d.actual || 0) / Math.max(burndownData.totalPoints, 1)) * 100
+                      return (
+                        <div
+                          key={d.day}
+                          className="absolute w-2.5 h-2.5 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2 ring-2 ring-white dark:ring-slate-800"
+                          style={{ left: `${x}%`, top: `${y}%` }}
+                          title={`Day ${d.day}: ${d.actual} pts remaining`}
+                        />
+                      )
+                    })}
+                </div>
+              </div>
+
+              {/* X-axis labels */}
+              <div className="ml-8 mt-2 flex justify-between text-xs" style={textMuted}>
+                {burndownData.days.filter((_, i) => i === 0 || i === burndownData.days.length - 1 || i % 3 === 0).map((d) => (
+                  <span key={d.day}>Day {d.day}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Kanban Board */}
         <div className="flex-1 overflow-auto p-6">

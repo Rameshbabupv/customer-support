@@ -14,6 +14,11 @@ interface Sprint {
   createdAt: string
 }
 
+interface VelocityData {
+  sprints: { id: number; name: string; velocity: number }[]
+  average: number
+}
+
 // Helper: Generate sprint name from date
 function generateSprintName(startDate: Date): string {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -32,6 +37,7 @@ function calculateEndDate(startDate: Date): string {
 
 export default function Sprints() {
   const [sprints, setSprints] = useState<Sprint[]>([])
+  const [velocityData, setVelocityData] = useState<VelocityData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -62,11 +68,14 @@ export default function Sprints() {
 
   const fetchSprints = async () => {
     try {
-      const res = await fetch('/api/sprints', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      setSprints(data.sprints || [])
+      const [sprintsRes, velocityRes] = await Promise.all([
+        fetch('/api/sprints', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/sprints/metrics/velocity', { headers: { Authorization: `Bearer ${token}` } }),
+      ])
+      const sprintsData = await sprintsRes.json()
+      const velocityDataRes = await velocityRes.json()
+      setSprints(sprintsData.sprints || [])
+      setVelocityData(velocityDataRes)
     } catch (err) {
       console.error('Failed to fetch sprints', err)
     } finally {
@@ -372,6 +381,53 @@ export default function Sprints() {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Velocity Chart */}
+              {velocityData && velocityData.sprints.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={textMuted}>
+                    Velocity Trend
+                  </h3>
+                  <div className="rounded-xl border p-6" style={surfaceStyles}>
+                    <div className="flex items-end justify-between gap-4 h-48">
+                      {velocityData.sprints.map((sprint) => {
+                        const maxVelocity = Math.max(...velocityData.sprints.map(s => s.velocity), 1)
+                        const heightPercent = (sprint.velocity / maxVelocity) * 100
+                        const isAboveAvg = sprint.velocity >= velocityData.average
+                        return (
+                          <div key={sprint.id} className="flex-1 flex flex-col items-center gap-2">
+                            <span className="text-sm font-semibold" style={textPrimary}>
+                              {sprint.velocity}
+                            </span>
+                            <div
+                              className={`w-full rounded-t-lg transition-all ${
+                                isAboveAvg
+                                  ? 'bg-gradient-to-t from-green-500 to-emerald-400'
+                                  : 'bg-gradient-to-t from-blue-500 to-blue-400'
+                              }`}
+                              style={{ height: `${heightPercent}%`, minHeight: '8px' }}
+                            />
+                            <span className="text-xs" style={textMuted}>{sprint.name}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="mt-4 pt-4 border-t flex items-center justify-center gap-6" style={{ borderColor: 'var(--border-primary)' }}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded bg-gradient-to-t from-green-500 to-emerald-400" />
+                        <span className="text-xs" style={textSecondary}>Above Average</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded bg-gradient-to-t from-blue-500 to-blue-400" />
+                        <span className="text-xs" style={textSecondary}>Below Average</span>
+                      </div>
+                      <div className="text-xs font-semibold" style={textPrimary}>
+                        Avg: {velocityData.average.toFixed(1)} pts/sprint
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
