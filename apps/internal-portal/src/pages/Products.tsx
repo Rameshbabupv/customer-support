@@ -23,6 +23,11 @@ export default function Products() {
   const [description, setDescription] = useState('')
   const [error, setError] = useState('')
 
+  const surfaceStyles = { backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }
+  const textPrimary = { color: 'var(--text-primary)' }
+  const textSecondary = { color: 'var(--text-secondary)' }
+  const textMuted = { color: 'var(--text-muted)' }
+
   useEffect(() => {
     fetchProducts()
   }, [])
@@ -110,13 +115,16 @@ export default function Products() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-background-light">
+    <div className="h-screen flex overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <Sidebar />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
-          <h2 className="text-lg font-bold text-slate-900">Products</h2>
+        <header
+          className="h-16 px-6 border-b flex items-center justify-between shrink-0"
+          style={surfaceStyles}
+        >
+          <h2 className="text-lg font-bold" style={textPrimary}>Products</h2>
           <button
             onClick={openAddModal}
             className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors"
@@ -129,13 +137,14 @@ export default function Products() {
         {/* Grid */}
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
+            <div className="flex items-center justify-center h-full" style={textSecondary}>Loading...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg hover:border-slate-300 transition-all group"
+                  className="rounded-xl border p-5 hover:shadow-lg hover:border-primary/30 transition-all group"
+                  style={surfaceStyles}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-primary">
@@ -143,13 +152,14 @@ export default function Products() {
                     </div>
                     <button
                       onClick={() => openEditModal(product)}
-                      className="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={textMuted}
                     >
                       <span className="material-symbols-outlined text-[20px]">edit</span>
                     </button>
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-1">{product.name}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-3">
+                  <h3 className="font-semibold mb-1" style={textPrimary}>{product.name}</h3>
+                  <p className="text-sm line-clamp-2 mb-3" style={textSecondary}>
                     {product.description || 'No description'}
                   </p>
                   <Link
@@ -163,7 +173,7 @@ export default function Products() {
               ))}
 
               {products.length === 0 && (
-                <div className="col-span-full text-center text-slate-400 py-12">
+                <div className="col-span-full text-center py-12" style={textMuted}>
                   No products found. Click "Add Product" to create one.
                 </div>
               )}
@@ -175,19 +185,26 @@ export default function Products() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
-            <div className="p-6 border-b border-slate-200">
-              <h3 className="text-lg font-bold text-slate-900">
+          <div className="rounded-xl shadow-xl w-full max-w-md mx-4" style={surfaceStyles}>
+            <div className="p-6 border-b" style={surfaceStyles}>
+              <h3 className="text-lg font-bold" style={textPrimary}>
                 {editingProduct ? 'Edit Product' : 'Add New Product'}
               </h3>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm mt-1" style={textSecondary}>
                 {editingProduct ? 'Update product details' : 'Create a new product offering'}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                <div
+                  className="p-3 border rounded-lg text-sm"
+                  style={{
+                    backgroundColor: 'var(--error-bg)',
+                    borderColor: 'var(--error-text)',
+                    color: 'var(--error-text)',
+                  }}
+                >
                   {error}
                 </div>
               )}
@@ -200,29 +217,44 @@ export default function Products() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                  className="input-field text-sm py-2"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border-primary)',
+                  }}
                   placeholder="e.g., HRM, Payroll, Attendance"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-600 mb-1">Description</label>
+                <label className="block text-sm mb-1" style={textSecondary}>Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 resize-none"
+                  className="input-field text-sm py-2 resize-none"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border-primary)',
+                  }}
                   rows={3}
                   placeholder="Brief description of the product"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t" style={surfaceStyles}>
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); resetForm() }}
-                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-primary)',
+                  }}
                 >
                   Cancel
                 </button>

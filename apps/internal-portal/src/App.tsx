@@ -24,7 +24,10 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   // Only owners can access internal portal
   if (!user?.isOwner) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background-light">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: 'var(--bg-secondary)' }}
+      >
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
           <p className="text-slate-600 mt-2">This portal is for internal team only.</p>

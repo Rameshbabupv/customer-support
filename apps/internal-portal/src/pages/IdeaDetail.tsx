@@ -185,7 +185,7 @@ export default function IdeaDetail() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-background-light">
+      <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <Toaster position="top-right" richColors />
         <Sidebar />
         <main className="flex-1 flex items-center justify-center">
@@ -204,7 +204,7 @@ export default function IdeaDetail() {
 
   if (!idea) {
     return (
-      <div className="flex h-screen bg-background-light">
+      <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <Toaster position="top-right" richColors />
         <Sidebar />
         <main className="flex-1 flex items-center justify-center">
@@ -237,7 +237,10 @@ export default function IdeaDetail() {
     .map(r => r.reaction)
 
   return (
-    <div className="flex h-screen bg-background-light overflow-hidden">
+    <div
+      className="flex h-screen overflow-hidden"
+      style={{ backgroundColor: 'var(--bg-secondary)' }}
+    >
       <Toaster position="top-right" richColors />
       <Sidebar />
 

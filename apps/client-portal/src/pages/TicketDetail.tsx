@@ -62,7 +62,10 @@ export default function TicketDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background-light flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: 'var(--bg-secondary)' }}
+      >
         <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
       </div>
     )
@@ -70,14 +73,17 @@ export default function TicketDetail() {
 
   if (!ticket) {
     return (
-      <div className="min-h-screen bg-background-light flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: 'var(--bg-secondary)' }}
+      >
         <p style={{ color: 'var(--text-secondary)' }}>Ticket not found</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background-light">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--bg-card)', borderBottomWidth: '1px', borderBottomColor: 'var(--border-primary)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

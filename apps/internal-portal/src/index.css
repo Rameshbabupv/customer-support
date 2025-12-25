@@ -86,6 +86,23 @@ body {
 }
 
 /* ========================================
+   Dark Mode Utility Overrides
+   ======================================== */
+.dark .bg-background-light { background-color: var(--bg-secondary); }
+.dark .bg-white { background-color: var(--bg-card); }
+.dark .bg-slate-50,
+.dark .bg-slate-100 { background-color: var(--bg-tertiary); }
+.dark .text-slate-900,
+.dark .text-slate-800 { color: var(--text-primary); }
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-500 { color: var(--text-secondary); }
+.dark .text-slate-400 { color: var(--text-muted); }
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300 { border-color: var(--border-primary); }
+
+/* ========================================
    Component Classes (using CSS Variables)
    ======================================== */
 
