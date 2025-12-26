@@ -1,12 +1,12 @@
 {
   "version": "5",
-  "dialect": "sqlite",
+  "dialect": "pg",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1766629038736,
-      "tag": "0000_whole_energizer",
+      "when": 1766757985865,
+      "tag": "0000_fine_misty_knight",
       "breakpoints": true
     }
   ]

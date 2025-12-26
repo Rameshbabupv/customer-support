@@ -32,7 +32,8 @@ taskRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(404).json({ error: 'Epic not found' })
     }
 
-    const issueKey = await generateIssueKey(epic.productId)
+    const taskType = type || 'task'
+    const issueKey = await generateIssueKey(epic.productId, taskType === 'bug' ? 'B' : 'T')
 
     const [task] = await db.insert(devTasks).values({
       tenantId,
@@ -40,7 +41,7 @@ taskRoutes.post('/', requireInternal, async (req, res) => {
       issueKey,
       title,
       description,
-      type: type || 'task',
+      type: taskType,
       priority: priority || 3,
       status: 'todo',
     }).returning()
@@ -221,7 +222,8 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res
       return res.status(404).json({ error: 'Epic not found' })
     }
 
-    const issueKey = await generateIssueKey(epic.productId)
+    const taskType = type || 'bug'
+    const issueKey = await generateIssueKey(epic.productId, taskType === 'bug' ? 'B' : 'T')
 
     // Create dev task
     const [task] = await db.insert(devTasks).values({
@@ -230,7 +232,7 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res
       issueKey,
       title: title || `Bug from ticket: ${ticket.title}`,
       description: description || ticket.description || '',
-      type: type || 'bug',
+      type: taskType,
       status: 'todo',
       priority: 3,
     }).returning()

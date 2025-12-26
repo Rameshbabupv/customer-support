@@ -27,7 +27,7 @@ featureRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(404).json({ error: 'Epic not found' })
     }
 
-    const issueKey = await generateIssueKey(epic.productId)
+    const issueKey = await generateIssueKey(epic.productId, 'F')
 
     const [feature] = await db.insert(features).values({
       tenantId,

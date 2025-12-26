@@ -1,4 +1,4 @@
-import { pgTable, text, integer, serial, boolean, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, serial, boolean, timestamp, unique } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // ========================================
@@ -65,9 +65,22 @@ export const products = pgTable('products', {
   name: text('name').notNull(),
   code: text('code').notNull(), // e.g., 'TSKLTS', 'CSUP' - used for issue keys
   description: text('description'),
-  nextIssueNum: integer('next_issue_num').default(1), // Auto-increment for issue keys
+  nextIssueNum: integer('next_issue_num').default(1), // Legacy: shared sequence (deprecated)
   createdAt: timestamp('created_at').defaultNow(),
 })
+
+// Per-type sequence counters for issue keys (E001, F001, T001, B001)
+export const productSequences = pgTable('product_sequences', {
+  id: serial('id').primaryKey(),
+  productId: integer('product_id').references(() => products.id).notNull(),
+  issueType: text('issue_type', {
+    enum: ['E', 'F', 'T', 'B', 'S', 'N'] // Epic, Feature, Task, Bug, Spike, Note
+  }).notNull(),
+  nextNum: integer('next_num').default(1).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  uniqueProductType: unique().on(table.productId, table.issueType),
+}))
 
 // Client-Product assignment (what products client purchased)
 export const clientProducts = pgTable('client_products', {

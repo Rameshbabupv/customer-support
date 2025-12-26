@@ -20,7 +20,7 @@ epicRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(400).json({ error: 'productId and title are required' })
     }
 
-    const issueKey = await generateIssueKey(productId)
+    const issueKey = await generateIssueKey(productId, 'E')
 
     const [epic] = await db.insert(epics).values({
       tenantId,
