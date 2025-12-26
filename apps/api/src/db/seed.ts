@@ -38,24 +38,24 @@ async function seed() {
 
   const productList = [
     // Legacy Products
-    { name: 'CRM (legacy)', description: 'Customer Relationship Management - Marketing, lead generation, deal conversion' },
-    { name: 'SDMS (legacy)', description: 'Supply & Distribution Management - Multi-location distributors' },
-    { name: 'MMS (legacy)', description: 'Manufacturing Management System - Discrete manufacturing' },
-    { name: 'HRM (legacy)', description: 'Human Resource Management - Recruitment to retirement' },
-    { name: 'Finance (legacy)', description: 'Financial Management - Standalone and integrated finance module' },
+    { name: 'CRM (legacy)', code: 'CRML', description: 'Customer Relationship Management - Marketing, lead generation, deal conversion' },
+    { name: 'SDMS (legacy)', code: 'SDMSL', description: 'Supply & Distribution Management - Multi-location distributors' },
+    { name: 'MMS (legacy)', code: 'MMSL', description: 'Manufacturing Management System - Discrete manufacturing' },
+    { name: 'HRM (legacy)', code: 'HRML', description: 'Human Resource Management - Recruitment to retirement' },
+    { name: 'Finance (legacy)', code: 'FINL', description: 'Financial Management - Standalone and integrated finance module' },
 
     // New/v2 Products
-    { name: 'CRM Sales', description: 'Customer Relationship Management v2 - Pre-sale customer engagement' },
-    { name: 'CRM Service', description: 'Customer Relationship Management v2 - Post-sale customer support' },
-    { name: 'SDMS v2', description: 'Supply & Distribution Management System v2' },
-    { name: 'MMS v2', description: 'Manufacturing Management System v2' },
-    { name: 'TMS', description: 'Textile Management System - spinning, processing, weaving, knitting, apparel' },
-    { name: 'HRM v2', description: 'Human Resource Management v2' },
-    { name: 'Finance v2', description: 'Financial Management v2' },
-    { name: 'EXIM', description: 'Export & Import Management' },
+    { name: 'CRM Sales', code: 'CRMS', description: 'Customer Relationship Management v2 - Pre-sale customer engagement' },
+    { name: 'CRM Service', code: 'CRMSV', description: 'Customer Relationship Management v2 - Post-sale customer support' },
+    { name: 'SDMS v2', code: 'SDMS', description: 'Supply & Distribution Management System v2' },
+    { name: 'MMS v2', code: 'MMS', description: 'Manufacturing Management System v2' },
+    { name: 'TMS', code: 'TMS', description: 'Textile Management System - spinning, processing, weaving, knitting, apparel' },
+    { name: 'HRM v2', code: 'HRM', description: 'Human Resource Management v2' },
+    { name: 'Finance v2', code: 'FIN', description: 'Financial Management v2' },
+    { name: 'EXIM', code: 'EXIM', description: 'Export & Import Management' },
 
     // Internal Tools
-    { name: 'Tasklets', description: 'Unified platform for client issues, internal requests, and development progress' },
+    { name: 'Tasklets', code: 'TSKLTS', description: 'Unified platform for client issues, internal requests, and development progress' },
   ]
 
   const createdProducts: { id: number; name: string }[] = []
@@ -63,6 +63,7 @@ async function seed() {
     const [prod] = await db.insert(products).values({
       tenantId: sysTechTenant.id,
       name: p.name,
+      code: p.code,
       description: p.description,
     }).returning()
     createdProducts.push({ id: prod.id, name: prod.name })

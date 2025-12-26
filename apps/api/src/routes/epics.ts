@@ -3,6 +3,7 @@ import { db } from '../db/index.js'
 import { epics } from '../db/schema.js'
 import { eq, desc } from 'drizzle-orm'
 import { authenticate, requireInternal } from '../middleware/auth.js'
+import { generateIssueKey } from '../utils/issue-key.js'
 
 export const epicRoutes = Router()
 
@@ -19,9 +20,12 @@ epicRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(400).json({ error: 'productId and title are required' })
     }
 
+    const issueKey = await generateIssueKey(productId)
+
     const [epic] = await db.insert(epics).values({
       tenantId,
       productId,
+      issueKey,
       title,
       description,
       priority: priority || 3,

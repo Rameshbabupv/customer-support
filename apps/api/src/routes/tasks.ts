@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import { db } from '../db/index.js'
-import { devTasks, taskAssignments, supportTicketTasks, tickets } from '../db/schema.js'
+import { devTasks, taskAssignments, supportTicketTasks, tickets, features, epics } from '../db/schema.js'
 import { eq, desc, inArray } from 'drizzle-orm'
 import { authenticate, requireInternal } from '../middleware/auth.js'
+import { generateIssueKey } from '../utils/issue-key.js'
 
 export const taskRoutes = Router()
 
@@ -19,9 +20,24 @@ taskRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(400).json({ error: 'featureId and title are required' })
     }
 
+    // Get productId via feature -> epic for issueKey generation
+    const [feature] = await db.select({ epicId: features.epicId })
+      .from(features).where(eq(features.id, featureId)).limit(1)
+    if (!feature) {
+      return res.status(404).json({ error: 'Feature not found' })
+    }
+    const [epic] = await db.select({ productId: epics.productId })
+      .from(epics).where(eq(epics.id, feature.epicId)).limit(1)
+    if (!epic) {
+      return res.status(404).json({ error: 'Epic not found' })
+    }
+
+    const issueKey = await generateIssueKey(epic.productId)
+
     const [task] = await db.insert(devTasks).values({
       tenantId,
       featureId,
+      issueKey,
       title,
       description,
       type: type || 'task',
@@ -176,6 +192,7 @@ taskRoutes.post('/:id/assign', requireInternal, async (req, res) => {
 // Spawn task from support ticket (owner only)
 taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res) => {
   try {
+    const { tenantId } = req.user!
     const { ticketId } = req.params
     const { featureId, title, description, type } = req.body
 
@@ -192,9 +209,25 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res
       return res.status(404).json({ error: 'Ticket not found' })
     }
 
+    // Get productId via feature -> epic for issueKey generation
+    const [feature] = await db.select({ epicId: features.epicId })
+      .from(features).where(eq(features.id, featureId)).limit(1)
+    if (!feature) {
+      return res.status(404).json({ error: 'Feature not found' })
+    }
+    const [epic] = await db.select({ productId: epics.productId })
+      .from(epics).where(eq(epics.id, feature.epicId)).limit(1)
+    if (!epic) {
+      return res.status(404).json({ error: 'Epic not found' })
+    }
+
+    const issueKey = await generateIssueKey(epic.productId)
+
     // Create dev task
     const [task] = await db.insert(devTasks).values({
+      tenantId,
       featureId,
+      issueKey,
       title: title || `Bug from ticket: ${ticket.title}`,
       description: description || ticket.description || '',
       type: type || 'bug',
@@ -204,6 +237,7 @@ taskRoutes.post('/spawn-from-ticket/:ticketId', requireInternal, async (req, res
 
     // Link ticket to task
     await db.insert(supportTicketTasks).values({
+      tenantId,
       ticketId: parseInt(ticketId),
       taskId: task.id,
     })

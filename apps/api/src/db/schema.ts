@@ -63,7 +63,9 @@ export const products = pgTable('products', {
   id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   name: text('name').notNull(),
+  code: text('code').notNull(), // e.g., 'TSKLTS', 'CSUP' - used for issue keys
   description: text('description'),
+  nextIssueNum: integer('next_issue_num').default(1), // Auto-increment for issue keys
   createdAt: timestamp('created_at').defaultNow(),
 })
 
@@ -142,6 +144,8 @@ export const epics = pgTable('epics', {
   id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
+  issueKey: text('issue_key').unique(), // e.g., 'TSKLTS-001'
+  beadsId: text('beads_id'), // Link to beads CLI issue
   title: text('title').notNull(),
   description: text('description'),
   status: text('status', {
@@ -162,6 +166,8 @@ export const features = pgTable('features', {
   id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   epicId: integer('epic_id').references(() => epics.id).notNull(),
+  issueKey: text('issue_key').unique(), // e.g., 'TSKLTS-002'
+  beadsId: text('beads_id'), // Link to beads CLI issue
   title: text('title').notNull(),
   description: text('description'),
   status: text('status', {
@@ -182,6 +188,8 @@ export const devTasks = pgTable('dev_tasks', {
   id: serial('id').primaryKey(),
   tenantId: integer('tenant_id').references(() => tenants.id).notNull(),
   featureId: integer('feature_id').references(() => features.id).notNull(),
+  issueKey: text('issue_key').unique(), // e.g., 'TSKLTS-003'
+  beadsId: text('beads_id'), // Link to beads CLI issue
   sprintId: integer('sprint_id'), // null = backlog, set = assigned to sprint
   title: text('title').notNull(),
   description: text('description'),

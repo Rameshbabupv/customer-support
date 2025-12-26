@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import { db } from '../db/index.js'
-import { features } from '../db/schema.js'
+import { features, epics } from '../db/schema.js'
 import { eq, desc } from 'drizzle-orm'
 import { authenticate, requireInternal } from '../middleware/auth.js'
+import { generateIssueKey } from '../utils/issue-key.js'
 
 export const featureRoutes = Router()
 
@@ -19,9 +20,19 @@ featureRoutes.post('/', requireInternal, async (req, res) => {
       return res.status(400).json({ error: 'epicId and title are required' })
     }
 
+    // Get productId from epic for issueKey generation
+    const [epic] = await db.select({ productId: epics.productId })
+      .from(epics).where(eq(epics.id, epicId)).limit(1)
+    if (!epic) {
+      return res.status(404).json({ error: 'Epic not found' })
+    }
+
+    const issueKey = await generateIssueKey(epic.productId)
+
     const [feature] = await db.insert(features).values({
       tenantId,
       epicId,
+      issueKey,
       title,
       description,
       priority: priority || 3,
