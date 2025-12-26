@@ -17,7 +17,7 @@ RUN npm run build
 # expose ports for all services
 EXPOSE 3000 3003 4000
 
-# start API in production mode
-WORKDIR /app/apps/api
+# start all services (API + frontend previews)
+WORKDIR /app
 CMD ["npm", "start"]
 

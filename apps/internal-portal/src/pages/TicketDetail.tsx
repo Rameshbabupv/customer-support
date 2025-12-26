@@ -143,7 +143,7 @@ export default function TicketDetail() {
   }
 
   const handleEpicChange = (epicId: string) => {
-    setSelectedEpicId(epicId)
+    setSelectedEpicId(epicId ? parseInt(epicId) : '')
     setSelectedFeatureId('')
     setFeatures([])
     if (epicId) {
